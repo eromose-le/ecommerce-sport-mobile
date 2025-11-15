@@ -4,7 +4,8 @@ import { ActivityIndicator, View } from "react-native";
 import { ErrorBoundary } from "@/components/common/ErrorBoundary";
 
 export default function ProtectedLayout() {
-  const { user, loading } = useAuth();
+  const { user, loading, skippedLogin } = useAuth();
+  console.log("(PROTECTED) _layout ==::", { user, loading, skippedLogin });
 
   if (loading) {
     return (
@@ -13,9 +14,12 @@ export default function ProtectedLayout() {
       </View>
     );
   }
+  if (skippedLogin) {
+    return <Redirect href="/(public)/(tabs-public)" />;
+  }
 
   if (!user) {
-    return <Redirect href="/(public)/(tabs-public)" />;
+    return <Redirect href="/(auth)/sign-in" />;
   }
 
   return (

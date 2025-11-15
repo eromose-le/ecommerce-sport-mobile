@@ -7,7 +7,7 @@ export default function SignUp() {
       <Text className="text-2xl mb-6">Sign Up</Text>
 
       <TouchableOpacity
-        onPress={() => router.push("/(public)/sign-in")}
+        onPress={() => router.push("../sign-in")}
         className="px-6 py-3 bg-black rounded-lg"
       >
         <Text className="text-white">Back to Sign In</Text>

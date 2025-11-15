@@ -1,8 +1,4 @@
 import { Tabs } from "expo-router";
-import HomeIcon from "@/assets/icons/home.svg";
-import CartIcon from "@/assets/icons/cart.svg";
-import NotificationIcon from "@/assets/icons/notification.svg";
-import ProfileIcon from "@/assets/icons/profile.svg";
 
 export default function ProtectedTabs() {
   return (

@@ -5,32 +5,39 @@ import { User } from "@/types/user";
 interface AuthContextProps {
   user: User | null;
   loading: boolean;
+  skippedLogin: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
+  skipLogin: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextProps | null>(null);
 
-const DUMMY_USER_ACCOUNT = { id: "1", email: "" };
+// const DUMMY_USER_ACCOUNT = { id: "1", email: "" };
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [skippedLogin, setSkippedLogin] = useState(false);
 
   useEffect(() => {
-    const loadUser = async () => {
-      try {
-        const data = await SecureStore.getItemAsync("user");
-        if (data) setUser(JSON.parse(data));
-      } catch (e) {
-        console.log("SecureStore error:", e);
-      } finally {
-        setLoading(false);
-      }
+    const load = async () => {
+      const storedUser = await SecureStore.getItemAsync("user");
+      const storedSkip = await SecureStore.getItemAsync("skippedLogin");
+
+      if (storedUser) setUser(JSON.parse(storedUser));
+      if (storedSkip === "true") setSkippedLogin(true);
+
+      setLoading(false);
     };
 
-    loadUser();
+    load();
   }, []);
+
+  const skipLogin = async () => {
+    setSkippedLogin(true);
+    await SecureStore.setItemAsync("skippedLogin", "true");
+  };
 
   const login = async (email: string, password: string) => {
     const loggedInUser = { id: "1", email };
@@ -44,7 +51,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
+    <AuthContext.Provider
+      value={{ user, loading, skippedLogin, login, logout, skipLogin }}
+    >
       {children}
     </AuthContext.Provider>
   );
