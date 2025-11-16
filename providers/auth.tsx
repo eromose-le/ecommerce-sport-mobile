@@ -6,9 +6,10 @@ interface AuthContextProps {
   user: User | null;
   loading: boolean;
   skippedLogin: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<User>;
   logout: () => Promise<void>;
   skipLogin: () => Promise<void>;
+  unSkipLogin: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextProps | null>(null);
@@ -39,10 +40,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     await SecureStore.setItemAsync("skippedLogin", "true");
   };
 
+  const unSkipLogin = async () => {
+    setSkippedLogin(false);
+    await SecureStore.deleteItemAsync("skippedLogin");
+  };
+
   const login = async (email: string, password: string) => {
     const loggedInUser = { id: "1", email };
     setUser(loggedInUser);
     await SecureStore.setItemAsync("user", JSON.stringify(loggedInUser));
+
+    return loggedInUser;
   };
 
   const logout = async () => {
@@ -52,7 +60,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <AuthContext.Provider
-      value={{ user, loading, skippedLogin, login, logout, skipLogin }}
+      value={{
+        user,
+        loading,
+        skippedLogin,
+        login,
+        logout,
+        skipLogin,
+        unSkipLogin,
+      }}
     >
       {children}
     </AuthContext.Provider>

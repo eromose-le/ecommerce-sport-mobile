@@ -9,13 +9,14 @@ interface ProductCardProps {
   horizontal?: boolean;
   width?: number;
   index?: number;
+  onAddToCart?: () => void; // optional callback
 }
 
 export const ProductCard: React.FC<ProductCardProps> = ({
   product,
   horizontal = false,
   width,
-  index,
+  onAddToCart,
 }) => {
   return (
     <Link
@@ -23,6 +24,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         pathname: `/product/[id]`,
         params: { id: product.id, product: JSON.stringify(product) },
       }}
+      // href={`/(protected)/product/${product.id.toString()}` as any} // simpler & works perfectly
       asChild
     >
       <TouchableOpacity
@@ -55,7 +57,14 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             ${product.price.toFixed(2)}
           </Text>
 
-          <TouchableOpacity className="p-1 bg-black rounded-full">
+          {/* Separate button for add-to-cart to avoid blocking Link */}
+          <TouchableOpacity
+            className="p-1 bg-black rounded-full"
+            onPress={(e) => {
+              e.stopPropagation(); // prevent triggering the Link
+              onAddToCart?.();
+            }}
+          >
             <Ionicons name="add" size={16} color="white" />
           </TouchableOpacity>
         </View>

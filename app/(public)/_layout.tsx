@@ -5,8 +5,8 @@ import { ErrorBoundary } from "@/components/common/ErrorBoundary";
 import "../global.css";
 
 export default function PublicLayout() {
-  const { user, loading, skippedLogin } = useAuth();
-  console.log("(PUBLIC) _layout ==::", { user, loading, skippedLogin });
+  const { user, loading } = useAuth();
+  console.log("(PUBLIC) _layout ==::", { user, loading });
 
   // Show loader while auth state is loading
   if (loading) {
@@ -20,10 +20,6 @@ export default function PublicLayout() {
   // Navigate automatically if logged in or skipped
   if (user) {
     return <Redirect href="/(protected)/(tabs-protected)" />;
-  }
-
-  if (skippedLogin) {
-    return <Redirect href="/(public)/(tabs-public)" />;
   }
 
   // Default: show public stack (SignIn / SignUp / Splash)

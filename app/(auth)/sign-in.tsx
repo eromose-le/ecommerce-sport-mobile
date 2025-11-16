@@ -1,16 +1,32 @@
 import { View, Text, TouchableOpacity, ActivityIndicator } from "react-native";
 import { useAuth } from "@/providers/auth";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { router } from "expo-router";
 
 export default function SignIn() {
-  const { login, user, skipLogin } = useAuth();
+  const { login, user, skipLogin, skippedLogin } = useAuth();
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      router.push("/(protected)/(tabs-protected)");
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (skippedLogin) {
+      router.push("/(public)/(tabs-public)");
+    }
+  }, [skippedLogin]);
 
   const handleLogin = async () => {
     setLoading(true);
     try {
-      await login("demo@email.com", "password");
+      const loggedInUser = await login("demo@email.com", "password"); // return user from login
+      if (loggedInUser) {
+        router.push("/(protected)/(tabs-protected)");
+      }
     } catch (err) {
       console.error("Login failed:", err);
     } finally {
@@ -21,11 +37,11 @@ export default function SignIn() {
   console.log("login", { login, user, skipLogin });
 
   const handleSkip = () => {
-    skipLogin?.();
+    skipLogin();
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView className="flex-1 bg-blue-300">
       <View className="flex-1 items-center justify-center p-6">
         <Text className="text-2xl mb-6 text-red-100">Sign In</Text>
 
