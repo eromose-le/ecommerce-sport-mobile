@@ -1,3 +1,4 @@
+import { PRODUCT_DETAIL } from "@/constants/urls";
 import { Product } from "@/types/product";
 import { Ionicons } from "@expo/vector-icons";
 import { Link } from "expo-router";
@@ -21,7 +22,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   return (
     <Link
       href={{
-        pathname: `/product/[id]`,
+        pathname: PRODUCT_DETAIL,
         params: { id: product.id, product: JSON.stringify(product) },
       }}
       // href={`/(protected)/product/${product.id.toString()}` as any} // simpler & works perfectly

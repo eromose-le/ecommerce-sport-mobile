@@ -3,13 +3,14 @@ import { useRouter } from "expo-router";
 import React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import { SvgIcon } from "../common/SvgIcon";
+import { CART } from "@/constants/urls";
 
 const CartButton = () => {
   const router = useRouter();
 
   return (
     <TouchableOpacity
-      onPress={() => router.push("/(tabs)/cart")}
+      onPress={() => router.push(CART)}
       className="relative p-3 rounded-full bg-transparent border border-[#0000001A]"
     >
       <SvgIcon Icon={CartIcon} size={22} color={"#000"} />

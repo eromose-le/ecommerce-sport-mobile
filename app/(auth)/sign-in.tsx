@@ -3,6 +3,7 @@ import { useAuth } from "@/providers/auth";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useEffect, useState } from "react";
 import { router } from "expo-router";
+import { TABS_PROTECTED, TABS_PUBLIC } from "@/constants/urls";
 
 export default function SignIn() {
   const { login, user, skipLogin, skippedLogin } = useAuth();
@@ -10,13 +11,13 @@ export default function SignIn() {
 
   useEffect(() => {
     if (user) {
-      router.push("/(protected)/(tabs-protected)");
+      router.push(TABS_PROTECTED);
     }
   }, [user]);
 
   useEffect(() => {
     if (skippedLogin) {
-      router.push("/(public)/(tabs-public)");
+      router.push(TABS_PUBLIC);
     }
   }, [skippedLogin]);
 
@@ -25,7 +26,7 @@ export default function SignIn() {
     try {
       const loggedInUser = await login("demo@email.com", "password"); // return user from login
       if (loggedInUser) {
-        router.push("/(protected)/(tabs-protected)");
+        router.push(TABS_PROTECTED);
       }
     } catch (err) {
       console.error("Login failed:", err);

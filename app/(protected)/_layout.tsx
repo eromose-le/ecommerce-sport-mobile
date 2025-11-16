@@ -2,6 +2,7 @@ import { Slot, Redirect } from "expo-router";
 import { useAuth } from "@/providers/auth";
 import { ActivityIndicator, View } from "react-native";
 import { ErrorBoundary } from "@/components/common/ErrorBoundary";
+import { SIGN_IN, TABS_PUBLIC } from "@/constants/urls";
 
 export default function ProtectedLayout() {
   const { user, loading, skippedLogin } = useAuth();
@@ -15,11 +16,11 @@ export default function ProtectedLayout() {
     );
   }
   if (skippedLogin) {
-    return <Redirect href="/(public)/(tabs-public)" />;
+    return <Redirect href={TABS_PUBLIC} />;
   }
 
   if (!user) {
-    return <Redirect href="/(auth)/sign-in" />;
+    return <Redirect href={SIGN_IN} />;
   }
 
   return (

@@ -3,6 +3,7 @@ import { useAuth } from "@/providers/auth";
 import { ActivityIndicator, View } from "react-native";
 import { ErrorBoundary } from "@/components/common/ErrorBoundary";
 import "../global.css";
+import { TABS_PROTECTED } from "@/constants/urls";
 
 export default function PublicLayout() {
   const { user, loading } = useAuth();
@@ -19,7 +20,7 @@ export default function PublicLayout() {
 
   // Navigate automatically if logged in or skipped
   if (user) {
-    return <Redirect href="/(protected)/(tabs-protected)" />;
+    return <Redirect href={TABS_PROTECTED} />;
   }
 
   // Default: show public stack (SignIn / SignUp / Splash)

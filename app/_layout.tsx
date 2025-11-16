@@ -24,7 +24,7 @@ function RootContent() {
     Jost_600SemiBold,
     Jost_700Bold,
   });
-  const { loading, skipLogin } = useAuth();
+  const { loading } = useAuth();
 
   useEffect(() => {
     async function prepare() {

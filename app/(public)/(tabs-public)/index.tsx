@@ -3,6 +3,7 @@ import { BackButton } from "@/components/common/BackButton";
 import { SvgIcon } from "@/components/common/SvgIcon";
 import { Title } from "@/components/common/Title";
 import { ProductGrid } from "@/components/product/ProductGrid";
+import { SIGN_IN } from "@/constants/urls";
 import { products } from "@/helpers/data";
 import { useAuth } from "@/providers/auth";
 import { Ionicons } from "@expo/vector-icons";
@@ -37,7 +38,7 @@ export default function PublicHome() {
           <BackButton
             onPress={() => {
               unSkipLogin();
-              router.push("/(auth)/sign-in");
+              router.push(SIGN_IN);
             }}
           />
         </View>
