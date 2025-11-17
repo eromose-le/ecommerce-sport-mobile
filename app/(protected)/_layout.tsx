@@ -1,11 +1,12 @@
-import { Slot, Redirect } from "expo-router";
-import { useAuth } from "@/providers/auth";
-import { ActivityIndicator, View } from "react-native";
+import AppLoader from "@/components/common/AppLoader";
 import { ErrorBoundary } from "@/components/common/ErrorBoundary";
 import { SIGN_IN, TABS_PUBLIC } from "@/constants/urls";
 import { useAppState } from "@/hooks/useAppState";
 import { useAuthUser } from "@/hooks/useAuthUser";
+import { useAuth } from "@/providers/auth";
 import { Logger } from "@/utils/logger";
+import { Redirect, Slot } from "expo-router";
+import { View } from "react-native";
 
 export default function ProtectedLayout() {
   const { user, loading, skippedLogin } = useAuth();
@@ -20,7 +21,7 @@ export default function ProtectedLayout() {
   if (loading) {
     return (
       <View className="items-center justify-center flex-1">
-        <ActivityIndicator size="small" />
+        <AppLoader />
       </View>
     );
   }

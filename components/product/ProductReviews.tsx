@@ -17,34 +17,34 @@ export default function ProductReviews({ reviews }: any) {
         <Text className="text-base text-primary font-jost">Very satisfied</Text>
       </View>
 
-      {reviews.map((item: any) => (
-        <View key={item.id} className="mt-6">
+      {reviews?.map((item: any) => (
+        <View key={item?.id} className="mt-6">
           <View className="flex-row items-center gap-3">
             <Image
-              source={{ uri: item.avatar }}
+              source={{ uri: item?.avatar }}
               className="bg-gray-200 rounded-full w-11 h-11"
             />
             <View>
               <Text className="text-sm font-jost-semibold">
-                {item.username}
+                {item?.username}
               </Text>
-              <Text className="text-xs text-primary">{item.date}</Text>
+              <Text className="text-xs text-primary">{item?.date}</Text>
             </View>
           </View>
 
           <View className="flex-row items-center mt-3 mb-2">
-            {Array.from({ length: 5 }).map((_, i) => (
+            {Array.from({ length: 5 })?.map((_, i) => (
               <Ionicons
                 key={i}
                 name="star"
                 size={16}
-                color={i < item.rating ? "#A8C302" : "#ddd"}
+                color={i < item?.rating ? "#A8C302" : "#ddd"}
               />
             ))}
           </View>
 
           <Text className="mt-1 text-xs leading-6 text-primary">
-            {item.comment}
+            {item?.comment}
           </Text>
         </View>
       ))}

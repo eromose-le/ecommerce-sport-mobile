@@ -9,15 +9,12 @@ import ProductDetailActions from "@/components/product/ProductDetailActions";
 import ProductGallery from "@/components/product/ProductGallery";
 import ProductReviews from "@/components/product/ProductReviews";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Logger } from "@/utils/logger";
 import { products } from "@/lib/dummy-data";
 import { formatCurrency } from "@/utils/currency";
 
 export default function ProductDetail() {
   const { product } = useLocalSearchParams() as any;
   const item = JSON.parse(product);
-
-  Logger.warn("product", item);
 
   return (
     <SafeAreaView className="flex-1 bg-background">

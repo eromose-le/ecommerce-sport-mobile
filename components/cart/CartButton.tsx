@@ -1,16 +1,18 @@
 import CartIcon from "@/assets/icons/cart.svg";
 import { useRouter } from "expo-router";
-import React from "react";
+import React, { FC } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import { SvgIcon } from "../common/SvgIcon";
-import { CART } from "@/constants/urls";
+import { CART_PROTECTED, CART_PUBLIC } from "@/constants/urls";
+import { useAuthUser } from "@/hooks/useAuthUser";
 
-const CartButton = () => {
+const CartButton: FC = () => {
   const router = useRouter();
+  const { user } = useAuthUser();
 
   return (
     <TouchableOpacity
-      onPress={() => router.push(CART)}
+      onPress={() => router.push(!!user ? CART_PROTECTED : CART_PUBLIC)}
       className="relative p-3 rounded-full bg-transparent border border-[#0000001A]"
     >
       <SvgIcon Icon={CartIcon} size={22} color={"#000"} />

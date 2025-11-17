@@ -1,6 +1,9 @@
-import { Slot } from "expo-router";
+import AppLoader from "@/components/common/AppLoader";
+import { ErrorBoundary } from "@/components/common/ErrorBoundary";
+import { toastConfig } from "@/components/common/ToastConfig";
 import { AuthProvider, useAuth } from "@/providers/auth";
-import { useEffect, useState } from "react";
+import { QueryProvider } from "@/providers/query";
+import { Logger } from "@/utils/logger";
 import {
   Jost_400Regular,
   Jost_500Medium,
@@ -8,14 +11,13 @@ import {
   Jost_700Bold,
   useFonts,
 } from "@expo-google-fonts/jost";
+import { Slot } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
-import { ActivityIndicator, View } from "react-native";
-import { ErrorBoundary } from "@/components/common/ErrorBoundary";
 import { StatusBar } from "expo-status-bar";
-import "./global.css";
-import { QueryProvider } from "@/providers/query";
+import { useEffect, useState } from "react";
+import { View } from "react-native";
 import ToastManager from "toastify-react-native";
-import { toastConfig } from "@/components/common/ToastConfig";
+import "./global.css";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -42,13 +44,13 @@ function RootContent() {
   if (!fontsLoaded || loading || !appIsReady) {
     return (
       <View className="items-center justify-center flex-1 bg-white">
-        <ActivityIndicator size="small" />
+        <AppLoader />
         <StatusBar style="dark" />
       </View>
     );
   }
 
-  console.log("(APP _content) ==::", { fontsLoaded, appIsReady, loading });
+  Logger.warn("(APP _content) ==::", { fontsLoaded, appIsReady, loading });
   return (
     <>
       <StatusBar style="dark" />
@@ -58,7 +60,7 @@ function RootContent() {
 }
 
 export default function RootLayout() {
-  console.log("(APP _LAYOUT) ==::");
+  Logger.warn("(APP _LAYOUT) ==::");
   return (
     <ErrorBoundary>
       <QueryProvider>

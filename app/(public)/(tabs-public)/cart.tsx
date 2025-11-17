@@ -1,5 +1,5 @@
-import CartEmpty from "@/components/cart/CartEmpty";
+import Cart from "@/components/cart/Cart";
 
 export default function PublicCart() {
-  return <CartEmpty />;
+  return <Cart />;
 }

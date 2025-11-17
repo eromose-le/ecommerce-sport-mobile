@@ -12,7 +12,7 @@ export default function ProductAttributes({
       <Text className="mb-3 text-lg font-jost-bold">Key attributes</Text>
 
       <View className="border">
-        {attributes.map((attr, i) => (
+        {attributes?.map((attr, i) => (
           <View
             key={i}
             className="flex-row bg-white border-b border-b-black last:border-b-0"

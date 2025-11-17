@@ -1,12 +1,13 @@
 import * as React from "react";
-import { View, Text } from "react-native";
+import { View } from "react-native";
+import AppLoader from "./AppLoader";
 
 export function ErrorBoundary({ children }: { children: React.ReactNode }) {
   return (
     <React.Suspense
       fallback={
-        <View className="flex-1 items-center justify-center">
-          <Text>Loading...</Text>
+        <View className="items-center justify-center flex-1">
+          <AppLoader />
         </View>
       }
     >

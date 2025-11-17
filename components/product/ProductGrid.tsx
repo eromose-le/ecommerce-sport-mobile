@@ -1,3 +1,4 @@
+import { Product } from "@/services/product/product.types";
 import React from "react";
 import {
   ActivityIndicator,
@@ -5,9 +6,10 @@ import {
   useWindowDimensions,
   View,
 } from "react-native";
+import { EmptyState } from "../common/EmptyState";
+import { ErrorState } from "../common/ErrorState";
 import { ProductCard } from "./ProductCard";
 import { SkeletonCard } from "./SkeletonCard";
-import { Product } from "@/services/product/product.types";
 
 interface ProductGridProps {
   data: Product[];
@@ -19,6 +21,9 @@ interface ProductGridProps {
   loadingMore?: boolean; // NEW → Infinite scroll loader
   onEndReached?: () => void;
   skeletonCount?: number; // NEW → How many skeletons to show
+
+  error?: any;
+  onRetry?: () => void;
 }
 
 export const ProductGrid: React.FC<ProductGridProps> = ({
@@ -31,6 +36,9 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
   loadingMore = false,
   skeletonCount = 6,
   onEndReached,
+
+  error,
+  onRetry,
 }) => {
   const { width } = useWindowDimensions();
 
@@ -43,6 +51,22 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
     id: `skeleton-${i}`,
     skeleton: true,
   }));
+
+  if (error) {
+    return (
+      <>
+        <ErrorState error={error} onRetry={onRetry} />
+      </>
+    );
+  }
+
+  if (!loading && (!data || data.length === 0)) {
+    return (
+      <>
+        <EmptyState error={"No Product Found"} onRetry={onRetry} />;
+      </>
+    );
+  }
 
   return (
     <FlatList

@@ -1,18 +1,13 @@
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  TextInput,
-  ActivityIndicator,
-} from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import AppLoader from "@/components/common/AppLoader";
+import { SIGN_UP, TABS_PROTECTED, TABS_PUBLIC } from "@/constants/urls";
 import { useAuth } from "@/providers/auth";
-import { useEffect, useState } from "react";
+import { api } from "@/services/api/api";
+import { Logger } from "@/utils/logger";
 import { useMutation } from "@tanstack/react-query";
 import { router } from "expo-router";
-import { api } from "@/services/api/api";
-import { TABS_PROTECTED, TABS_PUBLIC } from "@/constants/urls";
-import { Logger } from "@/utils/logger";
+import { useEffect, useState } from "react";
+import { Text, TextInput, TouchableOpacity, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function SignIn() {
   const { login, user, skipLogin, skippedLogin } = useAuth();
@@ -20,21 +15,18 @@ export default function SignIn() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  // Full-screen loading overlay
   const [loadingOverlay, setLoadingOverlay] = useState(false);
 
-  // Redirect if already authenticated or skipped
+  // Redirect if already authenticated
   useEffect(() => {
     if (user) router.push(TABS_PROTECTED);
   }, [user]);
 
+  // Redirect if skipped
   useEffect(() => {
     if (skippedLogin) router.push(TABS_PUBLIC);
   }, [skippedLogin]);
 
-  //
-  // 🚀 React Query Login Mutation
-  //
   const mutation = useMutation({
     mutationFn: async () => {
       const res = await api.post("/auth/login", { email, password });
@@ -42,26 +34,25 @@ export default function SignIn() {
     },
     onMutate: () => setLoadingOverlay(true),
     onSuccess: async (data) => {
-      // Sync with your AuthProvider -> Zustand + SecureStore
-      console.log("data", data);
       await login(data?.data);
 
       router.push(TABS_PROTECTED);
     },
     onError: (err: any) => {
-      Logger.error("LOGIN ERR", err);
-      console.log("LOGIN ERROR:", err?.response?.data || err.message);
+      Logger.error("LOGIN ERROR:", err?.response?.data || err.message);
     },
     onSettled: () => setLoadingOverlay(false),
   });
 
   const handleLogin = () => {
     if (!email || !password) {
-      console.log("Email & password required");
+      Logger.warn("Email & password required");
       return;
     }
     mutation.mutate();
   };
+
+  const handleRegister = () => router.push(SIGN_UP);
 
   const handleSkip = () => skipLogin();
 
@@ -102,18 +93,30 @@ export default function SignIn() {
           </Text>
         </TouchableOpacity>
 
-        {/* Skip */}
-        <TouchableOpacity onPress={handleSkip} disabled={mutation.isPending}>
-          <Text className="text-base text-blue-600 underline">
-            Skip for now
-          </Text>
-        </TouchableOpacity>
+        <View className="flex-col items-center gap-3">
+          {/* Sign up */}
+          <TouchableOpacity
+            onPress={handleRegister}
+            disabled={mutation.isPending}
+          >
+            <Text className="text-base underline text-primary">
+              Create Account
+            </Text>
+          </TouchableOpacity>
+
+          {/* Skip */}
+          <TouchableOpacity onPress={handleSkip} disabled={mutation.isPending}>
+            <Text className="text-base underline text-secondary">
+              Skip for now ?
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       {/* FULLSCREEN LOADING OVERLAY */}
       {loadingOverlay && (
         <View className="absolute inset-0 items-center justify-center bg-black/20">
-          <ActivityIndicator size="small" color="#000" />
+          <AppLoader />
         </View>
       )}
     </SafeAreaView>
