@@ -6,8 +6,12 @@ import {
   ILoginUserResponse,
   IResendSignupOtpPayload,
   IResendSignupOtpResponse,
+  IRequestPasswordResetPayload,
+  IRequestPasswordResetResponse,
   IVerifySignupOtpPayload,
   IVerifySignupOtpResponse,
+  IVerifyPasswordResetPayload,
+  IVerifyPasswordResetResponse,
 } from "@/services/auth/auth.types";
 import { Logger } from "@/utils/logger";
 
@@ -76,4 +80,39 @@ export const resendSignupOtp = async (
 
 export const logoutUser = async () => {
   return api.post("/auth/logout");
+};
+
+export const requestPasswordReset = async (
+  payload: IRequestPasswordResetPayload
+): Promise<IRequestPasswordResetResponse> => {
+  try {
+    const res = await api.post("/auth/send-reset-password-code", payload);
+
+    if (!res.data?.success)
+      throw new Error(res.data?.error || "Unable to send reset code");
+
+    return res.data;
+  } catch (error) {
+    Logger.error("requestPasswordReset Error", error);
+    throw error;
+  }
+};
+
+export const verifyPasswordResetCode = async (
+  payload: IVerifyPasswordResetPayload
+): Promise<IVerifyPasswordResetResponse> => {
+  try {
+    const res = await api.post(
+      "/auth/validate-reset-password-code",
+      payload
+    );
+
+    if (!res.data?.success)
+      throw new Error(res.data?.error || "Password reset failed");
+
+    return res.data;
+  } catch (error) {
+    Logger.error("verifyPasswordResetCode Error", error);
+    throw error;
+  }
 };

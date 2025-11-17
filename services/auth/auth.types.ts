@@ -31,3 +31,17 @@ export interface IResendSignupOtpPayload {
 }
 
 export type IResendSignupOtpResponse = ServerResponse<null>;
+
+export interface IRequestPasswordResetPayload {
+  email: string;
+}
+
+export type IRequestPasswordResetResponse = ServerResponse<{ email: string }>;
+
+export interface IVerifyPasswordResetPayload {
+  email: string;
+  code: string;
+  newPassword: string;
+}
+
+export type IVerifyPasswordResetResponse = ServerResponse<{ email: string }>;

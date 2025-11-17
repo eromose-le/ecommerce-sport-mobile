@@ -2,6 +2,7 @@ import DirectLeftIcon from "@/assets/icons/direct-left.svg";
 import AppLoader from "@/components/common/AppLoader";
 import { SvgIcon } from "@/components/common/SvgIcon";
 import {
+  FORGOT_PASSWORD,
   ON_BOARDING,
   SIGN_UP,
   TABS_PROTECTED,
@@ -95,7 +96,7 @@ export default function SignIn() {
       <Image
         source={require("@/assets/images/onboarding/slide3.png")}
         className="absolute top-0 left-0 right-0 w-full"
-        style={{ height: height * 0.50 }}
+        style={{ height: height * 0.5 }}
         resizeMode="cover"
       />
 
@@ -154,7 +155,15 @@ export default function SignIn() {
             </View>
 
             <View className="items-center w-full mt-4">
-              <TouchableOpacity disabled={loginMutation.isPending}>
+              <TouchableOpacity
+                disabled={loginMutation.isPending}
+                onPress={() =>
+                  router.push({
+                    pathname: FORGOT_PASSWORD,
+                    params: { email: form.email },
+                  })
+                }
+              >
                 <Text className="text-xs underline mb-7 text-primary font-jost-medium">
                   Forgot password?
                 </Text>

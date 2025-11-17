@@ -13,3 +13,5 @@ export const SIGN_IN = "/(auth)/sign-in";
 export const SIGN_UP = "/(auth)/sign-up";
 export const ON_BOARDING = "/(auth)/on-boarding";
 export const VERIFY_OTP = "/(auth)/verify-otp";
+export const FORGOT_PASSWORD = "/(auth)/forgot-password";
+export const RESET_PASSWORD = "/(auth)/reset-password";

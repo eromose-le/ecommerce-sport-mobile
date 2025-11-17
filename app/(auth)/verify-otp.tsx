@@ -191,11 +191,13 @@ export default function VerifyOtp() {
               <TextInput
                 placeholder="eg. name@domain.com"
                 placeholderTextColor="#9CA3AF"
-                className="flex-1 min-w-[220px] flex-row items-center justify-center px-4 py-3 text-xs bg-white border-[0.34px] border-[#DEE2E6] rounded font-jost h-[44px]"
+                className="flex-1 min-w-[220px] flex-row items-center justify-center px-4 py-3 text-xs bg-white border-[0.34px] border-[#DEE2E6] rounded font-jost h-[44px] text-[#aaa]"
                 value={form.email}
                 onChangeText={updateEmail}
                 autoCapitalize="none"
                 keyboardType="email-address"
+                editable={false}
+                selectTextOnFocus={false}
               />
             </View>
 
