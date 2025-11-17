@@ -95,11 +95,11 @@ export default function SignIn() {
       <Image
         source={require("@/assets/images/onboarding/slide3.png")}
         className="absolute top-0 left-0 right-0 w-full"
-        style={{ height: height * 0.53 }}
+        style={{ height: height * 0.50 }}
         resizeMode="cover"
       />
 
-      <SafeAreaView className="flex-1" style={{ marginTop: height * 0.48 }}>
+      <SafeAreaView className="flex-1" style={{ marginTop: height * 0.46 }}>
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : undefined}
           className="flex-1"

@@ -65,7 +65,7 @@ export default function OnBoarding() {
                 resizeMode="cover"
                 style={{
                   width: "100%",
-                  height: height * 0.53, // covers full top area
+                  height: height * 0.50, // covers full top area
                 }}
               />
             </View>
@@ -87,9 +87,9 @@ export default function OnBoarding() {
       </SafeAreaView>
 
       {/* Content area BELOW the image, inside safe area */}
-      <SafeAreaView style={{ flex: 1, marginTop: height * 0.48 }}>
+      <SafeAreaView style={{ flex: 1, marginTop: height * 0.46 }}>
         {/* Pagination Dots */}
-        <View className="flex-row justify-center mb-4 space-x-1">
+        <View className="flex-row justify-center mb-12 space-x-1">
           {onboardingSlides.map((_, i) => (
             <View
               key={i}
@@ -109,7 +109,7 @@ export default function OnBoarding() {
             </Text>
           </Text>
 
-          <View className="items-center gap-2 mt-5 space-y-3">
+          <View className="items-center gap-3 mt-5 space-y-3">
             {onboardingSlides[index].bullets.map((line: any, idx: number) => (
               <View key={idx} className="flex-row items-center gap-2 space-x-2">
                 <Text className="text-lg text-green-600">
