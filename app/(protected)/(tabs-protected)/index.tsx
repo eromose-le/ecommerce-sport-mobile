@@ -72,12 +72,17 @@ export default function ProtectedHome() {
             >
               <Text className="font-semibold text-white">{userName[0]}</Text>
             </TouchableOpacity>
-            <TouchableOpacity
-              onPress={logout}
-              className="items-center justify-center"
-            >
-              <SvgIcon Icon={LogoutIcon} size={28} />
-            </TouchableOpacity>
+            <View>
+              <TouchableOpacity
+                onPress={logout}
+                className="items-center justify-center"
+              >
+                <SvgIcon Icon={LogoutIcon} size={28} />
+              </TouchableOpacity>
+              <Text className="mb-3 text-xs font-light text-secondary font-jost">
+                Log out
+              </Text>
+            </View>
           </View>
         </View>
 

@@ -1,19 +1,25 @@
-import { SIGN_IN, SIGN_UP, TABS_PUBLIC } from "@/constants/urls";
+import GoodIcon from "@/assets/icons/good.svg";
+import { SvgIcon } from "@/components/common/SvgIcon";
+import { SIGN_IN, SIGN_UP } from "@/constants/urls";
 import { onboardingSlides } from "@/lib/dummy-data";
+import { useAuth } from "@/providers/auth";
 import { router } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import {
   Dimensions,
   FlatList,
   Image,
+  StatusBar,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-const { width } = Dimensions.get("window");
+const { width, height } = Dimensions.get("window");
 
 export default function OnBoarding() {
+  const { skipLogin } = useAuth();
   const [index, setIndex] = useState(0);
   const flatRef = useRef<FlatList>(null);
 
@@ -35,84 +41,112 @@ export default function OnBoarding() {
 
   return (
     <View className="flex-1 bg-white">
-      {/* Skip Button */}
-      <View className="absolute z-20 top-4 right-4">
-        <TouchableOpacity onPress={() => router.replace(TABS_PUBLIC)}>
-          <Text className="mt-12 text-xl underline font-jost-semibold text-background">
-            Skip
-          </Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Image slider */}
-      <FlatList
-        ref={flatRef}
-        data={onboardingSlides}
-        keyExtractor={(item) => item.id.toString()}
-        horizontal
-        pagingEnabled
-        showsHorizontalScrollIndicator={false}
-        onScroll={onScroll}
-        renderItem={({ item }) => (
-          <View style={{ width }} className="flex-1">
-            <Image
-              source={item.image}
-              className="h-[60%] w-full"
-              resizeMode="cover"
-            />
-
-            {/* Pagination Dots */}
-            <View className="flex-row justify-center mt-3 mb-4 space-x-1">
-              {onboardingSlides.map((_, i) => (
-                <View
-                  key={i}
-                  className={`h-1.5 rounded-full ${
-                    index === i ? "bg-black w-6" : "bg-gray-300 w-2"
-                  }`}
-                />
-              ))}
-            </View>
-
-            {/* Text content */}
-            <View className="items-center px-6 mt-10">
-              <Text className="text-center text-[24px] font-jost-bold max-w-60">
-                {item.title}{" "}
-                <Text className="font-extrabold">{item.highlight}</Text>
-              </Text>
-
-              <View className="items-center gap-2 mt-5 space-y-3">
-                {item.bullets.map((line: any, idx: number) => (
-                  <View
-                    key={idx}
-                    className="flex-row items-center gap-2 space-x-2"
-                  >
-                    <Text className="text-lg text-green-600">✔</Text>
-                    <Text className="text-base font-jost">{line}</Text>
-                  </View>
-                ))}
-              </View>
-            </View>
-          </View>
-        )}
+      <StatusBar
+        barStyle="light-content"
+        backgroundColor="transparent"
+        translucent
       />
 
-      {/* Bottom Buttons */}
-      <View className="px-6 mb-10">
-        <TouchableOpacity
-          onPress={() => router.push(SIGN_UP)}
-          className="py-4 bg-black rounded-lg"
-        >
-          <Text className="text-base text-center text-white font-jost-medium">
-            Sign up
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity onPress={() => router.push(SIGN_IN)} className="mt-4">
-          <Text className="text-base text-center underline text-primary font-jost-medium">
-            log in
-          </Text>
-        </TouchableOpacity>
+      {/* Absolute top image section (fully covers top, NOT safe area bounded) */}
+      <View className="absolute top-0 left-0 right-0 overflow-hidden">
+        <FlatList
+          ref={flatRef}
+          data={onboardingSlides}
+          keyExtractor={(item) => item.id.toString()}
+          horizontal
+          pagingEnabled
+          showsHorizontalScrollIndicator={false}
+          onScroll={onScroll}
+          scrollEventThrottle={16}
+          renderItem={({ item }) => (
+            <View style={{ width }}>
+              <Image
+                source={item.image}
+                resizeMode="cover"
+                style={{
+                  width: "100%",
+                  height: height * 0.53, // covers full top area
+                }}
+              />
+            </View>
+          )}
+        />
       </View>
+
+      {/* Overlay for skip button — inside safe area */}
+      <SafeAreaView
+        style={{ position: "absolute", top: 0, right: 0, left: 0, zIndex: 50 }}
+      >
+        <View className="flex-row justify-end px-4 mt-2">
+          <TouchableOpacity onPress={skipLogin}>
+            <Text className="text-lg text-white underline font-jost-semibold">
+              Skip
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+
+      {/* Content area BELOW the image, inside safe area */}
+      <SafeAreaView style={{ flex: 1, marginTop: height * 0.48 }}>
+        {/* Pagination Dots */}
+        <View className="flex-row justify-center mb-4 space-x-1">
+          {onboardingSlides.map((_, i) => (
+            <View
+              key={i}
+              className={`h-1.5 rounded-full ${
+                index === i ? "bg-black w-6" : "bg-gray-300 w-2"
+              }`}
+            />
+          ))}
+        </View>
+
+        {/* Slide Text */}
+        <View className="items-center px-6">
+          <Text className="text-center text-[24px] font-jost-bold max-w-60">
+            {onboardingSlides[index].title}{" "}
+            <Text className="font-extrabold">
+              {onboardingSlides[index].highlight}
+            </Text>
+          </Text>
+
+          <View className="items-center gap-2 mt-5 space-y-3">
+            {onboardingSlides[index].bullets.map((line: any, idx: number) => (
+              <View key={idx} className="flex-row items-center gap-2 space-x-2">
+                <Text className="text-lg text-green-600">
+                  <SvgIcon Icon={GoodIcon} size={16} />
+                </Text>
+                <Text className="text-base font-jost">{line}</Text>
+              </View>
+            ))}
+          </View>
+        </View>
+
+        {/* Bottom Buttons */}
+        <View className="px-6 mt-auto mb-10">
+          <TouchableOpacity
+            onPress={() => router.push(SIGN_UP)}
+            className="py-4 bg-black rounded-lg"
+          >
+            <Text className="text-base text-center text-white font-jost-medium">
+              Sign up
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => {
+              router.push({
+                pathname: SIGN_IN,
+                params: { fromOnboarding: "true" },
+              });
+            }}
+            className="mt-4"
+          >
+            <Text className="text-base text-center underline text-primary font-jost-medium">
+              log in
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
     </View>
   );
 }

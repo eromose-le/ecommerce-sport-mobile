@@ -1,9 +1,9 @@
-import { Product } from "@/types/product";
+import { Product } from "@/services/product/product.types";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 
-const CartCard: React.FC<{ product: Product & { quantity?: number  } }> = ({
+const CartCard: React.FC<{ product: Product & { quantity?: number } }> = ({
   product,
 }) => {
   return (
@@ -20,7 +20,7 @@ const CartCard: React.FC<{ product: Product & { quantity?: number  } }> = ({
         <View className="flex-1 ml-4">
           <Text className="text-lg font-jost-medium">{product.name}</Text>
           <Text className="mt-1 text-sm text-secondary font-jost">
-            {product.brand}
+            {product.description}
           </Text>
 
           <Text className="mt-2 text-base font-bold">${product.price}</Text>

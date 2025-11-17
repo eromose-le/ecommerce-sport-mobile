@@ -2,12 +2,10 @@ import LogoIcon from "@/assets/icons/logo.svg";
 import { BackButton } from "@/components/common/BackButton";
 import { SvgIcon } from "@/components/common/SvgIcon";
 import Product from "@/components/product/Product";
-import { SIGN_IN } from "@/constants/urls";
 
 import { useAuth } from "@/providers/auth";
 import { Logger } from "@/utils/logger";
 import { Ionicons } from "@expo/vector-icons";
-import { router } from "expo-router";
 import {
   ScrollView,
   Text,
@@ -37,13 +35,8 @@ export default function PublicHome() {
         <View className="flex-row items-center justify-between mb-2">
           <SvgIcon Icon={LogoIcon} size={75} />
           <View className="">
-            <BackButton
-              onPress={() => {
-                unSkipLogin();
-                router.push(SIGN_IN);
-              }}
-            />
-            <Text className="mb-3 text-sm font-light text-secondary font-jost">
+            <BackButton onPress={unSkipLogin} />
+            <Text className="mb-3 text-xs font-light text-secondary font-jost">
               Sign in
             </Text>
           </View>

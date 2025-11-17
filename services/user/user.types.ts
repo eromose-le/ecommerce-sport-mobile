@@ -1,7 +1,6 @@
 import { ServerResponse } from "@/types/global";
 
 export type User = Partial<{
-  token: string;
   id: string | number;
   firstName: string;
   lastName: string;
@@ -12,10 +11,12 @@ export type User = Partial<{
   googleId: string | null;
   avatar: string | null;
   bio: string | null;
-  freeGift: any[];
+  freeGift?: any[];
   createdAt: string;
   updatedAt: string;
   deletedAt: string | null;
+  isDeleted: boolean;
+  token: string;
 }>;
 
 export type IUserResponse = ServerResponse<User>;

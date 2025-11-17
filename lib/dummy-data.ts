@@ -263,3 +263,39 @@ export const products = [
     ],
   },
 ];
+
+export const onboardingSlides = [
+  {
+    id: 1,
+    image: require("@/assets/images/onboarding/slide1.png"),
+    title: "Welcome to",
+    highlight: "Sporty Galaxy",
+    bullets: [
+      "Get the best deals on top brands",
+      "Discover a wide range of products",
+      "Enjoy a seamless shopping experience",
+    ],
+  },
+  {
+    id: 2,
+    image: require("@/assets/images/onboarding/slide2.png"),
+    title: "Shop Smarter",
+    highlight: "With Confidence",
+    bullets: [
+      "Verified top-tier sellers",
+      "Authentic and premium-quality items",
+      "Exclusive members-only offers",
+    ],
+  },
+  {
+    id: 3,
+    image: require("@/assets/images/onboarding/slide3.png"),
+    title: "Your Fitness",
+    highlight: "Your Lifestyle",
+    bullets: [
+      "Personalized product recommendations",
+      "Optimized for active living",
+      "Fast checkout, instant delivery",
+    ],
+  },
+];

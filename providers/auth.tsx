@@ -1,6 +1,8 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
-import * as SecureStore from "expo-secure-store";
+import { SIGN_IN, TABS_PUBLIC } from "@/constants/urls";
 import { User } from "@/services/user/user.types";
+import { router } from "expo-router";
+import * as SecureStore from "expo-secure-store";
+import React, { createContext, useContext, useEffect, useState } from "react";
 
 interface AuthContextProps {
   user: User | null;
@@ -38,11 +40,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const skipLogin = async () => {
     setSkippedLogin(true);
     await SecureStore.setItemAsync("skippedLogin", "true");
+    router.push({
+      pathname: TABS_PUBLIC,
+      params: { fromOnboarding: "true" },
+    });
   };
 
   const unSkipLogin = async () => {
     setSkippedLogin(false);
     await SecureStore.deleteItemAsync("skippedLogin");
+    router.push({
+      pathname: SIGN_IN,
+      params: { fromOnboarding: "true" },
+    });
   };
 
   const login = async (user: User) => {
@@ -56,6 +66,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const logout = async () => {
     setUser(null);
     await SecureStore.deleteItemAsync("user");
+    router.push({
+      pathname: SIGN_IN,
+      params: { fromOnboarding: "true" },
+    });
   };
 
   return (
