@@ -10,24 +10,18 @@ export default function SignIn() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (user) {
-      router.push(TABS_PROTECTED);
-    }
+    if (user) router.push(TABS_PROTECTED);
   }, [user]);
 
   useEffect(() => {
-    if (skippedLogin) {
-      router.push(TABS_PUBLIC);
-    }
+    if (skippedLogin) router.push(TABS_PUBLIC);
   }, [skippedLogin]);
 
   const handleLogin = async () => {
     setLoading(true);
     try {
-      const loggedInUser = await login("demo@email.com", "password"); // return user from login
-      if (loggedInUser) {
-        router.push(TABS_PROTECTED);
-      }
+      const loggedInUser = await login("demo@email.com", "password");
+      if (loggedInUser) router.push(TABS_PROTECTED);
     } catch (err) {
       console.error("Login failed:", err);
     } finally {
@@ -35,34 +29,33 @@ export default function SignIn() {
     }
   };
 
-  console.log("login", { login, user, skipLogin });
-
-  const handleSkip = () => {
-    skipLogin();
-  };
+  const handleSkip = () => skipLogin();
 
   return (
-    <SafeAreaView className="flex-1 bg-blue-300">
-      <View className="flex-1 items-center justify-center p-6">
-        <Text className="text-2xl mb-6 text-red-100">Sign In</Text>
+    <SafeAreaView className="flex-1 bg-white">
+      <View className="items-center justify-center flex-1 px-6">
+        <Text className="mb-10 text-3xl font-semibold text-gray-800">
+          Welcome
+        </Text>
 
         <TouchableOpacity
           onPress={handleLogin}
-          className="px-6 py-3 bg-black rounded-lg mb-4"
           disabled={loading}
+          className="w-full max-w-[260px] py-3 bg-black rounded-xl mb-5"
         >
-          <Text className="text-white">Log In</Text>
+          <Text className="text-lg font-medium text-center text-white">
+            Sign In
+          </Text>
         </TouchableOpacity>
 
         <TouchableOpacity onPress={handleSkip} disabled={loading}>
-          <Text className="text-blue-500">Skip for now</Text>
+          <Text className="text-base text-blue-600 underline">Skip for now</Text>
         </TouchableOpacity>
       </View>
 
-      {/* Loader overlay */}
       {loading && (
-        <View className="absolute inset-0 bg-black bg-opacity-30 justify-center items-center">
-          <ActivityIndicator size="large" color="#fff" />
+        <View className="absolute inset-0 items-center justify-center bg-black/20">
+          <ActivityIndicator size="large" color="#000" />
         </View>
       )}
     </SafeAreaView>

@@ -46,7 +46,7 @@ export default function PublicHome() {
         {/* Sticky Search Section */}
         <View className="z-50 pt-2 pb-3 bg-background">
           <Text className="mb-3 text-sm font-light text-secondary font-jost">
-            What are you buying today?
+            What are you buying today??
           </Text>
 
           <View className="flex-row items-center px-3 py-3 bg-[#F0F0F0] gap-4 rounded-2xl">

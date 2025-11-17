@@ -1,16 +1,16 @@
 {
   "expo": {
-    "name": "Sporty Galaxy",
-    "slug": "sporty-galaxy-app",
+    "name": "Sporty Galaxy Test",
+    "slug": "sporty-galaxy-app-test",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/logo.png",
-    "scheme": "sportygalaxyapp",
+    "scheme": "sportygalaxyapptest",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.bazzcode.sportygalaxyapp"
+      "bundleIdentifier": "com.bazzcode.sportygalaxyapptest"
     },
     "android": {
       "adaptiveIcon": {
@@ -21,7 +21,7 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.bazzcode.sportygalaxyapp"
+      "package": "com.bazzcode.sportygalaxyapptest"
     },
     "web": {
       "bundler": "metro",
