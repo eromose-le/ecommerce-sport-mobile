@@ -1,6 +1,6 @@
 import CartCard from "@/components/cart/CartCard";
 import CartEmpty from "@/components/cart/CartEmpty";
-import { products } from "@/helpers/data";
+import { products } from "@/lib/dummy-data";
 import React, { useState } from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 

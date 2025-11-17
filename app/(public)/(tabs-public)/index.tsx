@@ -4,7 +4,7 @@ import { SvgIcon } from "@/components/common/SvgIcon";
 import { Title } from "@/components/common/Title";
 import { ProductGrid } from "@/components/product/ProductGrid";
 import { SIGN_IN } from "@/constants/urls";
-import { products } from "@/helpers/data";
+import { products } from "@/lib/dummy-data";
 import { useAuth } from "@/providers/auth";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";

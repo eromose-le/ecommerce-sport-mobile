@@ -6,7 +6,7 @@ interface AuthContextProps {
   user: User | null;
   loading: boolean;
   skippedLogin: boolean;
-  login: (email: string, password: string) => Promise<User>;
+  login: (user: User) => Promise<User>;
   logout: () => Promise<void>;
   skipLogin: () => Promise<void>;
   unSkipLogin: () => Promise<void>;
@@ -14,7 +14,7 @@ interface AuthContextProps {
 
 const AuthContext = createContext<AuthContextProps | null>(null);
 
-// const DUMMY_USER_ACCOUNT = { id: "1", email: "" };
+// const dummyLoggedInUser = { id: "1", email: "" };
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -45,8 +45,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     await SecureStore.deleteItemAsync("skippedLogin");
   };
 
-  const login = async (email: string, password: string) => {
-    const loggedInUser = { id: "1", email };
+  const login = async (user: User) => {
+    const loggedInUser = user;
     setUser(loggedInUser);
     await SecureStore.setItemAsync("user", JSON.stringify(loggedInUser));
 

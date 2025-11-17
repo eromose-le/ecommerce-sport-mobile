@@ -1,11 +1,21 @@
 import LogoIcon from "@/assets/icons/logo.svg";
 import LogoutIcon from "@/assets/icons/logout.svg";
+import { LoadingContent } from "@/components/common/LoadingContent";
 import { SvgIcon } from "@/components/common/SvgIcon";
 import { Title } from "@/components/common/Title";
 import { ProductGrid } from "@/components/product/ProductGrid";
-import { products } from "@/helpers/data";
+import { useAppState } from "@/hooks/useAppState";
+import { useAuthUser } from "@/hooks/useAuthUser";
+import { products } from "@/lib/dummy-data";
 import { useAuth } from "@/providers/auth";
+import { ProductService, UserService } from "@/services";
+import { IProductResponse } from "@/types/product";
+import { IUserResponse } from "@/types/user";
+import { Logger } from "@/utils/logger";
+import { AppToast } from "@/utils/toast";
 import { Ionicons } from "@expo/vector-icons";
+import { useQuery } from "@tanstack/react-query";
+import { useEffect } from "react";
 import {
   ScrollView,
   Text,
@@ -16,8 +26,52 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function ProtectedHome() {
-  const { logout, user, loading, skippedLogin } = useAuth();
-  console.log("(PROTECTED home) ==::", { user, loading, skippedLogin });
+  const { logout } = useAuth();
+
+  const appState = useAppState();
+  const userState = useAuthUser();
+
+  Logger.info("APP_STATE", appState);
+  Logger.info("USER_STATE", userState);
+  Logger.dump("LABEL", "(PROTECTED) home ==::");
+
+  const { data, isLoading, error, refetch, isSuccess } =
+    useQuery<IUserResponse>({
+      queryKey: ["users", "me"],
+      queryFn: UserService.fetchMe,
+      retry: 2,
+      staleTime: 1000 * 60 * 5, // 5 minutes
+    });
+
+  const {
+    data: productData,
+    isLoading: productIsLoading,
+    error: productError,
+    refetch: productRefetch,
+    isSuccess: productIsSuccess,
+  } = useQuery<IProductResponse>({
+    queryKey: ["products", "id"],
+    queryFn: () => ProductService.fetchProducts({ limit: 4 }),
+    retry: 2,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  });
+
+  useEffect(() => {
+    if (isSuccess) {
+      AppToast.success(`${data?.data?.firstName}'s profile retived!`);
+    }
+  }, [data, isSuccess]);
+
+  useEffect(() => {
+    if (productIsSuccess) {
+      AppToast.success(`Product retived!`);
+    }
+  }, [data, productIsSuccess]);
+
+  const userResponse = data?.data || null;
+  const productsResponse = productData?.data?.results || [];
+
+  const customerName = `${data?.data?.firstName} ${data?.data?.lastName}`;
 
   return (
     <SafeAreaView
@@ -50,9 +104,22 @@ export default function ProtectedHome() {
 
         {/* Sticky Search Section */}
         <View className="z-50 pt-2 pb-3 bg-background">
-          <Text className="mb-3 text-sm font-light text-secondary font-jost">
-            What are you buying today?
-          </Text>
+          <View className="flex-row items-center gap-1 mb-3">
+            <Text className="text-sm font-light text-secondary font-jost">
+              What are you buying today?
+            </Text>
+            <LoadingContent
+              loading={isLoading}
+              loadingClassName="flex absolute p-0 m-0 left-44"
+              error={error}
+              onRetry={refetch}
+              data={userResponse}
+            >
+              <Text className="text-sm font-light text-secondary font-jost">
+                {customerName}
+              </Text>
+            </LoadingContent>
+          </View>
 
           <View className="flex-row items-center px-3 py-3 bg-[#F0F0F0] gap-4 rounded-2xl">
             <TouchableOpacity className="flex-row items-center px-6 py-2 mr-2 bg-white rounded-xl">
@@ -108,9 +175,9 @@ export default function ProtectedHome() {
 
           <View className="flex items-center justify-center w-full">
             <ProductGrid
-              data={products}
-              loading={true}
-              loadingMore={true}
+              data={productsResponse}
+              loading={productIsLoading}
+              loadingMore={false}
               onEndReached={() => {}}
               numColumns={2}
               skeletonCount={2}
@@ -118,12 +185,20 @@ export default function ProtectedHome() {
               scrollEnabled={false}
             />
 
-            <ProductGrid
-              data={products}
-              numColumns={2}
-              gap={12}
-              scrollEnabled={false}
-            />
+            <LoadingContent
+              loading={productIsLoading}
+              error={productError}
+              onRetry={productRefetch}
+              data={productsResponse}
+              EmptyComponent={<Text>Product data not found!</Text>}
+            >
+              <ProductGrid
+                data={productsResponse}
+                numColumns={2}
+                gap={12}
+                scrollEnabled={false}
+              />
+            </LoadingContent>
           </View>
         </View>
 

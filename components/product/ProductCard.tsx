@@ -23,7 +23,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     <Link
       href={{
         pathname: PRODUCT_DETAIL,
-        params: { id: product.id, product: JSON.stringify(product) },
+        params: { id: product?.id, product: JSON.stringify(product) },
       }}
       // href={`/(protected)/product/${product.id.toString()}` as any} // simpler & works perfectly
       asChild
@@ -33,8 +33,15 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         className="p-3 bg-white"
         activeOpacity={0.8}
       >
+        {/* NOTE: local */}
+        {/* <Image
+          source={product?.displayImage}
+          className={`w-full ${horizontal ? "h-32" : "h-40"} bg-[#F5F5F7]`}
+          resizeMode="contain"
+        /> */}
+
         <Image
-          source={product.image}
+          source={{ uri: product?.displayImage }}
           className={`w-full ${horizontal ? "h-32" : "h-40"} bg-[#F5F5F7]`}
           resizeMode="contain"
         />
@@ -43,19 +50,19 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           className="mt-3 mb-1 text-base font-jost-medium"
           numberOfLines={1}
         >
-          {product.name}
+          {product?.name}
         </Text>
 
         <Text
           className="mb-2 text-sm text-secondary font-jost"
           numberOfLines={1}
         >
-          {product.brand}
+          {product?.description}
         </Text>
 
         <View className="flex-row items-center justify-between">
           <Text className="text-base text-primary font-jost-semibold">
-            ${product.price.toFixed(2)}
+            ${product?.price?.toFixed(2)}
           </Text>
 
           {/* Separate button for add-to-cart to avoid blocking Link */}

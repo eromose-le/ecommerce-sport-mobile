@@ -13,6 +13,9 @@ import { ActivityIndicator, View } from "react-native";
 import { ErrorBoundary } from "@/components/common/ErrorBoundary";
 import { StatusBar } from "expo-status-bar";
 import "./global.css";
+import { QueryProvider } from "@/providers/query";
+import ToastManager from "toastify-react-native";
+import { toastConfig } from "@/components/common/ToastConfig";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -38,8 +41,8 @@ function RootContent() {
 
   if (!fontsLoaded || loading || !appIsReady) {
     return (
-      <View className="flex-1 items-center justify-center bg-white">
-        <ActivityIndicator size="large" />
+      <View className="items-center justify-center flex-1 bg-white">
+        <ActivityIndicator size="small" />
         <StatusBar style="dark" />
       </View>
     );
@@ -58,9 +61,12 @@ export default function RootLayout() {
   console.log("(APP _LAYOUT) ==::");
   return (
     <ErrorBoundary>
-      <AuthProvider>
-        <RootContent />
-      </AuthProvider>
+      <QueryProvider>
+        <AuthProvider>
+          <RootContent />
+          <ToastManager config={toastConfig} />
+        </AuthProvider>
+      </QueryProvider>
     </ErrorBoundary>
   );
 }

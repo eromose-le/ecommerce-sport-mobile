@@ -12,8 +12,8 @@ export default function PublicLayout() {
   // Show loader while auth state is loading
   if (loading) {
     return (
-      <View className="flex-1 items-center justify-center bg-white">
-        <ActivityIndicator size="large" />
+      <View className="items-center justify-center flex-1 bg-white">
+        <ActivityIndicator size="small" />
       </View>
     );
   }

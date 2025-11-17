@@ -1,10 +1,10 @@
 export const products = [
   {
-    id: 1,
+    id: "1",
     name: "10kg Dumbbell",
     brand: "StrengthPro",
     price: 120,
-    image: require("@/assets/images/dumbbell.png"),
+    displayImage: require("@/assets/images/dumbbell.png"),
     images: [
       "https://picsum.photos/500/500?random=1",
       "https://picsum.photos/500/500?random=11",
@@ -66,11 +66,11 @@ export const products = [
   // ----------------------------------------------------------------------
 
   {
-    id: 2,
+    id: "2",
     name: "Adjustable Kettlebell",
     brand: "FlexForge",
     price: 220,
-    image: require("@/assets/images/dumbbell.png"),
+    displayImage: require("@/assets/images/dumbbell.png"),
     images: [
       "https://picsum.photos/500/500?random=2",
       "https://picsum.photos/500/500?random=21",
@@ -116,11 +116,11 @@ export const products = [
   // ----------------------------------------------------------------------
 
   {
-    id: 3,
+    id: "3",
     name: "Resistance Band Set",
     brand: "FitFlex",
     price: 45,
-    image: require("@/assets/images/dumbbell.png"),
+    displayImage: require("@/assets/images/dumbbell.png"),
     images: [
       "https://picsum.photos/500/500?random=3",
       "https://picsum.photos/500/500?random=31",
@@ -166,11 +166,11 @@ export const products = [
   // ----------------------------------------------------------------------
 
   {
-    id: 4,
+    id: "4",
     name: "Premium Yoga Mat",
     brand: "ZenFlow",
     price: 80,
-    image: require("@/assets/images/dumbbell.png"),
+    displayImage: require("@/assets/images/dumbbell.png"),
     images: [
       "https://picsum.photos/500/500?random=4",
       "https://picsum.photos/500/500?random=41",
@@ -216,11 +216,11 @@ export const products = [
   // ----------------------------------------------------------------------
 
   {
-    id: 5,
+    id: "5",
     name: "Smart Jump Rope",
     brand: "CardioTech",
     price: 65,
-    image: require("@/assets/images/dumbbell.png"),
+    displayImage: require("@/assets/images/dumbbell.png"),
     images: [
       "https://picsum.photos/500/500?random=5",
       "https://picsum.photos/500/500?random=51",
