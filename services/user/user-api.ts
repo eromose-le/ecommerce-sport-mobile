@@ -1,6 +1,6 @@
-import { IUserResponse } from "@/types/user";
-import { api } from "./api";
+import { api } from "../api/api";
 import { Logger } from "@/utils/logger";
+import { IUserResponse } from "./user.types";
 
 export const fetchMe = async (): Promise<IUserResponse> => {
   try {

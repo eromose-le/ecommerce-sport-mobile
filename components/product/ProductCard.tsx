@@ -1,5 +1,6 @@
 import { PRODUCT_DETAIL } from "@/constants/urls";
-import { Product } from "@/types/product";
+import { Product } from "@/services/product/product.types";
+import { formatCurrency } from "@/utils/currency";
 import { Ionicons } from "@expo/vector-icons";
 import { Link } from "expo-router";
 import React from "react";
@@ -62,12 +63,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 
         <View className="flex-row items-center justify-between">
           <Text className="text-base text-primary font-jost-semibold">
-            ${product?.price?.toFixed(2)}
+            {formatCurrency(product?.price)}
           </Text>
 
           {/* Separate button for add-to-cart to avoid blocking Link */}
           <TouchableOpacity
-            className="p-1 bg-black rounded-full"
+            className="hidden p-1 bg-black rounded-full"
             onPress={(e) => {
               e.stopPropagation(); // prevent triggering the Link
               onAddToCart?.();

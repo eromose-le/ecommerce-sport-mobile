@@ -1,4 +1,3 @@
-import { Product } from "@/types/product";
 import React from "react";
 import {
   ActivityIndicator,
@@ -8,6 +7,7 @@ import {
 } from "react-native";
 import { ProductCard } from "./ProductCard";
 import { SkeletonCard } from "./SkeletonCard";
+import { Product } from "@/services/product/product.types";
 
 interface ProductGridProps {
   data: Product[];

@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import * as SecureStore from "expo-secure-store";
-import { User } from "@/types/user";
-import { CartItem } from "@/types/cart";
+import { CartItem } from "@/services/cart/cart.types";
+import { User } from "@/services/user/user.types";
 
 interface AppState {
   // global

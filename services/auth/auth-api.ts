@@ -1,5 +1,5 @@
-import { api } from "@/services/api";
-import { ILoginUserPayload, ILoginUserResponse } from "@/types/auth";
+import { api } from "@/services/api/api";
+import { ILoginUserPayload, ILoginUserResponse } from "@/services/auth/auth.types";
 import { Logger } from "@/utils/logger";
 
 export const loginUser = async (

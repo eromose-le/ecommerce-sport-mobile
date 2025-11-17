@@ -1,4 +1,4 @@
-import { ServerResponse } from "./global";
+import { ServerResponse } from "@/types/global";
 
 export type User = Partial<{
   token: string;

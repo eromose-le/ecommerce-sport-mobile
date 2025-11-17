@@ -10,7 +10,7 @@ import { useAuth } from "@/providers/auth";
 import { useEffect, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { router } from "expo-router";
-import { api } from "@/services/api";
+import { api } from "@/services/api/api";
 import { TABS_PROTECTED, TABS_PUBLIC } from "@/constants/urls";
 import { Logger } from "@/utils/logger";
 

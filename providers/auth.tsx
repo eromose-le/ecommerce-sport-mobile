@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import * as SecureStore from "expo-secure-store";
-import { User } from "@/types/user";
+import { User } from "@/services/user/user.types";
 
 interface AuthContextProps {
   user: User | null;

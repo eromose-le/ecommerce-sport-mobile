@@ -1,8 +1,8 @@
-import { TProductQuery } from "@/types/product";
-import { api } from "./api";
+import { api } from "../api/api";
 import { AxiosRequestConfig } from "axios";
 import { Logger } from "@/utils/logger";
-import { axiosBaseQuery } from "./base-query";
+import { axiosBaseQuery } from "../api/base-query";
+import { TProductQuery } from "./product.types";
 
 export const fetchProducts = async (
   params?: TProductQuery,

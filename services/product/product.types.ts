@@ -1,4 +1,4 @@
-import { PaginatedServerResponse } from "./global";
+import { PaginatedServerResponse } from "@/types/global";
 
 export interface Product {
   id: string;

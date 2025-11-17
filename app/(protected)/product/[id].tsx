@@ -9,10 +9,15 @@ import ProductDetailActions from "@/components/product/ProductDetailActions";
 import ProductGallery from "@/components/product/ProductGallery";
 import ProductReviews from "@/components/product/ProductReviews";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { Logger } from "@/utils/logger";
+import { products } from "@/lib/dummy-data";
+import { formatCurrency } from "@/utils/currency";
 
 export default function ProductDetail() {
-  const { id, product } = useLocalSearchParams() as any;
+  const { product } = useLocalSearchParams() as any;
   const item = JSON.parse(product);
+
+  Logger.warn("product", item);
 
   return (
     <SafeAreaView className="flex-1 bg-background">
@@ -26,20 +31,20 @@ export default function ProductDetail() {
             <BackButton className="" />
 
             <Text className="text-xl font-jost-medium text-primary">
-              Product detail {id}
+              Product {item.modelNumber}
             </Text>
 
             <CartButton />
           </View>
 
-          <ProductGallery images={item.images} />
+          <ProductGallery images={item?.medias?.[0]?.images} />
 
           {/* TITLE / DESCRIPTION */}
           <View className="px-4 mt-5">
-            <Text className="text-2xl font-jost-medium">{item.name}</Text>
+            <Text className="text-2xl font-jost-medium">{item?.name}</Text>
 
             <Text className="mt-1 text-sm leading-4 font-jost text-secondary">
-              {item.description}
+              {item?.description}
             </Text>
 
             {/* Variations */}
@@ -48,7 +53,7 @@ export default function ProductDetail() {
                 Variations
               </Text>
               <Text className="text-[10px] text-primary">
-                Total options: {item.variations?.length ?? 1}
+                Total options: {item?.variations?.length ?? 1}
               </Text>
 
               <View className="flex-row items-center gap-2 mt-5">
@@ -64,7 +69,9 @@ export default function ProductDetail() {
 
             {/* Pricing & Quantity */}
             <View className="mt-4">
-              <Text className="text-2xl font-jost-medium">${item.price}</Text>
+              <Text className="text-2xl font-jost-medium">
+                {formatCurrency(item?.price)}
+              </Text>
 
               <View className="flex-row items-center gap-3 mt-4">
                 <TouchableOpacity className="flex-row items-center">
@@ -86,10 +93,11 @@ export default function ProductDetail() {
           </View>
 
           {/* KEY ATTRIBUTES */}
-          <ProductAttributes attributes={item.attributes} />
+          <ProductAttributes attributes={item?.keyattribute} />
 
           {/* REVIEWS */}
-          <ProductReviews reviews={item.reviews} />
+          {/* TODO: replace dummy */}
+          <ProductReviews reviews={products[0].reviews} />
 
           <View className="h-20" />
         </ScrollView>

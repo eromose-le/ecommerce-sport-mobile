@@ -8,9 +8,10 @@ import { useAppState } from "@/hooks/useAppState";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import { products } from "@/lib/dummy-data";
 import { useAuth } from "@/providers/auth";
-import { ProductService, UserService } from "@/services";
-import { IProductResponse } from "@/types/product";
-import { IUserResponse } from "@/types/user";
+import { ProductService, UserService } from "@/services/api";
+import { IProductResponse } from "@/services/product/product.types";
+import { IUserResponse } from "@/services/user/user.types";
+
 import { Logger } from "@/utils/logger";
 import { AppToast } from "@/utils/toast";
 import { Ionicons } from "@expo/vector-icons";
