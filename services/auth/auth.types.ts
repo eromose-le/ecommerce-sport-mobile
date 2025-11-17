@@ -7,3 +7,14 @@ export interface ILoginUserPayload {
 }
 
 export type ILoginUserResponse = ServerResponse<User>;
+
+export interface ICreateUserPayload {
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+  phone: string;
+  address: string;
+}
+
+export type ICreateUserResponse = ServerResponse<User>;

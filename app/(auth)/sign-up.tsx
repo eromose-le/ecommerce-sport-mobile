@@ -1,5 +1,9 @@
-import { SIGN_IN } from "@/constants/urls";
+import AppLoader from "@/components/common/AppLoader";
+import { SIGN_IN, VERIFY_OTP } from "@/constants/urls";
+import { AuthService } from "@/services/api";
+import { ICreateUserPayload } from "@/services/auth/auth.types";
 import { AppToast } from "@/utils/toast";
+import { useMutation } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { ReactNode, useState } from "react";
 import {
@@ -75,6 +79,29 @@ export default function SignUp() {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [countryModalVisible, setCountryModalVisible] = useState(false);
+  const [loadingOverlay, setLoadingOverlay] = useState(false);
+
+  const registerMutation = useMutation({
+    mutationFn: (payload: ICreateUserPayload) =>
+      AuthService.registerUser(payload),
+    onMutate: () => setLoadingOverlay(true),
+    onSuccess: (res, variables) => {
+      AppToast.success(
+        res?.message || "Account created! Check your email for the OTP"
+      );
+      const emailParam = variables?.email || form.email;
+      router.push({
+        pathname: VERIFY_OTP,
+        params: { email: emailParam },
+      });
+    },
+    onError: (err: any) => {
+      const msg =
+        err?.response?.data?.error || err?.message || "Registration failed";
+      AppToast.failed(msg);
+    },
+    onSettled: () => setLoadingOverlay(false),
+  });
 
   const updateForm = <K extends keyof FormState>(
     field: K,
@@ -99,7 +126,20 @@ export default function SignUp() {
       AppToast.info("Complete the form to register");
       return;
     }
-    AppToast.success("Registration submitted");
+
+    if (registerMutation.isPending) return;
+
+    const numericPhone = form.phoneNumber.replace(/[^0-9]/g, "");
+    const payload: ICreateUserPayload = {
+      email: form.email.trim(),
+      password: form.password,
+      firstName: form.firstName.trim(),
+      lastName: form.lastName.trim(),
+      address: form.address.trim(),
+      phone: `${form.country.dialCode}${numericPhone}`,
+    };
+
+    registerMutation.mutate(payload);
   };
 
   const FieldRow = ({
@@ -291,17 +331,19 @@ export default function SignUp() {
 
             <TouchableOpacity
               onPress={handleRegister}
-              disabled={!canSubmit}
+              disabled={!canSubmit || registerMutation.isPending}
               className={`w-full rounded mt-4 py-4 ${
                 canSubmit ? "bg-black" : "bg-gray-200"
-              }`}
+              } ${registerMutation.isPending ? "opacity-90" : ""}`}
             >
               <Text
                 className={`text-center text-base font-jost-medium ${
                   canSubmit ? "text-white" : "text-secondary"
                 }`}
               >
-                Agree and Register
+                {registerMutation.isPending
+                  ? "Registering..."
+                  : "Agree and Register"}
               </Text>
             </TouchableOpacity>
           </View>
@@ -376,6 +418,12 @@ export default function SignUp() {
           </View>
         </View>
       </Modal>
+
+      {loadingOverlay && (
+        <View className="absolute inset-0 items-center justify-center bg-black/20">
+          <AppLoader />
+        </View>
+      )}
     </SafeAreaView>
   );
 }

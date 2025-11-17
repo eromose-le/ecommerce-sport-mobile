@@ -1,5 +1,10 @@
 import { api } from "@/services/api/api";
-import { ILoginUserPayload, ILoginUserResponse } from "@/services/auth/auth.types";
+import {
+  ICreateUserPayload,
+  ICreateUserResponse,
+  ILoginUserPayload,
+  ILoginUserResponse,
+} from "@/services/auth/auth.types";
 import { Logger } from "@/utils/logger";
 
 export const loginUser = async (
@@ -19,4 +24,20 @@ export const loginUser = async (
 
 export const logoutUser = async () => {
   return api.post("/auth/logout");
+};
+
+export const registerUser = async (
+  payload: ICreateUserPayload
+): Promise<ICreateUserResponse> => {
+  try {
+    const res = await api.post("/auth/register", payload);
+
+    if (!res.data?.success)
+      throw new Error(res.data?.error || "Registration failed");
+
+    return res.data;
+  } catch (error) {
+    Logger.error("registerUser Error", error);
+    throw error;
+  }
 };
