@@ -4,6 +4,10 @@ import {
   ICreateUserResponse,
   ILoginUserPayload,
   ILoginUserResponse,
+  IResendSignupOtpPayload,
+  IResendSignupOtpResponse,
+  IVerifySignupOtpPayload,
+  IVerifySignupOtpResponse,
 } from "@/services/auth/auth.types";
 import { Logger } from "@/utils/logger";
 
@@ -22,10 +26,6 @@ export const loginUser = async (
   }
 };
 
-export const logoutUser = async () => {
-  return api.post("/auth/logout");
-};
-
 export const registerUser = async (
   payload: ICreateUserPayload
 ): Promise<ICreateUserResponse> => {
@@ -40,4 +40,40 @@ export const registerUser = async (
     Logger.error("registerUser Error", error);
     throw error;
   }
+};
+
+export const verifySignupOtp = async (
+  payload: IVerifySignupOtpPayload
+): Promise<IVerifySignupOtpResponse> => {
+  try {
+    const res = await api.post("/auth/verify-signup-otp", payload);
+
+    if (!res.data?.success)
+      throw new Error(res.data?.error || "OTP verification failed");
+
+    return res.data;
+  } catch (error) {
+    Logger.error("verifySignupOtp Error", error);
+    throw error;
+  }
+};
+
+export const resendSignupOtp = async (
+  payload: IResendSignupOtpPayload
+): Promise<IResendSignupOtpResponse> => {
+  try {
+    const res = await api.post("/auth/send-signup-otp", payload);
+
+    if (!res.data?.success)
+      throw new Error(res.data?.error || "Unable to resend OTP");
+
+    return res.data;
+  } catch (error) {
+    Logger.error("resendSignupOtp Error", error);
+    throw error;
+  }
+};
+
+export const logoutUser = async () => {
+  return api.post("/auth/logout");
 };

@@ -12,3 +12,4 @@ export const PROFILE = "/(protected)/(tabs-protected)/profile";
 export const SIGN_IN = "/(auth)/sign-in";
 export const SIGN_UP = "/(auth)/sign-up";
 export const ON_BOARDING = "/(auth)/on-boarding";
+export const VERIFY_OTP = "/(auth)/verify-otp";

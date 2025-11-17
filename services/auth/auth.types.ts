@@ -18,3 +18,16 @@ export interface ICreateUserPayload {
 }
 
 export type ICreateUserResponse = ServerResponse<User>;
+
+export interface IVerifySignupOtpPayload {
+  code: string;
+  email: string;
+}
+
+export type IVerifySignupOtpResponse = ServerResponse<User>;
+
+export interface IResendSignupOtpPayload {
+  email: string;
+}
+
+export type IResendSignupOtpResponse = ServerResponse<null>;
