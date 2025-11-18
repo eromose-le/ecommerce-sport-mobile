@@ -4,6 +4,7 @@ import { useAuth } from "@/providers/auth";
 import { OrderService, UserService } from "@/services/api";
 import { Order, OrderItem } from "@/services/order/order.types";
 import { IUpdateUserPayload } from "@/services/user/user.types";
+import { resolveImageSource } from "@/utils/images";
 import { AppToast } from "@/utils/toast";
 import { Ionicons } from "@expo/vector-icons";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -178,9 +179,7 @@ const OrderItemRow = ({ order, item }: { order: Order; item: OrderItem }) => {
   return (
     <View className="flex-row items-center gap-4 py-3 border-t border-gray-100">
       <Image
-        source={{
-          uri: product?.displayImage || "https://via.placeholder.com/80",
-        }}
+        source={resolveImageSource(product?.displayImage)}
         className="w-16 h-16 rounded-lg"
       />
       <View className="flex-1">
