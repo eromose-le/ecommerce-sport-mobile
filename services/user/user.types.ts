@@ -7,6 +7,8 @@ export type User = Partial<{
   email: string;
   phone: string;
   address: string;
+  location: string;
+  unreadNotifications: number;
   isVerified: boolean;
   googleId: string | null;
   avatar: string | null;
@@ -20,3 +22,15 @@ export type User = Partial<{
 }>;
 
 export type IUserResponse = ServerResponse<User>;
+
+export type IUpdateUserPayload = Partial<{
+  firstName: string;
+  lastName: string;
+  phone: string;
+  address: string;
+  location: string;
+}>;
+
+export type IUpdateUserParams = {
+  id: string | number;
+};

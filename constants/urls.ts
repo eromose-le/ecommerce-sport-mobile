@@ -1,6 +1,7 @@
 // protected
 export const TABS_PROTECTED = "/(protected)/(tabs-protected)";
 export const CART_PROTECTED = "/(protected)/(tabs-protected)/cart";
+export const NOTIFICATION_PROTECTED = "/(protected)/(tabs-protected)/notification";
 
 // public
 export const TABS_PUBLIC = "/(public)/(tabs-public)";

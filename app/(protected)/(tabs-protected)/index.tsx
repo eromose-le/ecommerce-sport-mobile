@@ -18,6 +18,7 @@ import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { useEffect } from "react";
 import {
+  ActivityIndicator,
   ScrollView,
   Text,
   TextInput,
@@ -98,6 +99,17 @@ export default function ProtectedHome() {
               error={error}
               onRetry={refetch}
               data={userResponse}
+              LoadingComponent={<ActivityIndicator size="small" />}
+              ErrorComponent={(error, refetch) => (
+                <View className="flex-row items-center gap-2">
+                  <Text className="text-xs text-[#ef4444]">
+                    {error?.message}
+                  </Text>
+                  <TouchableOpacity onPress={refetch}>
+                    <Ionicons name="reload-outline" size={12} color="#ef4444" />
+                  </TouchableOpacity>
+                </View>
+              )}
             >
               <Text className="text-sm font-light text-secondary font-jost">
                 {userName}
