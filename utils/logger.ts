@@ -1,5 +1,7 @@
+import { AppEnv } from "@/constants/env";
+
 // Toggle this to hide logs in production
-const ENABLE_LOGS = process.env.EXPO_PUBLIC_NODE_ENV !== "production";
+const ENABLE_LOGS = !AppEnv.isProduction;
 
 // Color presets for console logs
 const colors = {

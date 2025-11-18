@@ -1,6 +1,7 @@
 import AppLoader from "@/components/common/AppLoader";
 import { ErrorBoundary } from "@/components/common/ErrorBoundary";
 import { toastConfig } from "@/components/common/ToastConfig";
+import { AppEnv } from "@/constants/env";
 import { AuthProvider, useAuth } from "@/providers/auth";
 import { QueryProvider } from "@/providers/query";
 import { Logger } from "@/utils/logger";
@@ -50,7 +51,12 @@ function RootContent() {
     );
   }
 
-  Logger.warn("(APP _content) ==::", { fontsLoaded, appIsReady, loading });
+  Logger.warn("(APP _content) ==::", {
+    fontsLoaded,
+    appIsReady,
+    loading,
+    env: AppEnv,
+  });
   return (
     <>
       <StatusBar style="dark" />

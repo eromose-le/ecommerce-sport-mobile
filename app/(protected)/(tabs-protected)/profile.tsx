@@ -1,3 +1,4 @@
+import { AppEnv } from "@/constants/env";
 import { NOTIFICATION_PROTECTED } from "@/constants/urls";
 import { useAuth } from "@/providers/auth";
 import { AppToast } from "@/utils/toast";
@@ -15,7 +16,7 @@ type ProfileLink = {
   onPress?: () => void;
 };
 
-const versionNumber = process.env.EXPO_PUBLIC_APP_VERSION || "1.0.0";
+const versionNumber = AppEnv.config.appVersion;
 
 const settingsLinks: ProfileLink[] = [
   { key: "user-profile", label: "User profile", icon: "person-outline" },

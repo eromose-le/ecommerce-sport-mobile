@@ -1,9 +1,10 @@
+import { AppEnv } from "@/constants/env";
 import { Logger } from "@/utils/logger";
 import axios from "axios";
 import * as SecureStore from "expo-secure-store";
 
 export const api = axios.create({
-  baseURL: process.env.EXPO_PUBLIC_API_URL,
+  baseURL: AppEnv.config.apiUrl,
   timeout: 15000,
   headers: {
     "Content-Type": "application/json",
