@@ -1,6 +1,7 @@
 import { PRODUCT_DETAIL } from "@/constants/urls";
 import { Product } from "@/services/product/product.types";
 import { formatCurrency } from "@/utils/currency";
+import { resolveImageSource } from "@/utils/images";
 import { Ionicons } from "@expo/vector-icons";
 import { Link } from "expo-router";
 import React from "react";
@@ -42,7 +43,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         /> */}
 
         <Image
-          source={{ uri: product?.displayImage }}
+          source={resolveImageSource(product?.displayImage)}
           className={`w-full ${horizontal ? "h-32" : "h-40"} bg-[#F5F5F7]`}
           resizeMode="contain"
         />
