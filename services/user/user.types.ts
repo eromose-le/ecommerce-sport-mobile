@@ -28,7 +28,6 @@ export type IUpdateUserPayload = Partial<{
   lastName: string;
   phone: string;
   address: string;
-  location: string;
 }>;
 
 export type IUpdateUserParams = {

@@ -4,34 +4,41 @@ import ScrollableForm from "@/components/common/ScrollableForm";
 import { useUpdateProfileMutation } from "@/hooks/useUpdateProfileMutation";
 import { useAuth } from "@/providers/auth";
 import { IUpdateUserPayload } from "@/services/user/user.types";
-import { useEffect, useState } from "react";
+import { getFormikTextFieldProps } from "@/utils/formik";
+import { Logger } from "@/utils/logger";
+import { useFormik } from "formik";
 import { Text } from "react-native";
+import { InferType, object, string } from "yup";
+
+const deliveryAddressSchema = object({
+  phone: string().trim().required("Phone is required"),
+  address: string().trim().required("Full address is required"),
+});
+
+type DeliveryAddressFormValues = InferType<typeof deliveryAddressSchema>;
 
 const DeliveryAddress = () => {
   const { user } = useAuth();
-  const [form, setForm] = useState({
-    address: user?.address || "",
-    location: user?.location || "",
-    phone: user?.phone || "",
-  });
   const updateProfile = useUpdateProfileMutation();
-
-  useEffect(() => {
-    setForm({
+  const formik = useFormik<DeliveryAddressFormValues>({
+    enableReinitialize: true,
+    validateOnMount: true,
+    initialValues: {
       address: user?.address || "",
-      location: user?.location || "",
       phone: user?.phone || "",
-    });
-  }, [user]);
+    },
+    validationSchema: deliveryAddressSchema,
+    onSubmit: (values) => {
+      const payload: IUpdateUserPayload = {
+        address: values.address.trim(),
+        phone: values.phone.trim(),
+      };
+      updateProfile.mutate(payload);
+    },
+  });
 
-  const handleSave = () => {
-    const payload: IUpdateUserPayload = {
-      address: form.address.trim(),
-      location: form.location.trim(),
-      phone: form.phone.trim(),
-    };
-    updateProfile.mutate(payload);
-  };
+  Logger.warn("formik", formik.values);
+
   return (
     <ScrollableForm>
       <Text className="mb-4 text-sm text-secondary">
@@ -39,24 +46,18 @@ const DeliveryAddress = () => {
       </Text>
       <LabeledInput
         label="Phone"
-        value={form.phone}
         keyboardType="phone-pad"
-        onChangeText={(text) => setForm((p) => ({ ...p, phone: text }))}
-      />
-      <LabeledInput
-        label="Location"
-        value={form.location}
-        onChangeText={(text) => setForm((p) => ({ ...p, location: text }))}
+        {...getFormikTextFieldProps(formik, "phone")}
       />
       <LabeledInput
         label="Full address"
-        value={form.address}
         multiline
-        onChangeText={(text) => setForm((p) => ({ ...p, address: text }))}
+        {...getFormikTextFieldProps(formik, "address")}
       />
       <PrimaryButton
-        onPress={handleSave}
+        onPress={formik.submitForm}
         loading={updateProfile.isPending}
+        disabled={!formik.isValid}
         title="Update address"
       />
     </ScrollableForm>

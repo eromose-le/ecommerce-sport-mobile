@@ -4,43 +4,53 @@ import ScrollableForm from "@/components/common/ScrollableForm";
 import { useUpdateProfileMutation } from "@/hooks/useUpdateProfileMutation";
 import { useAuth } from "@/providers/auth";
 import { IUpdateUserPayload } from "@/services/user/user.types";
-import { useEffect, useState } from "react";
+import { getFormikTextFieldProps } from "@/utils/formik";
+import { Logger } from "@/utils/logger";
+import { useFormik } from "formik";
 import { Text } from "react-native";
+import { InferType, object, string } from "yup";
+
+const userProfileSchema = object({
+  firstName: string().trim().required("First name is required"),
+  lastName: string().trim().required("Last name is required"),
+  phone: string().trim().required("Phone number is required"),
+  address: string().trim().required("Address is required"),
+  email: string()
+    .trim()
+    .email("Enter a valid email")
+    .optional()
+    .nullable()
+    .transform((value) => (value === "" ? undefined : value)),
+});
+
+type UserProfileFormValues = InferType<typeof userProfileSchema>;
 
 const UserProfile = () => {
   const { user } = useAuth();
-  const [form, setForm] = useState({
-    firstName: user?.firstName || "",
-    lastName: user?.lastName || "",
-    email: user?.email || "",
-    phone: user?.phone || "",
-    address: user?.address || "",
-    location: user?.location || "",
-  });
-
   const updateProfile = useUpdateProfileMutation();
-
-  useEffect(() => {
-    setForm({
+  const formik = useFormik<UserProfileFormValues>({
+    enableReinitialize: true,
+    validateOnMount: true,
+    initialValues: {
       firstName: user?.firstName || "",
       lastName: user?.lastName || "",
       email: user?.email || "",
       phone: user?.phone || "",
       address: user?.address || "",
-      location: user?.location || "",
-    });
-  }, [user]);
+    },
+    validationSchema: userProfileSchema,
+    onSubmit: (values) => {
+      const payload: IUpdateUserPayload = {
+        firstName: values.firstName.trim(),
+        lastName: values.lastName.trim(),
+        phone: values.phone.trim(),
+        address: values.address.trim(),
+      };
+      updateProfile.mutate(payload);
+    },
+  });
 
-  const handleSave = () => {
-    const payload: IUpdateUserPayload = {
-      firstName: form.firstName.trim(),
-      lastName: form.lastName.trim(),
-      phone: form.phone.trim(),
-      address: form.address.trim(),
-      location: form.location.trim(),
-    };
-    updateProfile.mutate(payload);
-  };
+  Logger.warn("formik", formik.values);
 
   return (
     <ScrollableForm>
@@ -50,35 +60,31 @@ const UserProfile = () => {
       </Text>
       <LabeledInput
         label="First name"
-        value={form.firstName}
-        onChangeText={(text) => setForm((p) => ({ ...p, firstName: text }))}
+        {...getFormikTextFieldProps(formik, "firstName")}
       />
       <LabeledInput
         label="Last name"
-        value={form.lastName}
-        onChangeText={(text) => setForm((p) => ({ ...p, lastName: text }))}
+        {...getFormikTextFieldProps(formik, "lastName")}
       />
-      <LabeledInput label="Email" value={form.email} editable={false} />
+      <LabeledInput
+        label="Email"
+        disabled
+        {...getFormikTextFieldProps(formik, "email")}
+      />
       <LabeledInput
         label="Phone"
-        value={form.phone}
-        onChangeText={(text) => setForm((p) => ({ ...p, phone: text }))}
         keyboardType="phone-pad"
-      />
-      <LabeledInput
-        label="Location"
-        value={form.location}
-        onChangeText={(text) => setForm((p) => ({ ...p, location: text }))}
+        {...getFormikTextFieldProps(formik, "phone")}
       />
       <LabeledInput
         label="Address"
-        value={form.address}
         multiline
-        onChangeText={(text) => setForm((p) => ({ ...p, address: text }))}
+        {...getFormikTextFieldProps(formik, "address")}
       />
       <PrimaryButton
-        onPress={handleSave}
+        onPress={formik.submitForm}
         loading={updateProfile.isPending}
+        disabled={!formik.isValid}
         title="Save changes"
       />
     </ScrollableForm>
