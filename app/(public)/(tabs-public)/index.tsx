@@ -31,7 +31,7 @@ export default function PublicHome() {
         {/* Header Logo */}
         <View className="flex-row items-center justify-between mb-2">
           <SvgIcon Icon={LogoIcon} size={75} />
-          <View className="">
+          <View className="items-center">
             <BackButton onPress={unSkipLogin} />
             <Text className="mb-3 text-xs font-light text-secondary font-jost">
               Sign in
