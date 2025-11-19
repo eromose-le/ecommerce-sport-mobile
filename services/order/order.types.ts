@@ -24,6 +24,7 @@ export type Order = {
 
 export interface FetchOrdersParams {
   userId?: string | number;
+  sort?: string;
   page?: number;
   limit?: number;
 }

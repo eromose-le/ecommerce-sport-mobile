@@ -6,7 +6,9 @@ export const fetchOrders = async (
   params: FetchOrdersParams
 ): Promise<OrdersResponse> => {
   try {
-    const response = await api.get("/orders", { params });
+    const response = await api.get("/orders", {
+      params,
+    });
 
     if (!response?.data?.success) {
       throw new Error(response?.data?.error || "Unable to fetch orders");

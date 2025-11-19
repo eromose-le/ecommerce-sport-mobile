@@ -2,6 +2,7 @@ import { PRODUCT_DETAIL } from "@/constants/urls";
 import { useAuth } from "@/providers/auth";
 import { OrderService } from "@/services/api";
 import { Order, OrderItem } from "@/services/order/order.types";
+import { formatDate } from "@/utils/date";
 import { resolveImageSource } from "@/utils/images";
 import { Ionicons } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
@@ -26,6 +27,7 @@ const Orders = () => {
     queryFn: () =>
       OrderService.fetchOrders({
         userId: user?.id as string,
+        sort: "asc",
         page,
         limit,
       }),
@@ -45,6 +47,7 @@ const Orders = () => {
   return (
     <ScrollView
       className="flex-1 px-6 pt-6"
+      contentContainerStyle={{ paddingBottom: 32 }}
       refreshControl={
         <RefreshControl refreshing={isRefetching} onRefresh={() => refetch()} />
       }
@@ -57,30 +60,7 @@ const Orders = () => {
         <EmptyState message="No orders yet" icon="bag-handle-outline" />
       ) : (
         orders.map((order) => (
-          <View
-            key={String(order.id)}
-            className="p-4 mb-6 border border-gray-100 shadow-sm rounded-2xl"
-          >
-            <View className="flex-row items-center justify-between mb-3">
-              <View>
-                <Text className="text-base font-jost-semibold text-primary">
-                  Order #{order.id}
-                </Text>
-                <Text className="text-xs text-secondary">
-                  {formatDate(order.createdAt)} · {order.status}
-                </Text>
-              </View>
-              <StatusPill status={order.status} />
-            </View>
-
-            {(order.items ?? []).map((item) => (
-              <OrderItemRow
-                key={`${order.id}-${item.productId}-${item.orderId}`}
-                order={order}
-                item={item}
-              />
-            ))}
-          </View>
+          <OrderCard key={String(order.id)} order={order} />
         ))
       )}
 
@@ -107,7 +87,40 @@ const Orders = () => {
 
 export default Orders;
 
-const OrderItemRow = ({ order, item }: { order: Order; item: OrderItem }) => {
+const OrderCard = ({ order }: { order: Order }) => (
+  <View className="p-4 mb-6 bg-white border border-gray-200 rounded-2xl">
+    <View className="flex-row items-center justify-between mb-4">
+      <View>
+        <Text className="max-w-[250px] text-base font-jost-semibold text-primary text-wrap">
+          Order #{order.id}
+        </Text>
+        <Text className="mt-1 text-xs text-secondary">
+          {formatDate(order.createdAt)} · {order.status}
+        </Text>
+      </View>
+      <StatusPill status={order.status} />
+    </View>
+
+    {(order.items ?? []).map((item, index) => (
+      <OrderItemRow
+        key={`${order.id}-${item.productId}-${item.orderId}`}
+        order={order}
+        item={item}
+        isFirst={index === 0}
+      />
+    ))}
+  </View>
+);
+
+const OrderItemRow = ({
+  order,
+  item,
+  isFirst,
+}: {
+  order: Order;
+  item: OrderItem;
+  isFirst?: boolean;
+}) => {
   const product = item?.product;
 
   const handleViewProduct = () => {
@@ -119,7 +132,11 @@ const OrderItemRow = ({ order, item }: { order: Order; item: OrderItem }) => {
   };
 
   return (
-    <View className="flex-row items-center gap-4 py-3 border-t border-gray-100">
+    <View
+      className={`flex-row items-center gap-4 py-3 ${
+        isFirst ? "pt-0" : "border-t border-gray-100"
+      }`}
+    >
       <Image
         source={resolveImageSource(product?.displayImage)}
         className="w-16 h-16 rounded-lg"
@@ -149,15 +166,15 @@ const OrderItemRow = ({ order, item }: { order: Order; item: OrderItem }) => {
 const StatusPill = ({ status }: { status: string }) => {
   const normalized = status?.toLowerCase();
   const colorMap: Record<string, string> = {
-    delivered: "bg-green-100 text-green-700",
-    completed: "bg-green-100 text-green-700",
-    pending: "bg-yellow-100 text-yellow-700",
-    cancelled: "bg-red-100 text-red-700",
+    delivered: "bg-green-50 text-green-700",
+    completed: "bg-green-50 text-green-700",
+    pending: "bg-amber-50 text-amber-700",
+    cancelled: "bg-red-50 text-red-600",
   };
-  const classes = colorMap[normalized] || "bg-blue-100 text-blue-700";
+  const classes = colorMap[normalized] || "bg-blue-50 text-blue-700";
   return (
-    <View className={`rounded-full px-3 py-1 ${classes}`}>
-      <Text className="text-xs capitalize">{status}</Text>
+    <View className={`px-3 py-1 rounded-full ${classes}`}>
+      <Text className="text-xs capitalize font-jost-medium">{status}</Text>
     </View>
   );
 };
@@ -182,13 +199,9 @@ const PaginationButton = ({
 
 const EmptyState = ({ message, icon }: { message: string; icon: any }) => (
   <View className="items-center justify-center py-20">
-    <Ionicons name={icon} size={40} color="#D1D5DB" />
-    <Text className="mt-4 text-sm text-secondary">{message}</Text>
+    <View className="items-center justify-center w-16 h-16 mb-4 bg-gray-100 rounded-full">
+      <Ionicons name={icon} size={28} color="#9CA3AF" />
+    </View>
+    <Text className="text-sm text-center text-secondary">{message}</Text>
   </View>
 );
-
-const formatDate = (value: string) => {
-  if (!value) return "";
-  const date = new Date(value);
-  return date.toLocaleDateString();
-};
