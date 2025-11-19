@@ -1,9 +1,5 @@
-import { View, Text } from "react-native";
+import Order from "@/components/order/Order";
 
 export default function NotificationScreen() {
-  return (
-    <View className="flex-1 items-center justify-center bg-white">
-      <Text className="text-xl">Notifications</Text>
-    </View>
-  );
+  return <Order />;
 }

@@ -12,7 +12,7 @@ import OrderPaginationButton from "./OrderPaginationButton";
 const Order = () => {
   const { user } = useAuth();
   const [page, setPage] = useState(1);
-  const limit = 10;
+  const limit = 3;
   const { data, error, isLoading, refetch, isRefetching } = useQuery({
     queryKey: ["orders", user?.id, page],
     queryFn: () =>
