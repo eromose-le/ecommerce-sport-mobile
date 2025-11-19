@@ -21,3 +21,25 @@ export const PAGINATION_DEFAULT = {
 
 export const FIVE_MINUTES = 1000 * 60 * 5;
 
+export const faqs = [
+  {
+    question: "How long does shipping take?",
+    answer:
+      "Shipping typically takes 3–5 business days within the country. International orders may take up to 14 business days.",
+  },
+  {
+    question: "Can I return an item?",
+    answer:
+      "Yes, you can return any unused item within 7 days of delivery. Please ensure it is in its original packaging.",
+  },
+  {
+    question: "Do you offer bulk purchase discounts?",
+    answer:
+      "Absolutely! Contact our sales team for discounted pricing on bulk orders.",
+  },
+  {
+    question: "How can I track my order?",
+    answer:
+      "Once your order ships, you'll receive a tracking link via email. You can also check your order status in your account dashboard.",
+  },
+];

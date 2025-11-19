@@ -5,7 +5,7 @@ import { useAppState } from "@/hooks/useAppState";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import { useAuth } from "@/providers/auth";
 import { Logger } from "@/utils/logger";
-import { Redirect, Slot } from "expo-router";
+import { Redirect, Stack } from "expo-router";
 import { View } from "react-native";
 
 export default function ProtectedLayout() {
@@ -35,7 +35,7 @@ export default function ProtectedLayout() {
 
   return (
     <ErrorBoundary>
-      <Slot />
+      <Stack screenOptions={{ headerShown: false }} />
     </ErrorBoundary>
   );
 }

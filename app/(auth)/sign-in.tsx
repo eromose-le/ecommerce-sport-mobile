@@ -33,7 +33,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 const { height } = Dimensions.get("window");
 
 export default function SignIn() {
-  const params = useLocalSearchParams();
+  const params = useLocalSearchParams<{ fromOnboarding?: string }>();
   const cameFromOnboarding = params?.fromOnboarding === "true";
   const { login, user, skipLogin } = useAuth();
   const { isFreshUser, isGuest } = useAuthUser();

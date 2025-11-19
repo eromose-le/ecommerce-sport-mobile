@@ -12,7 +12,7 @@ interface ProductCardProps {
   horizontal?: boolean;
   width?: number;
   index?: number;
-  onAddToCart?: () => void; // optional callback
+  onAddToCart?: () => void;
 }
 
 export const ProductCard: React.FC<ProductCardProps> = ({

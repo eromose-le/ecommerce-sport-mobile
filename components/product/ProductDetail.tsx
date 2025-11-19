@@ -8,12 +8,15 @@ import ProductAttributes from "@/components/product/ProductAttributes";
 import ProductDetailActions from "@/components/product/ProductDetailActions";
 import ProductGallery from "@/components/product/ProductGallery";
 import ProductReviews from "@/components/product/ProductReviews";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { products } from "@/lib/dummy-data";
 import { formatCurrency } from "@/utils/currency";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function ProductDetail() {
-  const { product } = useLocalSearchParams() as any;
+  const { product } = useLocalSearchParams<{
+    id?: string;
+    product?: any[];
+  }>() as any;
   const item = JSON.parse(product);
 
   return (

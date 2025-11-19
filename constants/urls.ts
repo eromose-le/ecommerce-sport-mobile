@@ -8,6 +8,7 @@ export const TABS_PUBLIC = "/(public)/(tabs-public)";
 export const CART_PUBLIC = "/(public)/(tabs-public)/cart";
 export const PRODUCT_DETAIL = "/product/[id]";
 export const PROFILE = "/(protected)/(tabs-protected)/profile";
+export const PROFILE_DETAIL = "/(protected)/profile/[id]";
 
 // auth
 export const SIGN_IN = "/(auth)/sign-in";
