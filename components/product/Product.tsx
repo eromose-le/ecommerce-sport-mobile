@@ -67,12 +67,6 @@ export default function Product() {
         />
 
         <View className="flex items-center justify-center w-full">
-          {/* <LoadingContent
-            loading={productIsLoading}
-            error={productError}
-            onRetry={productRefetch}
-            data={productsResponse}
-          > */}
           <ProductGrid
             data={productsResponse}
             loading={productIsLoading}
@@ -85,7 +79,6 @@ export default function Product() {
             gap={12}
             scrollEnabled={false}
           />
-          {/* </LoadingContent> */}
         </View>
       </View>
 
@@ -97,12 +90,6 @@ export default function Product() {
           onActionPress={() => {}}
         />
 
-        {/* <LoadingContent
-          loading={productIsLoading}
-          error={productError}
-          onRetry={productRefetch}
-          data={productsResponse}
-        > */}
         <ProductGrid
           data={productsResponse}
           loading={productIsLoading}
@@ -113,7 +100,6 @@ export default function Product() {
           skeletonCount={3}
           gap={12}
         />
-        {/* </LoadingContent> */}
       </View>
     </>
   );

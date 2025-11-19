@@ -6,6 +6,7 @@ interface EmptyStateProps {
   onRetry?: () => void;
   className?: string; // override styles
   EmptyComponent?: (error: any, onRetry?: () => void) => React.ReactNode;
+  icon?: React.ReactNode;
 }
 
 export const EmptyState: React.FC<EmptyStateProps> = ({
@@ -13,6 +14,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   onRetry,
   className,
   EmptyComponent,
+  icon,
 }) => {
   const defaultContainer =
     "items-center px-5 py-8 w-full border border-background bg-white rounded-2xl";
@@ -28,6 +30,8 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   return (
     <View className={className || defaultContainer}>
       <>
+        {icon}
+
         <Text className="mb-0 text-center font-jost-medium">
           {error ? error : "No data available"}
         </Text>
