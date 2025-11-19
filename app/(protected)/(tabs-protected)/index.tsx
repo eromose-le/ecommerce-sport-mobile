@@ -5,13 +5,10 @@ import { SvgIcon } from "@/components/common/SvgIcon";
 import Product from "@/components/product/Product";
 import { FIVE_MINUTES } from "@/constants";
 import { PROFILE } from "@/constants/urls";
-import { useAppState } from "@/hooks/useAppState";
-import { useAuthUser } from "@/hooks/useAuthUser";
 import { useAuth } from "@/providers/auth";
 import { UserService } from "@/services/api";
 import { IUserResponse } from "@/services/user/user.types";
 
-import { Logger } from "@/utils/logger";
 import { AppToast } from "@/utils/toast";
 import { Ionicons } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
@@ -29,10 +26,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function ProtectedHome() {
   const { logout } = useAuth();
-  const appState = useAppState();
-  const userState = useAuthUser();
-
-  Logger.warn("LABEL", "(PROTECTED) home ==::", { appState, userState });
 
   const { data, isLoading, error, refetch, isSuccess } =
     useQuery<IUserResponse>({

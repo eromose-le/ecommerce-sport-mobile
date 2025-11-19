@@ -1,6 +1,8 @@
 import AppLoader from "@/components/common/AppLoader";
 import { ErrorBoundary } from "@/components/common/ErrorBoundary";
 import { TABS_PROTECTED } from "@/constants/urls";
+import { useAppState } from "@/hooks/useAppState";
+import { useAuthUser } from "@/hooks/useAuthUser";
 import { useAuth } from "@/providers/auth";
 import { Logger } from "@/utils/logger";
 import { Redirect, Slot } from "expo-router";
@@ -9,7 +11,11 @@ import "../global.css";
 
 export default function PublicLayout() {
   const { user, loading } = useAuth();
-  Logger.warn("(PUBLIC) _layout ==::", { user, loading });
+
+  const appState = useAppState();
+  const userState = useAuthUser();
+
+  Logger.warn("LAYOUT", "(PUBLIC) ==::", { appState, userState });
 
   // Show loader while auth state is loading
   if (loading) {

@@ -1,7 +1,15 @@
+import { useAppState } from "@/hooks/useAppState";
+import { useAuthUser } from "@/hooks/useAuthUser";
+import { Logger } from "@/utils/logger";
 import { Stack } from "expo-router";
 import React from "react";
 
 export default function AuthLayout() {
+  const appState = useAppState();
+  const userState = useAuthUser();
+
+  Logger.warn("LAYOUT", "(AUTH) ==::", { appState, userState });
+
   // Default: show public stack (SignIn / SignUp / OnBoarding)
   return (
     <Stack>

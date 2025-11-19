@@ -51,12 +51,13 @@ function RootContent() {
     );
   }
 
-  Logger.warn("(APP _content) ==::", {
+  Logger.warn("LAYOUT", "(APP) ==::", {
     fontsLoaded,
     appIsReady,
     loading,
     env: AppEnv,
   });
+
   return (
     <>
       <StatusBar style="dark" />
@@ -66,7 +67,6 @@ function RootContent() {
 }
 
 export default function RootLayout() {
-  Logger.warn("(APP _LAYOUT) ==::");
   return (
     <ErrorBoundary>
       <QueryProvider>

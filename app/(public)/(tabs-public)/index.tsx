@@ -4,7 +4,6 @@ import { SvgIcon } from "@/components/common/SvgIcon";
 import Product from "@/components/product/Product";
 
 import { useAuth } from "@/providers/auth";
-import { Logger } from "@/utils/logger";
 import { Ionicons } from "@expo/vector-icons";
 import {
   ScrollView,
@@ -16,9 +15,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function PublicHome() {
-  const { user, loading, skippedLogin, unSkipLogin } = useAuth();
-
-  Logger.warn("LABEL", "(PUBLIC home) ==::", { user, loading, skippedLogin });
+  const { unSkipLogin } = useAuth();
 
   return (
     <SafeAreaView

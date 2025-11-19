@@ -16,8 +16,11 @@ api.interceptors.request.use(async (config) => {
   const tokenString = await SecureStore.getItemAsync("user");
   const token = tokenString ? JSON.parse(tokenString) : null;
 
-  Logger.warn("TOKEN", token?.token);
-  Logger.warn("HEADERS", config.headers);
+  Logger.warn("HTTP", "TOKEN - HEADERS ==::", {
+    token: token?.token,
+    header: config.headers,
+  });
+
   if (token) {
     config.headers.Authorization = `Bearer ${token?.token}`;
   }
@@ -27,7 +30,7 @@ api.interceptors.request.use(async (config) => {
 // Handle unauthorized
 api.interceptors.response.use(
   (res) => {
-    Logger.success("AXIOS RESPONSE:", res?.data);
+    Logger.success("HTTP", "AXIOS RESPONSE ==::", res?.data);
     return res;
   },
   async (error) => {
@@ -36,7 +39,7 @@ api.interceptors.response.use(
       await SecureStore.deleteItemAsync("user");
     }
 
-    Logger.error("AXIOS ERROR:", error?.message);
+    Logger.error("HTTP", "AXIOS ERROR ==::", error?.message);
     return Promise.reject(error);
   }
 );

@@ -3,7 +3,6 @@ import {
   SCREEN_LABELS,
 } from "@/components/profile/profile-constants";
 import { ScreenComponentProps, ScreenKey } from "@/types/profile";
-import { Logger } from "@/utils/logger";
 import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import { Text, TouchableOpacity, View } from "react-native";
@@ -35,8 +34,6 @@ export default function ProfileDetailScreen() {
   const screenKey = (params.id as ScreenKey) || profileKeys.userProfile;
   const ScreenComponent = SCREEN_COMPONENTS[screenKey] ?? ComingSoon;
   const title = SCREEN_LABELS[screenKey] || "Profile";
-
-  Logger.warn("PROFILE_DETAIL", { params, screenKey });
 
   return (
     <SafeAreaView className="flex-1 bg-white">

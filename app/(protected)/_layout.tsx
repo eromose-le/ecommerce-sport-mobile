@@ -14,9 +14,7 @@ export default function ProtectedLayout() {
   const appState = useAppState();
   const userState = useAuthUser();
 
-  Logger.dump("APP_STATE", appState);
-  Logger.dump("USER_STATE", userState);
-  Logger.dump("LABEL", "(PROTECTED) _layout ==::");
+  Logger.warn("LAYOUT", "(PROTECTED) ==::", { appState, userState });
 
   if (loading) {
     return (
