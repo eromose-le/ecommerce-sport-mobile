@@ -10,7 +10,9 @@ import ProductGallery from "@/components/product/ProductGallery";
 import ProductReviews from "@/components/product/ProductReviews";
 import { products } from "@/lib/dummy-data";
 import { formatCurrency } from "@/utils/currency";
+import { Logger } from "@/utils/logger";
 import { SafeAreaView } from "react-native-safe-area-context";
+import ProductSpecifications from "./ProductSpecifications";
 
 export default function ProductDetail() {
   const { product } = useLocalSearchParams<{
@@ -19,6 +21,7 @@ export default function ProductDetail() {
   }>() as any;
   const item = JSON.parse(product);
 
+  Logger.warn("item", item);
   return (
     <SafeAreaView className="flex-1 bg-background">
       <View className="flex-1 bg-white">
@@ -94,6 +97,11 @@ export default function ProductDetail() {
 
           {/* KEY ATTRIBUTES */}
           <ProductAttributes attributes={item?.keyattribute} />
+
+          <ProductSpecifications
+            modelNumber={item?.modelNumber}
+            specifications={item?.specification}
+          />
 
           {/* REVIEWS */}
           {/* TODO: replace dummy */}

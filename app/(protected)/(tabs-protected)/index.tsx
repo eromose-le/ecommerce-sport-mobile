@@ -5,7 +5,6 @@ import { FIVE_MINUTES } from "@/constants";
 import { PROFILE } from "@/constants/urls";
 import { UserService } from "@/services/api";
 import { IUserResponse } from "@/services/user/user.types";
-
 import { AppToast } from "@/utils/toast";
 import { Ionicons } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
@@ -15,7 +14,6 @@ import {
   ActivityIndicator,
   ScrollView,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -31,13 +29,19 @@ export default function ProtectedHome() {
     });
 
   useEffect(() => {
-    if (isSuccess) {
-      AppToast.success(`${data?.data?.firstName}'s profile retived!`);
+    if (isSuccess && data?.data?.firstName) {
+      AppToast.success(`${data.data.firstName}'s profile retrieved!`);
     }
   }, [data, isSuccess]);
 
   const userResponse = data?.data || null;
-  const userName = `${data?.data?.firstName} ${data?.data?.lastName}`;
+  const userName =
+    `${data?.data?.firstName ?? ""} ${data?.data?.lastName ?? ""}`.trim() ||
+    "Guest";
+
+  const handleSearchPress = () => {
+    router.push("/search");
+  };
 
   return (
     <SafeAreaView
@@ -49,6 +53,7 @@ export default function ProtectedHome() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 50 }}
         stickyHeaderIndices={[1]}
+        keyboardShouldPersistTaps="handled"
       >
         {/* Header Logo */}
         <View className="flex-row items-center justify-between mb-2">
@@ -59,7 +64,9 @@ export default function ProtectedHome() {
               onPress={() => router.push(PROFILE)}
               className="items-center justify-center bg-black rounded-full w-9 h-9"
             >
-              <Text className="font-semibold text-white">{userName[0]}</Text>
+              <Text className="font-semibold text-white">
+                {userName[0] ?? "U"}
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -68,7 +75,7 @@ export default function ProtectedHome() {
         <View className="z-50 pt-2 pb-3 bg-background">
           <View className="flex-row items-center gap-1 mb-3">
             <Text className="text-sm font-light text-secondary font-jost">
-              What are you buying today?
+              What are you buying today,
             </Text>
             <LoadingContent
               loading={isLoading}
@@ -89,28 +96,32 @@ export default function ProtectedHome() {
               )}
             >
               <Text className="text-sm font-light text-secondary font-jost">
-                {userName}
+                {userName}?
               </Text>
             </LoadingContent>
           </View>
 
-          <View className="flex-row items-center px-3 py-3 bg-[#F0F0F0] gap-4 rounded-2xl">
-            <TouchableOpacity className="flex-row items-center px-6 py-2 mr-2 bg-white rounded-xl">
+          {/* Search Bar */}
+          <TouchableOpacity
+            activeOpacity={0.85}
+            onPress={handleSearchPress}
+            className="flex-row items-center px-3 py-3 bg-[#F0F0F0] gap-4 rounded-2xl"
+          >
+            <View className="flex-row items-center px-6 py-2 mr-2 bg-white rounded-xl">
               <Text className="mr-2 text-sm font-bold text-primary">
                 Products
               </Text>
-              <Ionicons name="chevron-down" size={14} color="black" />
-            </TouchableOpacity>
+              {/* <Ionicons name="chevron-down" size={14} color="black" /> */}
+            </View>
 
-            <TextInput
-              placeholder="Search..."
-              placeholderTextColor="#aaa"
-              className="flex-1 text-secondary font-jost-semibold"
-            />
+            <Text className="flex-1 text-secondary font-jost-medium">
+              I am looking for...
+            </Text>
             <Ionicons name="search-outline" size={20} color="black" />
-          </View>
+          </TouchableOpacity>
         </View>
 
+        {/* Main product listing */}
         <Product />
       </ScrollView>
     </SafeAreaView>
