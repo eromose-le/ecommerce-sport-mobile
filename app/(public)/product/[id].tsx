@@ -1,5 +1,5 @@
 import ProductDetail from "@/components/product/ProductDetail";
 
-export default function ProductDetailPublic() {
+export default function PublicProductDetail() {
   return <ProductDetail />;
 }

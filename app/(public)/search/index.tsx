@@ -1,5 +1,5 @@
 import Search from "@/components/search/Search";
 
-export default function ProtectedSearch() {
+export default function PublicSearch() {
   return <Search />;
 }

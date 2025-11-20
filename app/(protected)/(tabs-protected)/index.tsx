@@ -2,7 +2,7 @@ import { LoadingContent } from "@/components/common/LoadingContent";
 import Logo from "@/components/common/Logo";
 import Product from "@/components/product/Product";
 import { FIVE_MINUTES } from "@/constants";
-import { PROFILE } from "@/constants/urls";
+import { PROFILE, SEARCH_PROTECTED } from "@/constants/urls";
 import { UserService } from "@/services/api";
 import { IUserResponse } from "@/services/user/user.types";
 import { AppToast } from "@/utils/toast";
@@ -40,7 +40,7 @@ export default function ProtectedHome() {
     "Guest";
 
   const handleSearchPress = () => {
-    router.push("/search");
+    router.push(SEARCH_PROTECTED);
   };
 
   return (

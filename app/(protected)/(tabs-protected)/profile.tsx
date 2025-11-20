@@ -26,7 +26,7 @@ const navigateToProfileDetail = (key: ScreenKey) => {
   });
 };
 
-export default function ProfileScreen() {
+export default function ProtectedProfile() {
   const { user, logout } = useAuth();
   const displayName =
     [user?.firstName, user?.lastName].filter(Boolean).join(" ") || "Guest";

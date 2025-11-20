@@ -1,5 +1,5 @@
 import Order from "@/components/order/Order";
 
-export default function NotificationScreen() {
+export default function ProtectedNotification() {
   return <Order />;
 }

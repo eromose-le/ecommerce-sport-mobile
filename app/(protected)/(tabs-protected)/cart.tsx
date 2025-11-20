@@ -1,6 +1,6 @@
 import Cart from "@/components/cart/Cart";
 import React from "react";
 
-export default function CartProtected() {
+export default function ProtectedCart() {
   return <Cart />;
 }

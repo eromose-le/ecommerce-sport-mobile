@@ -25,16 +25,16 @@ npm run reset-project
 1. propagate the public index
 2. introduct the default pagination constant and limit
 3. setup custom forms (login / register / forgot password / reset password)
-4. wire peoduct detail screen
-5. checkout page
-6. categories
-7. all product page with filter (see all button)
-8. specification section
-9. card sales prices and discount
-10. review
-11. cart page func
-12. search
-13. add amount format
-14. image slider
-15. night mood
+4. specification section
+5. night mood
+6. all product page with filter (see all button)
+7. wire product detail screen
+8.  search, global component, public search, move to [search] folder component
+9.  categories
+10. card sales prices and discount
+11. review
+12. image slider
+13. cart page func
+14. add amount format
+15. checkout page
  -->

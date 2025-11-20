@@ -2,9 +2,11 @@ import LogoIcon from "@/assets/icons/logo.svg";
 import { BackButton } from "@/components/common/BackButton";
 import { SvgIcon } from "@/components/common/SvgIcon";
 import Product from "@/components/product/Product";
+import { SEARCH_PUBLIC } from "@/constants/urls";
 
 import { useAuth } from "@/providers/auth";
 import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
 import {
   ScrollView,
   Text,
@@ -16,6 +18,10 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function PublicHome() {
   const { unSkipLogin } = useAuth();
+
+  const handleSearchPress = () => {
+    router.push(SEARCH_PUBLIC);
+  };
 
   return (
     <SafeAreaView
@@ -46,11 +52,15 @@ export default function PublicHome() {
           </Text>
 
           <View className="flex-row items-center px-3 py-3 bg-[#F0F0F0] gap-4 rounded-2xl">
-            <TouchableOpacity className="flex-row items-center px-6 py-2 mr-2 bg-white rounded-xl">
+            <TouchableOpacity
+              activeOpacity={0.85}
+              onPress={handleSearchPress}
+              className="flex-row items-center px-6 py-2 mr-2 bg-white rounded-xl"
+            >
               <Text className="mr-2 text-sm font-bold text-primary">
                 Products
               </Text>
-              <Ionicons name="chevron-down" size={14} color="black" />
+              {/* <Ionicons name="chevron-down" size={14} color="black" /> */}
             </TouchableOpacity>
 
             <TextInput
