@@ -1,8 +1,8 @@
+import AppProtectedHeader from "@/components/common/AppProtectedHeader";
 import { LoadingContent } from "@/components/common/LoadingContent";
-import Logo from "@/components/common/Logo";
 import Product from "@/components/product/Product";
 import { FIVE_MINUTES } from "@/constants";
-import { PROFILE, SEARCH_PROTECTED } from "@/constants/urls";
+import { SEARCH_PROTECTED } from "@/constants/urls";
 import { UserService } from "@/services/api";
 import { IUserResponse } from "@/services/user/user.types";
 import { AppToast } from "@/utils/toast";
@@ -56,20 +56,7 @@ export default function ProtectedHome() {
         keyboardShouldPersistTaps="handled"
       >
         {/* Header Logo */}
-        <View className="flex-row items-center justify-between mb-2">
-          <Logo />
-
-          <View className="flex-row gap-2">
-            <TouchableOpacity
-              onPress={() => router.push(PROFILE)}
-              className="items-center justify-center bg-black rounded-full w-9 h-9"
-            >
-              <Text className="font-semibold text-white">
-                {userName[0] ?? "U"}
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
+        <AppProtectedHeader />
 
         {/* Sticky Search Section */}
         <View className="z-50 pt-2 pb-3 bg-background">
@@ -101,7 +88,6 @@ export default function ProtectedHome() {
             </LoadingContent>
           </View>
 
-          {/* Search Bar */}
           <TouchableOpacity
             activeOpacity={0.85}
             onPress={handleSearchPress}
@@ -121,7 +107,6 @@ export default function ProtectedHome() {
           </TouchableOpacity>
         </View>
 
-        {/* Main product listing */}
         <Product />
       </ScrollView>
     </SafeAreaView>

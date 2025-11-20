@@ -1,24 +1,13 @@
-import LogoIcon from "@/assets/icons/logo.svg";
-import { BackButton } from "@/components/common/BackButton";
-import { SvgIcon } from "@/components/common/SvgIcon";
+import AppPublicHeader from "@/components/common/AppPublicHeader";
 import Product from "@/components/product/Product";
 import { SEARCH_PUBLIC } from "@/constants/urls";
 
-import { useAuth } from "@/providers/auth";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import {
-  ScrollView,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function PublicHome() {
-  const { unSkipLogin } = useAuth();
-
   const handleSearchPress = () => {
     router.push(SEARCH_PUBLIC);
   };
@@ -35,15 +24,7 @@ export default function PublicHome() {
         stickyHeaderIndices={[1]}
       >
         {/* Header Logo */}
-        <View className="flex-row items-center justify-between mb-2">
-          <SvgIcon Icon={LogoIcon} size={75} />
-          <View className="items-center">
-            <BackButton onPress={unSkipLogin} />
-            <Text className="mb-3 text-xs font-light text-secondary font-jost">
-              Sign in
-            </Text>
-          </View>
-        </View>
+        <AppPublicHeader />
 
         {/* Sticky Search Section */}
         <View className="z-50 pt-2 pb-3 bg-background">
@@ -51,25 +32,23 @@ export default function PublicHome() {
             What are you buying today?
           </Text>
 
-          <View className="flex-row items-center px-3 py-3 bg-[#F0F0F0] gap-4 rounded-2xl">
-            <TouchableOpacity
-              activeOpacity={0.85}
-              onPress={handleSearchPress}
-              className="flex-row items-center px-6 py-2 mr-2 bg-white rounded-xl"
-            >
+          <TouchableOpacity
+            activeOpacity={0.85}
+            onPress={handleSearchPress}
+            className="flex-row items-center px-3 py-3 bg-[#F0F0F0] gap-4 rounded-2xl"
+          >
+            <View className="flex-row items-center px-6 py-2 mr-2 bg-white rounded-xl">
               <Text className="mr-2 text-sm font-bold text-primary">
                 Products
               </Text>
               {/* <Ionicons name="chevron-down" size={14} color="black" /> */}
-            </TouchableOpacity>
+            </View>
 
-            <TextInput
-              placeholder="Search..."
-              placeholderTextColor="#aaa"
-              className="flex-1 text-secondary font-jost-semibold"
-            />
+            <Text className="flex-1 text-secondary font-jost-medium">
+              I am looking for...
+            </Text>
             <Ionicons name="search-outline" size={20} color="black" />
-          </View>
+          </TouchableOpacity>
         </View>
 
         <Product />
