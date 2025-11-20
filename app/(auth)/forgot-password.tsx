@@ -1,32 +1,44 @@
 import AppLoader from "@/components/common/AppLoader";
+import LabeledInput from "@/components/common/LabeledInput";
+import PrimaryButton from "@/components/common/PrimaryButton";
+import SecondaryButton from "@/components/common/SecondaryButton";
 import { RESET_PASSWORD, SIGN_IN } from "@/constants/urls";
 import { AuthService } from "@/services/api";
 import { IRequestPasswordResetPayload } from "@/services/auth/auth.types";
 import { AppToast } from "@/utils/toast";
 import { useMutation } from "@tanstack/react-query";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
+import { useFormik } from "formik";
 import { useState } from "react";
 import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
   Text,
-  TextInput,
-  TouchableOpacity,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { InferType, object, string } from "yup";
+
+const forgotPasswordSchema = object({
+  email: string()
+    .trim()
+    .email("Enter a valid email address")
+    .required("Email is required"),
+});
+
+type ForgotPasswordFormValues = InferType<typeof forgotPasswordSchema>;
 
 export default function ForgotPassword() {
-  const [email, setEmail] = useState("");
+  const params = useLocalSearchParams<{ email?: string }>();
   const [loadingOverlay, setLoadingOverlay] = useState(false);
 
   const requestMutation = useMutation({
     mutationFn: (payload: IRequestPasswordResetPayload) =>
       AuthService.requestPasswordReset(payload),
     onMutate: () => setLoadingOverlay(true),
-    onSuccess: (res) => {
-      const targetEmail = res?.data?.email || email;
+    onSuccess: (res, variables) => {
+      const targetEmail = res?.data?.email || variables?.email || "";
       AppToast.success(res?.message || "Reset code sent to your email");
       router.push({
         pathname: RESET_PASSWORD,
@@ -43,16 +55,19 @@ export default function ForgotPassword() {
     onSettled: () => setLoadingOverlay(false),
   });
 
-  const handleSubmit = () => {
-    const trimmedEmail = email.trim();
-    if (!trimmedEmail) {
-      AppToast.info("Enter your email");
-      return;
-    }
-    if (requestMutation.isPending) return;
+  const formik = useFormik<ForgotPasswordFormValues>({
+    enableReinitialize: true,
+    initialValues: {
+      email: typeof params.email === "string" ? params.email : "",
+    },
+    validationSchema: forgotPasswordSchema,
+    validateOnMount: true,
+    onSubmit: (values) => {
+      requestMutation.mutate({ email: values.email.trim() });
+    },
+  });
 
-    requestMutation.mutate({ email: trimmedEmail });
-  };
+  const handleSubmit = () => formik.handleSubmit();
 
   return (
     <SafeAreaView className="flex-1 bg-background">
@@ -76,39 +91,32 @@ export default function ForgotPassword() {
           </View>
 
           <View className="gap-3 mt-16">
-            <Text className="text-sm text-gray-700 font-jost-medium">
-              Email
-            </Text>
-            <TextInput
+            <LabeledInput
+              label="Email"
               placeholder="eg. name@domain.com"
-              placeholderTextColor="#9CA3AF"
-              className="px-4 py-3 text-xs bg-white border-[0.34px] border-[#DEE2E6] rounded font-jost"
               autoCapitalize="none"
               keyboardType="email-address"
-              value={email}
-              onChangeText={setEmail}
+              value={formik.values.email}
+              onChangeText={formik.handleChange("email")}
+              onBlur={formik.handleBlur("email")}
+              error={formik.touched.email ? formik.errors.email : undefined}
             />
 
-            <TouchableOpacity
+            <PrimaryButton
+              title="Send code"
               onPress={handleSubmit}
-              disabled={requestMutation.isPending}
-              className={`w-full rounded mt-6 py-4 ${
-                requestMutation.isPending ? "bg-gray-200" : "bg-black"
-              }`}
-            >
-              <Text className="text-base text-center text-white font-jost-medium">
-                {requestMutation.isPending ? "Sending..." : "Send code"}
-              </Text>
-            </TouchableOpacity>
+              loading={requestMutation.isPending}
+              loadingText="Sending..."
+              disabled={!formik.isValid}
+              className="mt-2"
+            />
 
-            <TouchableOpacity
+            <SecondaryButton
+              title="Back to Login"
               onPress={() => router.replace(SIGN_IN)}
-              className="mt-4"
-            >
-              <Text className="text-base text-center underline text-primary font-jost-medium">
-                Back to Login
-              </Text>
-            </TouchableOpacity>
+              textClassName="text-primary underline"
+              className="border-transparent"
+            />
           </View>
         </ScrollView>
       </KeyboardAvoidingView>

@@ -1,6 +1,10 @@
 import DirectLeftIcon from "@/assets/icons/direct-left.svg";
 import AppLoader from "@/components/common/AppLoader";
+import PasswordField from "@/components/common/PasswordField";
+import PrimaryButton from "@/components/common/PrimaryButton";
+import SecondaryButton from "@/components/common/SecondaryButton";
 import { SvgIcon } from "@/components/common/SvgIcon";
+import TextField from "@/components/common/TextField";
 import {
   FORGOT_PASSWORD,
   ON_BOARDING,
@@ -13,9 +17,11 @@ import { useAuth } from "@/providers/auth";
 import { AuthService } from "@/services/api";
 import { ILoginUserPayload } from "@/services/auth/auth.types";
 import { User } from "@/services/user/user.types";
+import { Logger } from "@/utils/logger";
 import { AppToast } from "@/utils/toast";
 import { useMutation } from "@tanstack/react-query";
 import { router, useLocalSearchParams } from "expo-router";
+import { useFormik } from "formik";
 import { useEffect, useState } from "react";
 import {
   Dimensions,
@@ -24,24 +30,32 @@ import {
   Platform,
   ScrollView,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { InferType, object, string } from "yup";
 
 const { height } = Dimensions.get("window");
+
+const signInSchema = object({
+  email: string()
+    .trim()
+    .email("Enter a valid email address")
+    .required("Email is required"),
+  password: string()
+    .trim()
+    .min(6, "Password must be at least 6 characters")
+    .required("Password is required"),
+});
+
+type SignInFormValues = InferType<typeof signInSchema>;
 
 export default function SignIn() {
   const params = useLocalSearchParams<{ fromOnboarding?: string }>();
   const cameFromOnboarding = params?.fromOnboarding === "true";
   const { login, user, skipLogin } = useAuth();
   const { isFreshUser, isGuest } = useAuthUser();
-
-  const [form, setForm] = useState<ILoginUserPayload>({
-    email: "",
-    password: "",
-  });
 
   const [loadingOverlay, setLoadingOverlay] = useState(false);
 
@@ -63,7 +77,7 @@ export default function SignIn() {
   }, [cameFromOnboarding, isFreshUser]);
 
   const loginMutation = useMutation({
-    mutationFn: () => AuthService.loginUser(form),
+    mutationFn: (payload: ILoginUserPayload) => AuthService.loginUser(payload),
     onMutate: () => setLoadingOverlay(true),
     onSuccess: async (res) => {
       AppToast.success("Login Successful");
@@ -80,16 +94,28 @@ export default function SignIn() {
     onSettled: () => setLoadingOverlay(false),
   });
 
-  const handleLogin = () => {
-    if (!form.email || !form.password) {
-      AppToast.info("Enter email & password");
-      return;
-    }
-    loginMutation.mutate();
-  };
+  const formik = useFormik<SignInFormValues>({
+    initialValues: {
+      email: "",
+      password: "",
+    },
+    validationSchema: signInSchema,
+    validateOnMount: true,
+    onSubmit: (values) => {
+      const payload: ILoginUserPayload = {
+        email: values.email.trim(),
+        password: values.password,
+      };
+      loginMutation.mutate(payload);
+    },
+  });
+
+  const handleLogin = () => formik.handleSubmit();
 
   const handleRegister = () => router.push(SIGN_UP);
   const handleSkip = () => skipLogin();
+
+  Logger.warn("formik", formik.values);
 
   return (
     <View className="flex-1 bg-white">
@@ -123,63 +149,53 @@ export default function SignIn() {
               </Text>
             </View>
 
-            <View>
-              <Text className="mb-1 text-xs text-primary font-jost-medium">
-                Account
-              </Text>
-              <TextInput
-                placeholder="Enter your E-mail or member id"
-                placeholderTextColor="#828282"
+            <View className="gap-3">
+              <TextField
+                label="Email"
+                // hideLabel
+                // leftIconName="mail-outline"
+                placeholder="you@example.com"
                 keyboardType="email-address"
                 autoCapitalize="none"
-                className="p-3 mb-4 text-xs border-[0.46px] border-[#DEE2E6] rounded-md font-jost bg-white"
-                value={form.email}
-                onChangeText={(text) => setForm((p) => ({ ...p, email: text }))}
+                value={formik.values.email}
+                onChangeText={formik.handleChange("email")}
+                onBlur={formik.handleBlur("email")}
+                error={formik.touched.email ? formik.errors.email : undefined}
               />
-            </View>
-
-            <View>
-              <Text className="mb-1 text-xs text-primary font-jost-medium">
-                Password
-              </Text>
-              <TextInput
-                placeholder="Enter password"
-                placeholderTextColor="#828282"
-                secureTextEntry
-                className="p-3 mb-3 text-xs border-[0.46px] border-[#DEE2E6] rounded-md font-jost bg-white"
-                value={form.password}
-                onChangeText={(text) =>
-                  setForm((p) => ({ ...p, password: text }))
+              <PasswordField
+                label="Password"
+                // hideLabel
+                placeholder="******"
+                value={formik.values.password}
+                onChangeText={formik.handleChange("password")}
+                onBlur={formik.handleBlur("password")}
+                error={
+                  formik.touched.password ? formik.errors.password : undefined
                 }
               />
             </View>
 
-            <View className="items-center w-full mt-4">
-              <TouchableOpacity
+            <View className="items-center w-full gap-2 mt-8">
+              <PrimaryButton
+                title="Sign in"
+                onPress={handleLogin}
+                loading={loginMutation.isPending}
+                loadingText="Signing In..."
+                disabled={!formik.isValid}
+                className="w-full"
+              />
+              <SecondaryButton
+                title="Forgot password ?"
                 disabled={loginMutation.isPending}
                 onPress={() =>
                   router.push({
                     pathname: FORGOT_PASSWORD,
-                    params: { email: form.email },
+                    params: { email: formik.values.email.trim() },
                   })
                 }
-              >
-                <Text className="text-xs underline mb-7 text-primary font-jost-medium">
-                  Forgot password?
-                </Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                onPress={handleLogin}
-                disabled={loginMutation.isPending}
-                className={`py-4 w-full rounded mb-8 ${
-                  loginMutation.isPending ? "bg-background" : "bg-black"
-                }`}
-              >
-                <Text className="text-base text-center text-white font-jost-medium">
-                  {loginMutation.isPending ? "Signing In..." : "Sign in"}
-                </Text>
-              </TouchableOpacity>
+                textClassName="text-primary underline"
+                className="bg-white border-transparent w-fit"
+              />
             </View>
 
             <View className="items-center">
@@ -211,23 +227,21 @@ export default function SignIn() {
               </View>
             </View>
 
-            <View className="gap-3 mb-8">
-              <TouchableOpacity
+            <View className="flex-row items-center justify-center gap-3 mb-8">
+              <SecondaryButton
+                title="Create Account"
                 onPress={handleRegister}
                 disabled={loginMutation.isPending}
-              >
-                <Text className="text-base text-center underline font-jost-semibold text-primary">
-                  Create Account
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
+                textClassName="text-primary underline"
+                className="border-transparent"
+              />
+              <SecondaryButton
+                title="Skip for now?"
                 onPress={handleSkip}
                 disabled={loginMutation.isPending}
-              >
-                <Text className="text-base text-center underline font-jost text-secondary">
-                  Skip for now ?
-                </Text>
-              </TouchableOpacity>
+                textClassName="text-secondary underline"
+                className="border-transparent"
+              />
             </View>
           </ScrollView>
         </KeyboardAvoidingView>

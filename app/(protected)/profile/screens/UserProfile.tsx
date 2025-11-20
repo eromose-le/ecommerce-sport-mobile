@@ -1,20 +1,20 @@
-import LabeledInput from "@/components/common/LabeledInput";
 import PrimaryButton from "@/components/common/PrimaryButton";
 import ScrollableForm from "@/components/common/ScrollableForm";
+import TextField from "@/components/common/TextField";
 import { useUpdateProfileMutation } from "@/hooks/useUpdateProfileMutation";
 import { useAuth } from "@/providers/auth";
 import { IUpdateUserPayload } from "@/services/user/user.types";
 import { getFormikTextFieldProps } from "@/utils/formik";
 import { Logger } from "@/utils/logger";
 import { useFormik } from "formik";
-import { Text } from "react-native";
+import { Text, View } from "react-native";
 import { InferType, object, string } from "yup";
 
 const userProfileSchema = object({
   firstName: string().trim().required("First name is required"),
   lastName: string().trim().required("Last name is required"),
   phone: string().trim().required("Phone number is required"),
-  address: string().trim().required("Address is required"),
+  bio: string().optional().nullable(),
   email: string()
     .trim()
     .email("Enter a valid email")
@@ -36,7 +36,7 @@ const UserProfile = () => {
       lastName: user?.lastName || "",
       email: user?.email || "",
       phone: user?.phone || "",
-      address: user?.address || "",
+      bio: user?.bio || "",
     },
     validationSchema: userProfileSchema,
     onSubmit: (values) => {
@@ -44,7 +44,7 @@ const UserProfile = () => {
         firstName: values.firstName.trim(),
         lastName: values.lastName.trim(),
         phone: values.phone.trim(),
-        address: values.address.trim(),
+        bio: values.bio || "",
       };
       updateProfile.mutate(payload);
     },
@@ -58,35 +58,62 @@ const UserProfile = () => {
         Update your basic profile information. These details are used to
         personalize your experience.
       </Text>
-      <LabeledInput
-        label="First name"
-        {...getFormikTextFieldProps(formik, "firstName")}
-      />
-      <LabeledInput
-        label="Last name"
-        {...getFormikTextFieldProps(formik, "lastName")}
-      />
-      <LabeledInput
-        label="Email"
-        disabled
-        {...getFormikTextFieldProps(formik, "email")}
-      />
-      <LabeledInput
-        label="Phone"
-        keyboardType="phone-pad"
-        {...getFormikTextFieldProps(formik, "phone")}
-      />
-      <LabeledInput
-        label="Address"
-        multiline
-        {...getFormikTextFieldProps(formik, "address")}
-      />
-      <PrimaryButton
-        onPress={formik.submitForm}
-        loading={updateProfile.isPending}
-        disabled={!formik.isValid}
-        title="Save changes"
-      />
+
+      <View className="gap-4 mt-2">
+        <TextField
+          label="First name"
+          placeholder="Enter First name"
+          keyboardType="default"
+          autoCapitalize="none"
+          {...getFormikTextFieldProps(formik, "firstName")}
+        />
+
+        <TextField
+          label="Last name"
+          placeholder="Enter Last name"
+          keyboardType="default"
+          autoCapitalize="none"
+          {...getFormikTextFieldProps(formik, "lastName")}
+        />
+
+        <TextField
+          label="Email"
+          placeholder="you@example.com"
+          keyboardType="email-address"
+          autoCapitalize="none"
+          disabled
+          editable={false}
+          {...getFormikTextFieldProps(formik, "email")}
+        />
+
+        <TextField
+          label="Phone Number"
+          placeholder="Enter Phone"
+          keyboardType="phone-pad"
+          autoCapitalize="none"
+          {...getFormikTextFieldProps(formik, "phone")}
+        />
+
+        <TextField
+          label="Bio"
+          multiline
+          numberOfLines={4}
+          textAlignVertical="top"
+          placeholder="Tell us about yourself"
+          rightIconName="close-circle-outline"
+          onRightIconPress={() => formik.setFieldValue("bio", "")}
+          {...getFormikTextFieldProps(formik, "bio")}
+        />
+      </View>
+
+      <View className="mt-6">
+        <PrimaryButton
+          onPress={formik.submitForm}
+          loading={updateProfile.isPending}
+          disabled={!formik.isValid}
+          title="Save changes"
+        />
+      </View>
     </ScrollableForm>
   );
 };

@@ -1,13 +1,18 @@
 import AppLoader from "@/components/common/AppLoader";
+import PasswordField from "@/components/common/PasswordField";
+import PrimaryButton from "@/components/common/PrimaryButton";
+import SecondaryButton from "@/components/common/SecondaryButton";
 import { FORGOT_PASSWORD, SIGN_IN } from "@/constants/urls";
 import { AuthService } from "@/services/api";
 import {
   IRequestPasswordResetPayload,
   IVerifyPasswordResetPayload,
 } from "@/services/auth/auth.types";
+import { Logger } from "@/utils/logger";
 import { AppToast } from "@/utils/toast";
 import { useMutation } from "@tanstack/react-query";
 import { router, useLocalSearchParams } from "expo-router";
+import { useFormik } from "formik";
 import { useEffect, useRef, useState } from "react";
 import {
   KeyboardAvoidingView,
@@ -19,35 +24,36 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { InferType, object, ref, string } from "yup";
 
 const OTP_LENGTH = 4;
 const RESEND_INTERVAL = 60;
 
-type FormState = {
-  email: string;
-  code: string;
-  password: string;
-  confirmPassword: string;
-};
+const resetPasswordSchema = object({
+  email: string()
+    .trim()
+    .email("Enter a valid email address")
+    .required("Email is required"),
+  code: string()
+    .trim()
+    .length(OTP_LENGTH, `Enter the ${OTP_LENGTH}-digit code`)
+    .required("Enter the code we sent"),
+  password: string()
+    .trim()
+    .min(6, "Password must be at least 6 characters")
+    .required("Password is required"),
+  confirmPassword: string()
+    .oneOf([ref("password")], "Passwords must match")
+    .required("Confirm your new password"),
+});
+
+type ResetPasswordFormValues = InferType<typeof resetPasswordSchema>;
 
 export default function ResetPassword() {
   const params = useLocalSearchParams<{ email?: string }>();
-  const [form, setForm] = useState<FormState>({
-    email: typeof params.email === "string" ? params.email : "",
-    code: "",
-    password: "",
-    confirmPassword: "",
-  });
-  const [showPassword, setShowPassword] = useState(false);
   const [loadingOverlay, setLoadingOverlay] = useState(false);
   const [resendTimer, setResendTimer] = useState(RESEND_INTERVAL);
   const hiddenInputRef = useRef<TextInput>(null);
-
-  useEffect(() => {
-    if (typeof params.email === "string") {
-      setForm((prev) => ({ ...prev, email: params.email as string }));
-    }
-  }, [params.email]);
 
   useEffect(() => {
     if (resendTimer <= 0) return;
@@ -57,27 +63,6 @@ export default function ResetPassword() {
     );
     return () => clearInterval(timer);
   }, [resendTimer]);
-
-  const updateForm = <K extends keyof FormState>(
-    field: K,
-    value: FormState[K]
-  ) => {
-    setForm((prev) => ({ ...prev, [field]: value }));
-  };
-
-  const handleCodeChange = (text: string) => {
-    const clean = text.replace(/[^0-9]/g, "").slice(0, OTP_LENGTH);
-    updateForm("code", clean);
-  };
-
-  const canSubmit =
-    !!form.email.trim() &&
-    form.code.length === OTP_LENGTH &&
-    !!form.password &&
-    !!form.confirmPassword &&
-    form.password === form.confirmPassword;
-
-  const resendDisabled = resendTimer > 0 || form.email.trim().length === 0;
 
   const verifyMutation = useMutation({
     mutationFn: (payload: IVerifyPasswordResetPayload) =>
@@ -112,33 +97,48 @@ export default function ResetPassword() {
     },
   });
 
-  const handleSubmit = () => {
-    if (!canSubmit) {
-      AppToast.info("Complete the form to reset your password");
-      return;
-    }
+  const formik = useFormik<ResetPasswordFormValues>({
+    enableReinitialize: true,
+    initialValues: {
+      email: typeof params.email === "string" ? params.email : "",
+      code: "",
+      password: "",
+      confirmPassword: "",
+    },
+    validationSchema: resetPasswordSchema,
+    validateOnMount: true,
+    onSubmit: (values) => {
+      if (verifyMutation.isPending) return;
+      const payload: IVerifyPasswordResetPayload = {
+        email: values.email.trim(),
+        code: values.code,
+        newPassword: values.password,
+      };
+      verifyMutation.mutate(payload);
+    },
+  });
 
-    if (verifyMutation.isPending) return;
+  const resendDisabled =
+    resendTimer > 0 || formik.values.email.trim().length === 0;
 
-    const payload: IVerifyPasswordResetPayload = {
-      email: form.email.trim(),
-      code: form.code,
-      newPassword: form.password,
-    };
-
-    verifyMutation.mutate(payload);
+  const handleCodeChange = (text: string) => {
+    const clean = text.replace(/[^0-9]/g, "").slice(0, OTP_LENGTH);
+    formik.setFieldValue("code", clean);
+    formik.setFieldTouched("code", true, false);
   };
+
+  const handleSubmit = () => formik.handleSubmit();
 
   const handleResend = () => {
     if (resendDisabled || resendMutation.isPending) return;
 
-    resendMutation.mutate({ email: form.email.trim() });
+    resendMutation.mutate({ email: formik.values.email.trim() });
   };
 
   const renderOtpBoxes = () => (
     <View className="flex-row items-center justify-between gap-3">
       {Array.from({ length: OTP_LENGTH }).map((_, idx) => {
-        const digit = form.code[idx] ?? "";
+        const digit = formik.values.code[idx] ?? "";
         const isFilled = digit !== "";
         return (
           <TouchableOpacity
@@ -157,7 +157,7 @@ export default function ResetPassword() {
       })}
       <TextInput
         ref={hiddenInputRef}
-        value={form.code}
+        value={formik.values.code}
         onChangeText={handleCodeChange}
         keyboardType="number-pad"
         textContentType="oneTimeCode"
@@ -167,6 +167,8 @@ export default function ResetPassword() {
       />
     </View>
   );
+
+  Logger.warn("formik", formik.values);
 
   return (
     <SafeAreaView className="flex-1 bg-background">
@@ -185,122 +187,89 @@ export default function ResetPassword() {
           <Text className="mt-3 text-xs text-center text-secondary font-jost">
             Enter the code we emailed you along with your new password.
           </Text>
+          <Text className="mt-3 text-sm text-center text-primary font-jost">
+            ({formik.values.email})
+          </Text>
 
-          <View className="gap-6 mt-16">
-            <View className="gap-2">
-              <Text className="text-sm text-gray-700 font-jost-medium">
-                Email
-              </Text>
-              <TextInput
-                placeholder="eg. name@domain.com"
-                placeholderTextColor="#9CA3AF"
-                className="px-4 py-3 text-xs bg-white border-[0.34px] border-[#DEE2E6] rounded font-jost text-[#aaa]"
-                autoCapitalize="none"
-                keyboardType="email-address"
-                value={form.email}
-                onChangeText={(text) => updateForm("email", text)}
-                editable={false}
-                selectTextOnFocus={false}
-              />
-            </View>
-
+          <View className="gap-6 mt-14">
             <View className="gap-2">
               <Text className="text-sm text-gray-700 font-jost-medium">
                 OTP Code
               </Text>
               {renderOtpBoxes()}
-              <TouchableOpacity
-                onPress={handleResend}
-                disabled={resendDisabled || resendMutation.isPending}
-                className="mt-2"
-              >
-                <Text className="text-xs text-right text-primary font-jost-medium">
-                  {resendMutation.isPending
-                    ? "Sending..."
-                    : resendTimer > 0
-                      ? `Request new code in ${resendTimer}s`
-                      : "Request new code"}
+              {formik.touched.code && formik.errors.code ? (
+                <Text className="text-xs text-red-500 font-jost">
+                  {formik.errors.code}
                 </Text>
-              </TouchableOpacity>
-            </View>
-
-            <View className="gap-2">
-              <Text className="text-sm text-gray-700 font-jost-medium">
-                New Password
-              </Text>
-              <View className="relative">
-                <TextInput
-                  placeholder="Enter new password"
-                  placeholderTextColor="#9CA3AF"
-                  className="px-4 py-3 text-xs bg-white border-[0.34px] border-[#DEE2E6] rounded font-jost"
-                  secureTextEntry={!showPassword}
-                  value={form.password}
-                  onChangeText={(text) => updateForm("password", text)}
+              ) : null}
+              <View className="flex-row mt-0 ml-auto w-fit">
+                <SecondaryButton
+                  title={
+                    resendMutation.isPending
+                      ? "Sending..."
+                      : resendTimer > 0
+                        ? `Request new code in ${resendTimer}s`
+                        : "Request new code"
+                  }
+                  onPress={handleResend}
+                  disabled={resendDisabled || resendMutation.isPending}
+                  textClassName="text-xs text-right text-primary font-jost-medium underline p-0 m-0"
+                  className="p-0 m-0 border-transparent"
                 />
-                <TouchableOpacity
-                  onPress={() => setShowPassword((prev) => !prev)}
-                  className="absolute -translate-y-1/2 right-4 top-1/2"
-                >
-                  <Text className="text-xs text-primary font-jost-medium">
-                    {showPassword ? "Hide" : "Show"}
-                  </Text>
-                </TouchableOpacity>
               </View>
             </View>
 
             <View className="gap-2">
-              <Text className="text-sm text-gray-700 font-jost-medium">
-                Confirm Password
-              </Text>
-              <View className="relative">
-                <TextInput
-                  placeholder="Re-enter new password"
-                  placeholderTextColor="#9CA3AF"
-                  className="px-4 py-3 text-xs bg-white border-[0.34px] border-[#DEE2E6] rounded font-jost"
-                  secureTextEntry={!showPassword}
-                  value={form.confirmPassword}
-                  onChangeText={(text) => updateForm("confirmPassword", text)}
-                />
-                <TouchableOpacity
-                  onPress={() => setShowPassword((prev) => !prev)}
-                  className="absolute -translate-y-1/2 right-4 top-1/2"
-                >
-                  <Text className="text-xs text-primary font-jost-medium">
-                    {showPassword ? "Hide" : "Show"}
-                  </Text>
-                </TouchableOpacity>
-              </View>
+              <PasswordField
+                label="New Password"
+                hideLabel
+                placeholder="Enter new password"
+                value={formik.values.password}
+                onChangeText={formik.handleChange("password")}
+                onBlur={formik.handleBlur("password")}
+                error={
+                  formik.touched.password ? formik.errors.password : undefined
+                }
+              />
             </View>
 
-            <TouchableOpacity
+            <View className="gap-2">
+              <PasswordField
+                label="Confirm Password"
+                hideLabel
+                placeholder="Re-enter new password"
+                value={formik.values.confirmPassword}
+                onChangeText={formik.handleChange("confirmPassword")}
+                onBlur={formik.handleBlur("confirmPassword")}
+                error={
+                  formik.touched.confirmPassword
+                    ? formik.errors.confirmPassword
+                    : undefined
+                }
+              />
+            </View>
+
+            <PrimaryButton
+              title="Reset password"
               onPress={handleSubmit}
-              disabled={!canSubmit || verifyMutation.isPending}
-              className={`w-full rounded py-4 ${
-                canSubmit ? "bg-black" : "bg-gray-200"
-              } ${verifyMutation.isPending ? "opacity-90" : ""}`}
-            >
-              <Text className="text-base text-center text-white font-jost-medium">
-                {verifyMutation.isPending ? "Updating..." : "Reset password"}
-              </Text>
-            </TouchableOpacity>
+              loading={verifyMutation.isPending}
+              loadingText="Updating..."
+              disabled={!formik.isValid}
+            />
 
-            <TouchableOpacity
+            <SecondaryButton
+              title="Back to Forgot Password"
               onPress={() => router.replace(FORGOT_PASSWORD)}
-              className="mt-2"
-            >
-              <Text className="text-xs text-center underline text-primary font-jost-medium">
-                Back to Forgot Password
-              </Text>
-            </TouchableOpacity>
+              textClassName="text-primary underline"
+              className="bg-white border-transparent w-fit"
+            />
 
-            <TouchableOpacity
+            <SecondaryButton
+              title="Return to Login"
               onPress={() => router.replace(SIGN_IN)}
-              className="mt-1"
-            >
-              <Text className="text-xs text-center underline text-secondary font-jost-medium">
-                Return to Login
-              </Text>
-            </TouchableOpacity>
+              textClassName="text-secondary underline"
+              className="mt-1 bg-white border-transparent"
+            />
           </View>
         </ScrollView>
       </KeyboardAvoidingView>

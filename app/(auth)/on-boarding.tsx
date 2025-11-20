@@ -1,4 +1,6 @@
 import GoodIcon from "@/assets/icons/good.svg";
+import PrimaryButton from "@/components/common/PrimaryButton";
+import SecondaryButton from "@/components/common/SecondaryButton";
 import { SvgIcon } from "@/components/common/SvgIcon";
 import { SIGN_IN, SIGN_UP } from "@/constants/urls";
 import { onboardingSlides } from "@/lib/dummy-data";
@@ -11,7 +13,6 @@ import {
   Image,
   StatusBar,
   Text,
-  TouchableOpacity,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -65,7 +66,7 @@ export default function OnBoarding() {
                 resizeMode="cover"
                 style={{
                   width: "100%",
-                  height: height * 0.50, // covers full top area
+                  height: height * 0.5, // covers full top area
                 }}
               />
             </View>
@@ -78,11 +79,12 @@ export default function OnBoarding() {
         style={{ position: "absolute", top: 0, right: 0, left: 0, zIndex: 50 }}
       >
         <View className="flex-row justify-end px-4 mt-2">
-          <TouchableOpacity onPress={skipLogin}>
-            <Text className="text-lg text-white underline font-jost-semibold">
-              Skip
-            </Text>
-          </TouchableOpacity>
+          <SecondaryButton
+            title="Skip"
+            onPress={skipLogin}
+            textClassName="text-white text-lg underline font-jost-semibold"
+            className="bg-transparent border-transparent w-fit"
+          />
         </View>
       </SafeAreaView>
 
@@ -122,29 +124,25 @@ export default function OnBoarding() {
         </View>
 
         {/* Bottom Buttons */}
-        <View className="px-6 mt-auto mb-10">
-          <TouchableOpacity
+        <View className="gap-3 px-6 mt-auto mb-10">
+          <PrimaryButton
+            title="Sign up"
             onPress={() => router.push(SIGN_UP)}
-            className="py-4 bg-black rounded-lg"
-          >
-            <Text className="text-base text-center text-white font-jost-medium">
-              Sign up
-            </Text>
-          </TouchableOpacity>
+            loadingText="Signing In..."
+            className="w-full"
+          />
 
-          <TouchableOpacity
+          <SecondaryButton
+            title="Log in"
             onPress={() => {
               router.push({
                 pathname: SIGN_IN,
                 params: { fromOnboarding: "true" },
               });
             }}
-            className="mt-4"
-          >
-            <Text className="text-base text-center underline text-primary font-jost-medium">
-              log in
-            </Text>
-          </TouchableOpacity>
+            textClassName="text-primary underline"
+            className="bg-white border-transparent w-fit"
+          />
         </View>
       </SafeAreaView>
     </View>
