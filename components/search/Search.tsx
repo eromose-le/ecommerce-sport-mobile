@@ -9,7 +9,6 @@ import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import {
-  ActivityIndicator,
   Image,
   KeyboardAvoidingView,
   Platform,
@@ -20,6 +19,8 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { EmptyState } from "../common/EmptyState";
+import { LoadingContent } from "../common/LoadingContent";
 
 export default function Search() {
   const inputRef = useRef<TextInput>(null);
@@ -44,7 +45,7 @@ export default function Search() {
     retry: 1,
   });
 
-  const results: TProduct[] = data?.data?.results || [];
+  const productsResponse: TProduct[] = data?.data?.results || [];
 
   const handleSelect = (product: TProduct) => {
     try {
@@ -98,59 +99,68 @@ export default function Search() {
           showsVerticalScrollIndicator={false}
           className="flex-1 px-4"
         >
-          {(isLoading || isFetching) && (
-            <View className="py-8">
-              <ActivityIndicator size="small" />
-            </View>
-          )}
-
-          {error ? (
-            <TouchableOpacity
-              className="items-center justify-center py-6"
-              onPress={() => refetch()}
-            >
-              <Text className="text-sm text-center text-red-500 font-jost">
-                There was a problem loading products. Tap to retry.
-              </Text>
-            </TouchableOpacity>
-          ) : results.length === 0 ? (
-            <View className="py-6">
-              <Text className="text-sm text-center text-secondary font-jost">
-                {debouncedQuery
-                  ? "No products matched your search."
-                  : "Start typing to find products."}
-              </Text>
-            </View>
-          ) : (
-            results.map((product) => (
-              <TouchableOpacity
-                key={product.id}
-                className="flex-row items-center py-3 border-b border-[#F1F5F9]"
-                onPress={() => handleSelect(product)}
-                activeOpacity={0.8}
-              >
-                <View className="items-center justify-center w-12 h-12 mr-3 bg-[#F1F5F9] rounded-full overflow-hidden">
-                  {product.displayImage ? (
-                    <Image
-                      source={{ uri: product.displayImage }}
-                      className="w-full h-full"
-                      resizeMode="cover"
+          <LoadingContent
+            loading={isLoading || isFetching}
+            loadingClassName="flex absolute p-0 m-0 left-44"
+            error={error}
+            onRetry={refetch}
+            data={productsResponse}
+            EmptyComponent={(error, onRetry) => (
+              <View className="items-center">
+                <EmptyState
+                  icon={
+                    <Ionicons
+                      name={"bag-handle-outline"}
+                      size={38}
+                      color="#ddd"
                     />
-                  ) : (
-                    <Ionicons name="cube-outline" size={20} color="#9CA3AF" />
-                  )}
-                </View>
-                <View className="flex-1">
-                  <Text className="text-base font-jost-medium text-primary">
-                    {product.name}
-                  </Text>
-                  <Text className="text-xs text-secondary font-jost">
-                    ₦{Number(product.price || 0).toLocaleString()}
-                  </Text>
-                </View>
-              </TouchableOpacity>
-            ))
-          )}
+                  }
+                  error="No product found"
+                  onRetry={onRetry}
+                />
+              </View>
+            )}
+            // LoadingComponent={<ActivityIndicator size="small" />}
+            // ErrorComponent={(error, refetch) => (
+            //   <View className="flex-row items-center gap-2">
+            //     <Text className="text-xs text-[#ef4444]">{error?.message}</Text>
+            //     <TouchableOpacity onPress={refetch}>
+            //       <Ionicons name="reload-outline" size={12} color="#ef4444" />
+            //     </TouchableOpacity>
+            //   </View>
+            // )}
+          >
+            <>
+              {productsResponse?.map((product) => (
+                <TouchableOpacity
+                  key={product.id}
+                  className="flex-row items-center py-3 border-b border-[#F1F5F9]"
+                  onPress={() => handleSelect(product)}
+                  activeOpacity={0.8}
+                >
+                  <View className="items-center justify-center w-12 h-12 mr-3 bg-[#F1F5F9] rounded-full overflow-hidden">
+                    {product.displayImage ? (
+                      <Image
+                        source={{ uri: product.displayImage }}
+                        className="w-full h-full"
+                        resizeMode="cover"
+                      />
+                    ) : (
+                      <Ionicons name="cube-outline" size={20} color="#9CA3AF" />
+                    )}
+                  </View>
+                  <View className="flex-1">
+                    <Text className="text-base font-jost-medium text-primary">
+                      {product.name}
+                    </Text>
+                    <Text className="text-xs text-secondary font-jost">
+                      ₦{Number(product.price || 0).toLocaleString()}
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              ))}
+            </>
+          </LoadingContent>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
