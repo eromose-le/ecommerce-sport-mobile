@@ -1,8 +1,10 @@
 import { PRODUCT_DETAIL } from "@/constants/urls";
+import { calculatePercentageDecrease } from "@/helpers/product-discount";
 import { Product } from "@/services/product/product.types";
 import { formatCurrency } from "@/utils/currency";
 import { resolveImageSource } from "@/utils/images";
 import { Ionicons } from "@expo/vector-icons";
+import classNames from "classnames";
 import { Link } from "expo-router";
 import React from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
@@ -21,6 +23,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   width,
   onAddToCart,
 }) => {
+  const discountCap = calculatePercentageDecrease({
+    price: Number(product?.price),
+    salesPrice: Number(product?.salesPrice),
+  });
+
   return (
     <Link
       href={{
@@ -32,9 +39,19 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     >
       <TouchableOpacity
         style={{ width }}
-        className="p-3 bg-white"
+        className="relative p-3 bg-white"
         activeOpacity={0.8}
       >
+        {/* NOTE: sales */}
+        <Text
+          className={classNames(
+            !discountCap && "hidden",
+            "bg-orange-400 rounded-md p-1 absolute w-fit z-[1] text-xs text-white font-jost-semibold"
+          )}
+        >
+          {discountCap}
+        </Text>
+
         {/* NOTE: local */}
         {/* <Image
           source={product?.displayImage}
@@ -63,9 +80,22 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         </Text>
 
         <View className="flex-row items-center justify-between">
-          <Text className="text-base text-primary font-jost-semibold">
-            {formatCurrency(product?.price)}
-          </Text>
+          <>
+            {discountCap ? (
+              <View className="space-y-0.5">
+                <Text className="text-base text-primary font-jost-semibold">
+                  {formatCurrency(product?.price || 0)}
+                </Text>
+                <Text className="text-base line-through text-secondary font-jost-medium">
+                  {formatCurrency(product?.salesPrice || 0)}
+                </Text>
+              </View>
+            ) : (
+              <Text className="text-base text-primary font-jost-semibold">
+                {formatCurrency(product?.price || 0)}
+              </Text>
+            )}
+          </>
 
           {/* Separate button for add-to-cart to avoid blocking Link */}
           <TouchableOpacity
