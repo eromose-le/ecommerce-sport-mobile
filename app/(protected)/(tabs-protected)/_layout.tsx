@@ -61,7 +61,7 @@ export default function ProtectedTabs() {
           tabBarLabel: "Profile",
           headerShown: false,
           tabBarIcon: ({ focused }) => (
-            <TabBarIcon Icon={ProfileIcon} label="Profile" focused={focused} />
+            <TabBarIcon Icon={ProfileIcon} label="Me" focused={focused} />
           ),
         }}
       />

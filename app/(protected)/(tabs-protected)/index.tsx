@@ -1,11 +1,8 @@
-import LogoutIcon from "@/assets/icons/logout.svg";
 import { LoadingContent } from "@/components/common/LoadingContent";
 import Logo from "@/components/common/Logo";
-import { SvgIcon } from "@/components/common/SvgIcon";
 import Product from "@/components/product/Product";
 import { FIVE_MINUTES } from "@/constants";
 import { PROFILE } from "@/constants/urls";
-import { useAuth } from "@/providers/auth";
 import { UserService } from "@/services/api";
 import { IUserResponse } from "@/services/user/user.types";
 
@@ -25,8 +22,6 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function ProtectedHome() {
-  const { logout } = useAuth();
-
   const { data, isLoading, error, refetch, isSuccess } =
     useQuery<IUserResponse>({
       queryKey: ["users", "me"],
@@ -66,17 +61,6 @@ export default function ProtectedHome() {
             >
               <Text className="font-semibold text-white">{userName[0]}</Text>
             </TouchableOpacity>
-            <View>
-              <TouchableOpacity
-                onPress={logout}
-                className="items-center justify-center"
-              >
-                <SvgIcon Icon={LogoutIcon} size={28} />
-              </TouchableOpacity>
-              <Text className="mb-3 text-xs font-light text-secondary font-jost">
-                Log out
-              </Text>
-            </View>
           </View>
         </View>
 
