@@ -30,11 +30,11 @@ npm run reset-project
 6.  card sales prices and discount ✅
 7.  review ✅
 8.  add amount format ✅
-9. night mood
-10. all product page with filter (see all button)
-11. wire product detail screen
-12. image slider
-13. categories
-14. cart page func
+9.  cart page func ✅
+10. night mood
+11. all product page with filter (see all button)
+12. wire product detail screen
+13. image slider
+14. categories
 15. checkout page
  -->
