@@ -21,15 +21,19 @@ const PrimaryButton = ({
     <TouchableOpacity
       onPress={onPress}
       disabled={isDisabled}
-      className={`rounded-2xl bg-black py-4 ${
+      activeOpacity={0.7}
+      className={`rounded-2xl bg-black py-3 max-h-[50px] ${
         isDisabled ? "opacity-60" : ""
       } ${className}`}
-      activeOpacity={0.7}
     >
       <View className="flex-row items-center justify-center">
         {loading ? (
           <>
-            <ActivityIndicator color="#fff" size="small" style={{ marginRight: 8 }} />
+            <ActivityIndicator
+              color="#fff"
+              size="small"
+              style={{ marginRight: 8 }}
+            />
             <Text className="text-base text-white font-jost-medium">
               {loadingText}
             </Text>

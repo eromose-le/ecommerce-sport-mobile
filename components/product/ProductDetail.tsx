@@ -1,6 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams } from "expo-router";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { useState } from "react";
 
 import CartButton from "@/components/cart/CartButton";
 import { BackButton } from "@/components/common/BackButton";
@@ -8,7 +9,7 @@ import ProductAttributes from "@/components/product/ProductAttributes";
 import ProductDetailActions from "@/components/product/ProductDetailActions";
 import ProductGallery from "@/components/product/ProductGallery";
 import ProductReviews from "@/components/product/ProductReviews";
-import { products } from "@/lib/dummy-data";
+import ReviewModal from "@/components/review/ReviewModal";
 import { formatCurrency } from "@/utils/currency";
 import { Logger } from "@/utils/logger";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -20,6 +21,8 @@ export default function ProductDetail() {
     product?: any[];
   }>() as any;
   const item = JSON.parse(product);
+  const productId = item?.id || item?._id;
+  const [isReviewOpen, setIsReviewOpen] = useState(false);
 
   Logger.warn("item", item);
   return (
@@ -104,8 +107,19 @@ export default function ProductDetail() {
           />
 
           {/* REVIEWS */}
-          {/* TODO: replace dummy */}
-          <ProductReviews reviews={products?.[0].reviews} />
+          <ProductReviews
+            productId={productId}
+            onAddReview={() => setIsReviewOpen(true)}
+          />
+
+          {productId ? (
+            <ReviewModal
+              visible={isReviewOpen}
+              onClose={() => setIsReviewOpen(false)}
+              productId={String(productId)}
+              productName={item?.name}
+            />
+          ) : null}
 
           <View className="h-20" />
         </ScrollView>

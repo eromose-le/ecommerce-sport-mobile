@@ -16,7 +16,7 @@ export const images = {
 
 export const PAGINATION_DEFAULT = {
   page: 1,
-  limit: 3,
+  limit: 4,
 };
 
 export const FIVE_MINUTES = 1000 * 60 * 5;

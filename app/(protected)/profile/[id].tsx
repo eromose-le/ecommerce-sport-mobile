@@ -1,11 +1,11 @@
+import { BackButton } from "@/components/common/BackButton";
 import {
   profileKeys,
   SCREEN_LABELS,
 } from "@/components/profile/profile-constants";
 import { ScreenComponentProps, ScreenKey } from "@/types/profile";
-import { Ionicons } from "@expo/vector-icons";
-import { router, useLocalSearchParams } from "expo-router";
-import { Text, TouchableOpacity, View } from "react-native";
+import { useLocalSearchParams } from "expo-router";
+import { Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ComingSoon from "./screens/ComingSoon";
 import DeliveryAddress from "./screens/DeliveryAddress";
@@ -38,9 +38,8 @@ export default function ProfileDetailScreen() {
   return (
     <SafeAreaView className="flex-1 bg-white">
       <View className="flex-row items-center px-6 py-4 border-b border-gray-100">
-        <TouchableOpacity onPress={() => router.back()} className="p-2">
-          <Ionicons name="arrow-back" size={20} color="#111" />
-        </TouchableOpacity>
+        <BackButton />
+
         <Text className="flex-1 pr-8 text-lg text-center font-jost-bold text-primary">
           {title}
         </Text>

@@ -24,7 +24,7 @@ const SecondaryButton = ({
       onPress={onPress}
       activeOpacity={0.7}
       disabled={isDisabled}
-      className={`rounded-2xl border border-black py-2 px-0 ${
+      className={`rounded-2xl border border-black py-3 max-h-[50px] ${
         isDisabled ? "opacity-60" : ""
       } bg-transparent ${className}`}
     >

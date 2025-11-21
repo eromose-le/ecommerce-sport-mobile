@@ -1,9 +1,9 @@
 import {
-  subDays,
   format,
-  parseISO,
-  isValid,
   formatDistanceToNow,
+  isValid,
+  parseISO,
+  subDays,
 } from "date-fns";
 
 export function substractDaysFromTodaysDate(DAY_COUNT: number) {
@@ -64,3 +64,12 @@ export function formatDate(dateString: string): string {
   // Step 3: Format the date to 'MMM d, yyyy' (e.g., "Oct 8, 2024")
   return format(parsedDate, "MMM d, yyyy");
 }
+
+export const safeFormatDate = (value?: string) => {
+  if (!value) return "";
+  try {
+    return formatDate(value);
+  } catch {
+    return "";
+  }
+};
