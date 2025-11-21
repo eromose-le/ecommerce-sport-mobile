@@ -1,6 +1,7 @@
 import { PRODUCT_DETAIL } from "@/constants/urls";
 import { calculatePercentageDecrease } from "@/helpers/product-discount";
 import { Product } from "@/services/product/product.types";
+import { useCartStore } from "@/store/useCartStore";
 import { formatCurrency } from "@/utils/currency";
 import { resolveImageSource } from "@/utils/images";
 import { Ionicons } from "@expo/vector-icons";
@@ -23,6 +24,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   width,
   onAddToCart,
 }) => {
+  const { addToCart } = useCartStore();
   const discountCap = calculatePercentageDecrease({
     price: Number(product?.price),
     salesPrice: Number(product?.salesPrice),
@@ -99,10 +101,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 
           {/* Separate button for add-to-cart to avoid blocking Link */}
           <TouchableOpacity
-            className="hidden p-1 bg-black rounded-full"
+            className="hidden p-1 bg-black rounded-full "
             onPress={(e) => {
               e.stopPropagation(); // prevent triggering the Link
               onAddToCart?.();
+              addToCart(product, true);
             }}
           >
             <Ionicons name="add" size={16} color="white" />

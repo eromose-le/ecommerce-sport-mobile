@@ -1,6 +1,5 @@
 import { create } from "zustand";
 import * as SecureStore from "expo-secure-store";
-import { CartItem } from "@/services/cart/cart.types";
 import { User } from "@/services/user/user.types";
 
 interface AppState {
@@ -17,15 +16,9 @@ interface AppState {
 
   token: string | null;
   setToken: (t: string | null) => Promise<void>;
-
-  // cart
-  cart: CartItem[];
-  addToCart: (item: any) => void;
-  removeFromCart: (id: string) => void;
-  clearCart: () => void;
 }
 
-export const useAppStore = create<AppState>((set, get) => ({
+export const useAppStore = create<AppState>((set) => ({
   loading: true,
   setLoading: (v) => set({ loading: v }),
 
@@ -55,17 +48,4 @@ export const useAppStore = create<AppState>((set, get) => ({
       await SecureStore.deleteItemAsync("skippedLogin");
     }
   },
-
-  cart: [],
-  addToCart: (item) =>
-    set((s) => ({
-      cart: [...s.cart, item],
-    })),
-
-  removeFromCart: (id) =>
-    set((s) => ({
-      cart: s.cart.filter((c) => c.id !== id),
-    })),
-
-  clearCart: () => set({ cart: [] }),
 }));

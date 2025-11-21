@@ -62,7 +62,7 @@ export const TabBarIcon: React.FC<TabBarIconProps> = ({
       {showBadge && (
         <Animated.View
           style={animatedStyle}
-          className="absolute -top-1 -right-2 min-w-[18px] h-[18px] bg-red-600 rounded-full items-center justify-center px-1"
+          className="absolute -top-1 right-0 min-w-[18px] h-[18px] bg-red-600 rounded-full items-center justify-center px-1"
         >
           <Text className="text-[10px] font-bold text-white">
             {badgeCount > 99 ? "99+" : badgeCount}

@@ -1,11 +1,30 @@
 import CartCard from "@/components/cart/CartCard";
 import CartEmpty from "@/components/cart/CartEmpty";
-import { products } from "@/lib/dummy-data";
-import React, { useState } from "react";
+import {
+  showShippingFeePrice,
+  showTotalPrice,
+  showTotalPriceInCart,
+} from "@/helpers/cart";
+import { useCartStore } from "@/store/useCartStore";
+import { formatCurrency } from "@/utils/currency";
+import React, { useMemo } from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 
 export default function Cart() {
-  const [isEmpty, setIsEmpty] = useState<boolean>(false);
+  const { cart, incrementQty, decrementQty, removeFromCart } = useCartStore();
+
+  const isEmpty = (cart?.length || 0) === 0;
+  const shippingPercentage = 5;
+
+  const subtotal = useMemo(() => showTotalPriceInCart(cart), [cart]);
+  const shippingFee = useMemo(
+    () => showShippingFeePrice(subtotal, shippingPercentage),
+    [shippingPercentage, subtotal]
+  );
+  const total = useMemo(
+    () => showTotalPrice(subtotal, shippingFee),
+    [shippingFee, subtotal]
+  );
 
   if (isEmpty) {
     return <CartEmpty />;
@@ -16,8 +35,14 @@ export default function Cart() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 120 }}
       >
-        {products?.map((item, idx) => (
-          <CartCard key={idx} product={item} />
+        {cart?.map((item) => (
+          <CartCard
+            key={item.id}
+            item={item}
+            onIncrement={() => incrementQty(item.id)}
+            onDecrement={() => decrementQty(item.id)}
+            onRemove={() => removeFromCart(item.id)}
+          />
         ))}
       </ScrollView>
 
@@ -32,19 +57,29 @@ export default function Cart() {
           elevation: 6,
         }}
       >
+        <View className="flex-row items-center justify-between mb-3">
+          <Text className="text-base text-secondary font-jost">
+            Subtotal + shipping
+          </Text>
+          <Text className="text-xl font-bold">
+            {formatCurrency(total)}
+          </Text>
+        </View>
         <View className="flex-row items-center justify-between">
-          <TouchableOpacity
-            onPress={() => {
-              setIsEmpty(!isEmpty);
-            }}
-            className="px-8 py-4 bg-black"
-          >
+          <View>
+            <Text className="text-sm font-jost-semibold text-primary">
+              Shipping ({shippingPercentage}%)
+            </Text>
+            <Text className="text-xs text-secondary font-jost">
+              Fee: {formatCurrency(shippingFee)} · Subtotal:{" "}
+              {formatCurrency(subtotal)}
+            </Text>
+          </View>
+          <TouchableOpacity className="px-8 py-4 bg-black rounded-2xl">
             <Text className="text-white rounded-md font-jost-semibold">
               Check out now
             </Text>
           </TouchableOpacity>
-
-          <Text className="text-xl font-bold">$200</Text>
         </View>
       </View>
     </View>

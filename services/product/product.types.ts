@@ -27,6 +27,8 @@ export interface Product {
   sizes?: any[];
   colors?: any[];
   medias?: ProductMedia[];
+
+  variant: any;
 }
 
 export interface ProductAttribute {

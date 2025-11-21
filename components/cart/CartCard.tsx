@@ -1,39 +1,76 @@
-import { Product } from "@/services/product/product.types";
+import { showSinglePriceInCart } from "@/helpers/cart";
+import { CartItem } from "@/services/cart/cart.types";
+import { formatCurrency } from "@/utils/currency";
+import { resolveImageSource } from "@/utils/images";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 
-const CartCard: React.FC<{ product: Product & { quantity?: number } }> = ({
-  product,
+type CartCardProps = {
+  item: CartItem;
+  onIncrement: () => void;
+  onDecrement: () => void;
+  onRemove: () => void;
+};
+
+const CartCard: React.FC<CartCardProps> = ({
+  item,
+  onIncrement,
+  onDecrement,
+  onRemove,
 }) => {
+  const qty = Math.max(1, item?.variant?.qty || 1);
+  const lineTotal = showSinglePriceInCart(item);
+  const imageSource = resolveImageSource(
+    item?.displayImage || item?.product?.displayImage
+  );
+
   return (
     <View className="flex-1 mb-8">
       <View className="flex-row items-center gap-4">
         {/* Product Image */}
         <Image
-          source={require("@/assets/images/dumbbell.png")}
-          className="w-36 h-24 bg-[#E8EAEC]"
-          resizeMode="contain"
+          source={imageSource}
+          className="w-36 h-24 rounded-xl bg-[#E8EAEC]"
+          resizeMode="cover"
         />
 
         {/* Details */}
         <View className="flex-1 ml-4">
-          <Text className="text-lg font-jost-medium">{product.name}</Text>
-          <Text className="mt-1 text-sm text-secondary font-jost">
-            {product.description}
+          <Text className="text-lg font-jost-medium" numberOfLines={1}>
+            {item.name}
+          </Text>
+          <Text
+            numberOfLines={2}
+            className="mt-1 text-sm text-secondary font-jost"
+          >
+            {item.description || "No description added"}
           </Text>
 
-          <Text className="mt-2 text-base font-bold">${product.price}</Text>
+          <Text className="mt-2 text-base font-bold">
+            {formatCurrency(lineTotal)}
+          </Text>
 
           {/* Quantity Controls */}
           <View className="flex-row items-center mt-2">
-            <TouchableOpacity className="px-2 py-1 border border-gray-300 rounded">
-              <Ionicons name="remove" size={14} color="black" />
+            <TouchableOpacity
+              className="px-2 py-1 border border-gray-300 rounded"
+              onPress={onDecrement}
+              disabled={qty <= 1}
+            >
+              <Ionicons
+                name="remove"
+                size={14}
+                color={qty <= 1 ? "#9CA3AF" : "black"}
+              />
             </TouchableOpacity>
 
-            <Text className="mx-3 font-jost">{product.quantity || 1}</Text>
+            <Text className="mx-3 font-jost">{qty}</Text>
 
-            <TouchableOpacity className="px-2 py-1 border border-gray-300 rounded">
+            <TouchableOpacity
+              className="px-2 py-1 border border-gray-300 rounded"
+              onPress={onIncrement}
+            >
               <Ionicons name="add" size={14} color="black" />
             </TouchableOpacity>
           </View>
@@ -42,13 +79,16 @@ const CartCard: React.FC<{ product: Product & { quantity?: number } }> = ({
 
       <View className="flex-row items-center justify-between mt-2">
         {/* Save for later */}
-        <TouchableOpacity className="px-4 py-2 border border-gray-300 rounded-xl w-fit">
-          <Text className="text-sm font-jost">Save for later</Text>
+        <TouchableOpacity
+          disabled
+          className="px-4 py-2 border border-gray-300 rounded-xl w-fit"
+        >
+          <Text className="text-sm font-jost text-secondary">Save for later</Text>
         </TouchableOpacity>
 
         {/* Trash Icon */}
-        <TouchableOpacity>
-          <Ionicons name="trash-outline" size={22} color="black" />
+        <TouchableOpacity onPress={onRemove} hitSlop={8}>
+          <Ionicons name="trash-outline" size={22} color="red" />
         </TouchableOpacity>
       </View>
     </View>
