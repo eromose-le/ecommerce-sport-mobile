@@ -101,7 +101,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 
           {/* Separate button for add-to-cart to avoid blocking Link */}
           <TouchableOpacity
-            className="p-1 bg-black rounded-full "
+            className="hidden p-1 bg-black rounded-full "
             onPress={(e) => {
               e.stopPropagation(); // prevent triggering the Link
               onAddToCart?.();

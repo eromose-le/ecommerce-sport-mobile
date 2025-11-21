@@ -31,10 +31,11 @@ npm run reset-project
 7.  review ✅
 8.  add amount format ✅
 9.  cart page func ✅
-10. night mood
-11. all product page with filter (see all button)
-12. wire product detail screen
-13. image slider
-14. categories
-15. checkout page
+10. web mobile product detail page spacing on key attribute and specification
+11. night mood
+12. all product page with filter (see all button) and filter
+13. wire product detail screen
+14. image slider
+15. categories
+16. checkout page
  -->

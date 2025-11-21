@@ -148,7 +148,7 @@ export default function ProductReviews({
           <View className="items-center">
             <EmptyState
               icon={<Ionicons name="chatbox-outline" size={38} color="#ddd" />}
-              error="No product found"
+              error="No reviews for product yet"
               onRetry={onRetry}
             />
           </View>
