@@ -22,18 +22,18 @@ npm run reset-project
 - npx expo start -c
 
 <!--
-1. propagate the public index ✅
-2. introduct the default pagination constant and limit ✅
-3. setup custom forms (login / register / forgot password / reset password) ✅
-4. specification section ✅
-5.  search, global component, public search, move to [search] folder component ✅
-6.  card sales prices and discount ✅
-7.  review ✅
-8.  add amount format ✅
-9.  cart page func ✅
-10. web mobile product detail page spacing on key attribute and specification
-11. night mood
-12. all product page with filter (see all button) and filter
+1.  web mobile product detail page spacing on key attribute and specification
+2.  night mood
+3. propagate the public index ✅
+4. introduct the default pagination constant and limit ✅
+5. setup custom forms (login / register / forgot password / reset password) ✅
+6. specification section ✅
+7.  search, global component, public search, move to [search] folder component ✅
+8.  card sales prices and discount ✅
+9.  review ✅
+10. add amount format ✅
+11. cart page func ✅
+12. all product page with filter (see all button) and filter ✅
 13. wire product detail screen
 14. image slider
 15. categories

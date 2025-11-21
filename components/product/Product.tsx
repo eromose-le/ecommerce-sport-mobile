@@ -1,6 +1,7 @@
 import { Title } from "@/components/common/Title";
 import { ProductGrid } from "@/components/product/ProductGrid";
 import { FIVE_MINUTES, PAGINATION_DEFAULT } from "@/constants";
+import { PRODUCTS_PROTECTED, PRODUCTS_PUBLIC } from "@/constants/urls";
 import { ProductService } from "@/services/api";
 import { IProductResponse } from "@/services/product/product.types";
 
@@ -9,8 +10,12 @@ import { Ionicons } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { router } from "expo-router";
+import { useAuth } from "@/providers/auth";
 
 export default function Product() {
+  const { user } = useAuth();
+
   const {
     data: productData,
     isLoading: productIsLoading,
@@ -31,6 +36,9 @@ export default function Product() {
   }, [productData, productIsSuccess]);
 
   const productsResponse = productData?.data?.results || [];
+
+  const handleSeeAll = () =>
+    router.push(user ? PRODUCTS_PROTECTED : PRODUCTS_PUBLIC);
 
   return (
     <>
@@ -63,7 +71,7 @@ export default function Product() {
         <Title
           title="New arrival"
           actionText="See all"
-          onActionPress={() => {}}
+          onActionPress={handleSeeAll}
         />
 
         <View className="flex items-center justify-center w-full">
@@ -87,7 +95,7 @@ export default function Product() {
         <Title
           title="Recently viewed"
           actionText="See all"
-          onActionPress={() => {}}
+          onActionPress={handleSeeAll}
         />
 
         <ProductGrid

@@ -4,11 +4,13 @@ export const CART_PROTECTED = "/(protected)/(tabs-protected)/cart";
 export const NOTIFICATION_PROTECTED =
   "/(protected)/(tabs-protected)/notification";
 export const SEARCH_PROTECTED = "/(protected)/search";
+export const PRODUCTS_PROTECTED = "/(protected)/products";
 
 // public
 export const TABS_PUBLIC = "/(public)/(tabs-public)";
 export const CART_PUBLIC = "/(public)/(tabs-public)/cart";
 export const SEARCH_PUBLIC = "/(public)/search";
+export const PRODUCTS_PUBLIC = "/(public)/products";
 
 // export const PRODUCTS = "/products";
 export const PRODUCT_DETAIL = "/product/[id]";

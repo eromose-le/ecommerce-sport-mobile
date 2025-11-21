@@ -3,6 +3,7 @@ import React from "react";
 import {
   ActivityIndicator,
   FlatList,
+  FlatListProps,
   useWindowDimensions,
   View,
 } from "react-native";
@@ -24,6 +25,9 @@ interface ProductGridProps {
 
   error?: any;
   onRetry?: () => void;
+
+  ListHeaderComponent?: FlatListProps<Product>["ListHeaderComponent"];
+  contentContainerStyle?: FlatListProps<Product>["contentContainerStyle"];
 }
 
 export const ProductGrid: React.FC<ProductGridProps> = ({
@@ -39,6 +43,9 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
 
   error,
   onRetry,
+
+  ListHeaderComponent,
+  contentContainerStyle,
 }) => {
   const { width } = useWindowDimensions();
 
@@ -79,6 +86,7 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
       contentContainerStyle={{
         gap,
         paddingBottom: 4,
+        ...contentContainerStyle,
       }}
       numColumns={horizontal ? undefined : numColumns}
       columnWrapperStyle={
@@ -88,7 +96,9 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
             }
           : undefined
       }
-      keyExtractor={(item: any) => item.id.toString()}
+      keyExtractor={(item: any, index) =>
+        (item?.id ?? item?.key ?? `item-${index}`).toString()
+      }
       renderItem={({ item, index }) =>
         item.skeleton ? (
           <SkeletonCard width={cardWidth} horizontal={horizontal} />
@@ -101,6 +111,7 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
           />
         )
       }
+      ListHeaderComponent={ListHeaderComponent}
       ListFooterComponent={
         loadingMore ? (
           <View className="items-center justify-center py-4">
