@@ -89,7 +89,7 @@ export default function Search() {
       <KeyboardAvoidingView
         className="flex-1"
         behavior={Platform.OS === "ios" ? "padding" : undefined}
-        keyboardVerticalOffset={Platform.select({ ios: 0, android: 0 })}
+        keyboardVerticalOffset={Platform.select({ ios: 10, android: 10 })}
       >
         <ScrollView
           contentInsetAdjustmentBehavior="automatic"

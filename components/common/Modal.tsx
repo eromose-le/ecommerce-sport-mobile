@@ -103,6 +103,7 @@ const Modal = ({
 
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : undefined}
+          keyboardVerticalOffset={Platform.select({ ios: 10, android: 10 })}
           style={[
             baseContentStyle,
             isBottomVariant && occupyFullBottom
