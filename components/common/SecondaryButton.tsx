@@ -1,3 +1,4 @@
+import classNames from "classnames";
 import React from "react";
 import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
 
@@ -24,17 +25,17 @@ const SecondaryButton = ({
       onPress={onPress}
       activeOpacity={0.7}
       disabled={isDisabled}
-      className={`rounded-2xl border border-black py-3 max-h-[50px] ${
-        isDisabled ? "opacity-60" : ""
-      } bg-transparent ${className}`}
+      className={classNames(
+        className && className,
+        isDisabled ? "opacity-60 border-[#bcbcbd]" : "border-black",
+        "rounded-2xl border border-black py-3 max-h-[50px] bg-transparent"
+      )}
     >
       <View className="flex-row items-center justify-center gap-2">
         {loading ? (
           <>
             <ActivityIndicator color="#000" size="small" />
-            <Text
-              className={`text-base font-jost-medium ${textClassName}`}
-            >
+            <Text className={`text-base font-jost-medium ${textClassName}`}>
               {loadingText}
             </Text>
           </>

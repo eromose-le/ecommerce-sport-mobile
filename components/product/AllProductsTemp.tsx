@@ -7,6 +7,7 @@ import { ProductGrid } from "@/components/product/ProductGrid";
 import { FIVE_MINUTES, PAGINATION_DEFAULT } from "@/constants";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { CategoryService, ProductService } from "@/services/api";
+import { Logger } from "@/utils/logger";
 import { Ionicons } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
 import React, { useMemo, useState } from "react";
@@ -63,7 +64,7 @@ const SORT_OPTIONS: { label: string; value: SortValue }[] = [
   { label: "Price: High to Low", value: "desc" },
 ];
 
-// const PAGE_SIZE_OPTIONS = [6, 8, 12, 16, 20];
+const PAGE_SIZE_OPTIONS = [6, 8, 12, 16, 20];
 
 const defaultFilter: FilterState = {
   q: "",
@@ -82,6 +83,8 @@ const AllProducts = () => {
     queryFn: CategoryService.fetchCategories,
     staleTime: FIVE_MINUTES,
   });
+
+  Logger.warn("categoriesData", categoriesData);
 
   const selectedCategoryId = filter.category;
   const { data: categoryDetail, isLoading: categoryDetailLoading } = useQuery({
@@ -139,14 +142,13 @@ const AllProducts = () => {
     ]
   );
 
-  const { data, isLoading, isFetching, error, refetch, isRefetching } =
-    useQuery({
-      queryKey: ["products", "all", queryParams],
-      queryFn: () => ProductService.fetchProducts(queryParams),
-      // keepPreviousData: true,
-      retry: 1,
-      staleTime: FIVE_MINUTES,
-    });
+  const { data, isLoading, error, refetch, isRefetching } = useQuery({
+    queryKey: ["products", "all", queryParams],
+    queryFn: () => ProductService.fetchProducts(queryParams),
+    // keepPreviousData: true,
+    retry: 1,
+    staleTime: FIVE_MINUTES,
+  });
 
   const products = data?.data?.results || [];
   const currentPage = data?.data?.currentPage || filter.page;
@@ -250,43 +252,327 @@ const AllProducts = () => {
 
   const FiltersHeader = (
     <View className="pt-3 pb-4">
-      <View className="flex-row gap-2">
-        {/* Search */}
-        <View className="flex-1 flex-row items-center px-4 py-3 bg-white border border-[#E5E7EB] rounded-2xl">
-          <Ionicons name="search-outline" size={18} color="#9CA3AF" />
-          <TextInput
-            placeholder="Search products"
-            placeholderTextColor="#9CA3AF"
-            className="flex-1 ml-3 text-base text-primary font-jost"
-            value={filter.q}
-            onChangeText={(text) => updateFilter({ q: text })}
-            autoCapitalize="none"
-            autoCorrect={false}
-            returnKeyType="search"
-          />
-          {filter.q.length > 0 && (
-            <TouchableOpacity
-              onPress={() => updateFilter({ q: "" })}
-              hitSlop={8}
-            >
-              <Ionicons name="close-circle" size={18} color="#9CA3AF" />
-            </TouchableOpacity>
-          )}
-        </View>
+      {/* Search */}
+      <View className="flex-row items-center px-4 py-3 bg-white border border-[#E5E7EB] rounded-2xl">
+        <Ionicons name="search-outline" size={18} color="#9CA3AF" />
+        <TextInput
+          placeholder="Search products"
+          placeholderTextColor="#9CA3AF"
+          className="flex-1 ml-3 text-base text-primary font-jost"
+          value={filter.q}
+          onChangeText={(text) => updateFilter({ q: text })}
+          autoCapitalize="none"
+          autoCorrect={false}
+          returnKeyType="search"
+        />
+        {filter.q.length > 0 && (
+          <TouchableOpacity onPress={() => updateFilter({ q: "" })} hitSlop={8}>
+            <Ionicons name="close-circle" size={18} color="#9CA3AF" />
+          </TouchableOpacity>
+        )}
+      </View>
 
-        {/* Filter Button */}
-        <View className="ml-auto">
+      {/* Quick filters */}
+      <View className="mt-4">
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{ gap: 8, paddingVertical: 4 }}
+        >
+          {/* Categories */}
+          <TouchableOpacity
+            onPress={() => handleToggleCategory(undefined)}
+            className={`px-4 py-2 rounded-full border ${
+              !filter.category
+                ? "bg-black border-black"
+                : "bg-white border-[#E5E7EB]"
+            }`}
+          >
+            <Text
+              className={`text-sm font-jost-medium ${
+                !filter.category ? "text-white" : "text-primary"
+              }`}
+            >
+              All categories
+            </Text>
+          </TouchableOpacity>
+
+          {categories.map((item) => {
+            const isActive = filter.category === item.id;
+            return (
+              <TouchableOpacity
+                key={item.id}
+                onPress={() => handleToggleCategory(item.id)}
+                className={`px-4 py-2 rounded-full border ${
+                  isActive
+                    ? "bg-black border-black"
+                    : "bg-white border-[#E5E7EB]"
+                }`}
+              >
+                <Text
+                  className={`text-sm font-jost-medium ${
+                    isActive ? "text-white" : "text-primary"
+                  }`}
+                >
+                  {item.name}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+
+          {/* Subcategories (only show when a category is selected) */}
+          {filter.category ? (
+            <>
+              <TouchableOpacity
+                onPress={() => handleToggleSubcategory(undefined)}
+                className={`px-4 py-2 rounded-full border ${
+                  !filter.subcategory
+                    ? "bg-[#111827] border-[#111827]"
+                    : "bg-white border-[#E5E7EB]"
+                }`}
+              >
+                <Text
+                  className={`text-sm font-jost-medium ${
+                    !filter.subcategory ? "text-white" : "text-primary"
+                  }`}
+                >
+                  All subcategories
+                </Text>
+              </TouchableOpacity>
+
+              {(categoryDetailLoading && (
+                <Text className="text-xs text-secondary font-jost">
+                  Loading subcategories...
+                </Text>
+              )) ||
+                null}
+
+              {subcategories.map((item) => {
+                const isActive = filter.subcategory === item.id;
+                return (
+                  <TouchableOpacity
+                    key={`sub-${item.id}`}
+                    onPress={() => handleToggleSubcategory(item.id)}
+                    className={`px-4 py-2 rounded-full border ${
+                      isActive
+                        ? "bg-[#111827] border-[#111827]"
+                        : "bg-white border-[#E5E7EB]"
+                    }`}
+                  >
+                    <Text
+                      className={`text-sm font-jost-medium ${
+                        isActive ? "text-white" : "text-primary"
+                      }`}
+                    >
+                      {item.name}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </>
+          ) : null}
+
+          {PRICE_PRESETS.map((preset) => {
+            const isActive =
+              filter.minPrice === preset.range[0] &&
+              filter.maxPrice === preset.range[1];
+            return (
+              <TouchableOpacity
+                key={preset.label}
+                onPress={() =>
+                  handlePresetPrice(preset.range as [number, number])
+                }
+                className={`px-4 py-2 rounded-full border ${
+                  isActive
+                    ? "bg-black border-black"
+                    : "bg-white border-[#E5E7EB]"
+                }`}
+              >
+                <Text
+                  className={`text-sm font-jost-medium ${
+                    isActive ? "text-white" : "text-primary"
+                  }`}
+                >
+                  {preset.label}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+
           <TouchableOpacity
             onPress={() => setShowFilters(true)}
-            className="flex-row items-center gap-2 px-4 py-4 border rounded-full border-[#E5E7EB] bg-white"
+            className="flex-row items-center gap-2 px-4 py-2 border rounded-full border-[#E5E7EB] bg-white"
           >
             <Ionicons name="options" size={16} color="#111" />
             <Text className="text-sm font-jost-medium text-primary">
               Filters
             </Text>
           </TouchableOpacity>
-        </View>
+        </ScrollView>
       </View>
+
+      {/* Category list with subcategories */}
+      <View className="mt-3">
+        <Text className="mb-2 text-sm font-jost-medium text-primary">
+          Category & Subcategory
+        </Text>
+
+        {categoriesLoading ? (
+          <Text className="text-xs text-secondary font-jost">
+            Loading categories...
+          </Text>
+        ) : (
+          <View className="border border-[#E5E7EB] rounded-2xl bg-white">
+            {categories.map((item) => {
+              const isActive = filter.category === item.id;
+              return (
+                <View
+                  key={`list-cat-${item.id}`}
+                  className="border-b border-[#F3F4F6] last:border-b-0"
+                >
+                  <TouchableOpacity
+                    onPress={() => handleToggleCategory(item.id)}
+                    className={`flex-row items-center justify-between px-4 py-3 ${
+                      isActive ? "bg-[#F9FAFB]" : ""
+                    }`}
+                  >
+                    <Text
+                      className={`text-sm font-jost-medium ${
+                        isActive ? "text-primary" : "text-secondary"
+                      }`}
+                    >
+                      {item.name}
+                    </Text>
+                    {isActive ? (
+                      <Ionicons name="chevron-down" size={16} color="#111" />
+                    ) : (
+                      <Ionicons
+                        name="chevron-forward"
+                        size={16}
+                        color="#9CA3AF"
+                      />
+                    )}
+                  </TouchableOpacity>
+
+                  {isActive ? (
+                    <View className="px-4 pb-3">
+                      {categoryDetailLoading ? (
+                        <Text className="text-xs text-secondary font-jost">
+                          Loading subcategories...
+                        </Text>
+                      ) : subcategories.length === 0 ? (
+                        <Text className="text-xs text-secondary font-jost">
+                          No subcategories found
+                        </Text>
+                      ) : (
+                        <View className="flex-row flex-wrap gap-2 mt-2">
+                          <TouchableOpacity
+                            onPress={() => handleToggleSubcategory(undefined)}
+                            className={`px-3 py-2 rounded-full border ${
+                              !filter.subcategory
+                                ? "bg-[#111827] border-[#111827]"
+                                : "bg-white border-[#E5E7EB]"
+                            }`}
+                          >
+                            <Text
+                              className={`text-xs font-jost-medium ${
+                                !filter.subcategory
+                                  ? "text-white"
+                                  : "text-primary"
+                              }`}
+                            >
+                              All
+                            </Text>
+                          </TouchableOpacity>
+
+                          {subcategories.map((sub) => {
+                            const subActive = filter.subcategory === sub.id;
+                            return (
+                              <TouchableOpacity
+                                key={`list-sub-${sub.id}`}
+                                onPress={() => handleToggleSubcategory(sub.id)}
+                                className={`px-3 py-2 rounded-full border ${
+                                  subActive
+                                    ? "bg-[#111827] border-[#111827]"
+                                    : "bg-white border-[#E5E7EB]"
+                                }`}
+                              >
+                                <Text
+                                  className={`text-xs font-jost-medium ${
+                                    subActive ? "text-white" : "text-primary"
+                                  }`}
+                                >
+                                  {sub.name}
+                                </Text>
+                              </TouchableOpacity>
+                            );
+                          })}
+                        </View>
+                      )}
+                    </View>
+                  ) : null}
+                </View>
+              );
+            })}
+          </View>
+        )}
+      </View>
+
+      {/* Color & size chips */}
+      <View className="mt-2">
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{ gap: 8, paddingVertical: 4 }}
+        >
+          {COLOR_FILTERS.map((item) => {
+            const isActive = filter.colors.includes(item.value);
+            return (
+              <TouchableOpacity
+                key={`color-${item.value}`}
+                onPress={() => toggleArrayValue("colors", item.value)}
+                className={`px-4 py-2 rounded-full border ${
+                  isActive
+                    ? "bg-black border-black"
+                    : "bg-white border-[#E5E7EB]"
+                }`}
+              >
+                <Text
+                  className={`text-sm font-jost-medium ${
+                    isActive ? "text-white" : "text-primary"
+                  }`}
+                >
+                  {item.label}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+
+          {SIZE_FILTERS.map((item) => {
+            const isActive = filter.sizes.includes(item.value);
+            return (
+              <TouchableOpacity
+                key={`size-${item.value}`}
+                onPress={() => toggleArrayValue("sizes", item.value)}
+                className={`px-4 py-2 rounded-full border ${
+                  isActive
+                    ? "bg-black border-black"
+                    : "bg-white border-[#E5E7EB]"
+                }`}
+              >
+                <Text
+                  className={`text-sm font-jost-medium ${
+                    isActive ? "text-white" : "text-primary"
+                  }`}
+                >
+                  {item.label}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </ScrollView>
+      </View>
+
       {/* Active filter badges */}
       {activeBadges.length > 0 && (
         <View className="flex-row flex-wrap gap-2 mt-3">
@@ -323,46 +609,11 @@ const AllProducts = () => {
     </View>
   );
 
-  const FilterModalContent = (
+  const filterModalContent = (
     <View className="gap-4">
-      <Text className="text-2xl font-jost-semibold text-primary">
+      <Text className="text-lg font-jost-semibold text-primary">
         Filter & Sort
       </Text>
-
-      <View className="gap-2">
-        <Text className="text-sm font-jost-medium text-primary">
-          Price range pick
-        </Text>
-
-        <View className="flex-row flex-wrap">
-          {PRICE_PRESETS.map((preset) => {
-            const isActive =
-              filter.minPrice === preset.range[0] &&
-              filter.maxPrice === preset.range[1];
-            return (
-              <TouchableOpacity
-                key={preset.label}
-                onPress={() =>
-                  handlePresetPrice(preset.range as [number, number])
-                }
-                className={`px-4 py-2 rounded-full border ${
-                  isActive
-                    ? "bg-black border-black"
-                    : "bg-white border-[#E5E7EB]"
-                }`}
-              >
-                <Text
-                  className={`text-sm font-jost-medium ${
-                    isActive ? "text-white" : "text-primary"
-                  }`}
-                >
-                  {preset.label}
-                </Text>
-              </TouchableOpacity>
-            );
-          })}
-        </View>
-      </View>
 
       <View className="gap-2">
         <Text className="text-sm font-jost-medium text-primary">
@@ -416,12 +667,6 @@ const AllProducts = () => {
               All
             </Text>
           </TouchableOpacity>
-
-          {categoriesLoading && (
-            <Text className="text-xs text-secondary font-jost">
-              Loading categories...
-            </Text>
-          )}
 
           {categories.map((item) => {
             const isActive = filter.category === item.id;
@@ -504,6 +749,62 @@ const AllProducts = () => {
       ) : null}
 
       <View className="gap-2">
+        <Text className="text-sm font-jost-medium text-primary">Colors</Text>
+        <View className="flex-row flex-wrap gap-2">
+          {COLOR_FILTERS.map((item) => {
+            const isActive = filter.colors.includes(item.value);
+            return (
+              <TouchableOpacity
+                key={`modal-color-${item.value}`}
+                onPress={() => toggleArrayValue("colors", item.value)}
+                className={`px-4 py-2 rounded-full border ${
+                  isActive
+                    ? "bg-black border-black"
+                    : "bg-white border-[#E5E7EB]"
+                }`}
+              >
+                <Text
+                  className={`text-sm font-jost-medium ${
+                    isActive ? "text-white" : "text-primary"
+                  }`}
+                >
+                  {item.label}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+      </View>
+
+      <View className="gap-2">
+        <Text className="text-sm font-jost-medium text-primary">Sizes</Text>
+        <View className="flex-row flex-wrap gap-2">
+          {SIZE_FILTERS.map((item) => {
+            const isActive = filter.sizes.includes(item.value);
+            return (
+              <TouchableOpacity
+                key={`modal-size-${item.value}`}
+                onPress={() => toggleArrayValue("sizes", item.value)}
+                className={`px-4 py-2 rounded-full border ${
+                  isActive
+                    ? "bg-black border-black"
+                    : "bg-white border-[#E5E7EB]"
+                }`}
+              >
+                <Text
+                  className={`text-sm font-jost-medium ${
+                    isActive ? "text-white" : "text-primary"
+                  }`}
+                >
+                  {item.label}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+      </View>
+
+      <View className="gap-2">
         <Text className="text-sm font-jost-medium text-primary">Sort</Text>
         <View className="flex-row flex-wrap gap-2">
           {SORT_OPTIONS.map((option) => {
@@ -531,55 +832,17 @@ const AllProducts = () => {
         </View>
       </View>
 
-      {/* Color */}
       <View className="gap-2">
-        <Text className="text-sm font-jost-medium text-primary">Color</Text>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ gap: 8, paddingVertical: 4 }}
-        >
-          {COLOR_FILTERS.map((item) => {
-            const isActive = filter.colors.includes(item.value);
-            return (
-              <TouchableOpacity
-                key={`color-${item.value}`}
-                onPress={() => toggleArrayValue("colors", item.value)}
-                className={`px-4 py-2 rounded-full border ${
-                  isActive
-                    ? "bg-black border-black"
-                    : "bg-white border-[#E5E7EB]"
-                }`}
-              >
-                <Text
-                  className={`text-sm font-jost-medium ${
-                    isActive ? "text-white" : "text-primary"
-                  }`}
-                >
-                  {item.label}
-                </Text>
-              </TouchableOpacity>
-            );
-          })}
-        </ScrollView>
-      </View>
-
-      {/* Size */}
-      <View className="">
-        <Text className="gap-2 text-sm font-jost-medium text-primary">
-          Size
+        <Text className="text-sm font-jost-medium text-primary">
+          Items per page
         </Text>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ gap: 8, paddingVertical: 4 }}
-        >
-          {SIZE_FILTERS.map((item) => {
-            const isActive = filter.sizes.includes(item.value);
+        <View className="flex-row flex-wrap gap-2">
+          {PAGE_SIZE_OPTIONS.map((size) => {
+            const isActive = filter.limit === size;
             return (
               <TouchableOpacity
-                key={`size-${item.value}`}
-                onPress={() => toggleArrayValue("sizes", item.value)}
+                key={size}
+                onPress={() => updateFilter({ limit: size })}
                 className={`px-4 py-2 rounded-full border ${
                   isActive
                     ? "bg-black border-black"
@@ -591,12 +854,12 @@ const AllProducts = () => {
                     isActive ? "text-white" : "text-primary"
                   }`}
                 >
-                  {item.label}
+                  {size}
                 </Text>
               </TouchableOpacity>
             );
           })}
-        </ScrollView>
+        </View>
       </View>
 
       <View className="flex-row gap-3 mt-2">
@@ -641,58 +904,60 @@ const AllProducts = () => {
       />
 
       {/* Pagination footer */}
-      <View className="absolute left-0 right-0 bottom-0 px-8 py-4 bg-white border-t border-[#E5E7EB]">
+      <View className="absolute left-0 right-0 bottom-0 px-5 py-4 bg-white border-t border-[#E5E7EB]">
         <View className="flex-row items-center justify-between">
-          <SecondaryButton
-            title="Prev"
+          <TouchableOpacity
             onPress={() => handleChangePage("prev")}
             disabled={currentPage <= 1}
-            textClassName={`text-sm font-jost-semibold ${
-              currentPage <= 1 ? "text-secondary" : "text-primary"
-            }`}
             className={`px-4 py-3 rounded-2xl border ${
-              currentPage <= 1 ? "border-[#bcbcbd]" : "border-black"
+              currentPage <= 1 ? "border-[#E5E7EB]" : "border-black"
             }`}
-          />
+          >
+            <Text
+              className={`text-sm font-jost-semibold ${
+                currentPage <= 1 ? "text-secondary" : "text-primary"
+              }`}
+            >
+              Prev
+            </Text>
+          </TouchableOpacity>
 
           <View className="items-center">
-            <Text className="mb-1 text-sm text-secondary font-jost">
+            <Text className="mb-1 text-xs text-secondary font-jost">
               Page {currentPage} of {totalPages}
             </Text>
-            <Text className="text-xs font-jost text-secondary">
+            <Text className="text-sm font-jost text-secondary">
               {totalCount ? `${totalCount} items` : ""}
             </Text>
           </View>
 
-          <SecondaryButton
-            title="Next"
+          <TouchableOpacity
             onPress={() => handleChangePage("next")}
             disabled={currentPage >= totalPages}
             className={`px-4 py-3 rounded-2xl border ${
-              currentPage >= totalPages ? "border-[#bcbcbd]" : "border-black"
+              currentPage >= totalPages ? "border-[#E5E7EB]" : "border-black"
             }`}
-          />
+          >
+            <Text
+              className={`text-sm font-jost-semibold ${
+                currentPage >= totalPages ? "text-secondary" : "text-primary"
+              }`}
+            >
+              Next
+            </Text>
+          </TouchableOpacity>
         </View>
       </View>
 
       <Modal
         visible={showFilters}
-        variant="bottom"
         onClose={() => setShowFilters(false)}
         occupyFullBottom
-        // contentHeight="80%"
       >
-        <SafeAreaView className="">
-          <ScrollView
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ gap: 8, paddingVertical: 4 }}
-          >
-            {FilterModalContent}
-          </ScrollView>
-        </SafeAreaView>
+        {filterModalContent}
       </Modal>
 
-      {(isLoading || isFetching) && (
+      {isLoading && (
         <View className="absolute inset-0 items-center justify-center pointer-events-none">
           <AppLoader />
         </View>

@@ -1,3 +1,4 @@
+import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import {
   DimensionValue,
@@ -5,6 +6,7 @@ import {
   Platform,
   Modal as ReactNativeModal,
   StyleProp,
+  TouchableOpacity,
   TouchableWithoutFeedback,
   View,
   ViewStyle,
@@ -98,10 +100,11 @@ const Modal = ({
         <TouchableWithoutFeedback
           onPress={dismissOnBackdropPress ? onClose : undefined}
         >
-          <View className="absolute inset-0" />
+          <View className="absolute inset-0" pointerEvents="box-only" />
         </TouchableWithoutFeedback>
 
         <KeyboardAvoidingView
+          pointerEvents="box-none"
           behavior={Platform.OS === "ios" ? "padding" : undefined}
           keyboardVerticalOffset={Platform.select({ ios: 10, android: 10 })}
           style={[
@@ -115,10 +118,18 @@ const Modal = ({
           ]}
           className={
             isBottomVariant
-              ? "bg-background rounded-t-3xl px-5 pt-5"
-              : "bg-background rounded-3xl px-5 pt-5"
+              ? "relative bg-background rounded-t-3xl px-5 pt-5"
+              : "relative bg-background rounded-3xl px-5 pt-5"
           }
         >
+          <TouchableOpacity
+            className="absolute top-5 right-5 z-10 p-1 border border-[#fff] rounded-full"
+            onPress={onClose}
+            hitSlop={8}
+          >
+            <Ionicons name="close" size={20} color="#aaa" />
+          </TouchableOpacity>
+
           {children}
         </KeyboardAvoidingView>
       </View>

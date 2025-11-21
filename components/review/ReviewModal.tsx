@@ -1,6 +1,5 @@
-import { Ionicons } from "@expo/vector-icons";
 import React from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import { Text, View } from "react-native";
 
 import { SafeAreaView } from "react-native-safe-area-context";
 import Modal from "../common/Modal";
@@ -28,7 +27,7 @@ const ReviewModal = ({
       dismissOnBackdropPress={false}
       // contentHeight="42%"
     >
-      <SafeAreaView className="">
+      <SafeAreaView className="relative">
         <View className="flex-row items-baseline justify-between gap-2 mb-4">
           <View className="flex-1">
             <Text className="text-lg font-jost-semibold text-primary">
@@ -40,14 +39,6 @@ const ReviewModal = ({
               </Text>
             ) : null}
           </View>
-
-          <TouchableOpacity
-            className="p-1 border border-[#fff] rounded-full"
-            onPress={onClose}
-            hitSlop={8}
-          >
-            <Ionicons name="close" size={20} color="#aaa" />
-          </TouchableOpacity>
         </View>
 
         <ReviewForm productId={productId} onClose={onClose} />
