@@ -16,11 +16,13 @@ import { Slot } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
-import { View } from "react-native";
+import { Platform, View } from "react-native";
 import ToastManager from "toastify-react-native";
 import "./global.css";
 
-SplashScreen.preventAutoHideAsync();
+if (Platform.OS !== "web") {
+  SplashScreen.preventAutoHideAsync().catch(() => {});
+}
 
 function RootContent() {
   const [appIsReady, setAppIsReady] = useState(false);
@@ -34,9 +36,16 @@ function RootContent() {
 
   useEffect(() => {
     async function prepare() {
-      if (fontsLoaded && !loading) {
-        setAppIsReady(true);
-        await SplashScreen.hideAsync();
+      if (!fontsLoaded || loading) return;
+
+      setAppIsReady(true);
+
+      if (Platform.OS !== "web") {
+        try {
+          await SplashScreen.hideAsync();
+        } catch (error) {
+          Logger.error("Splash hide error", error);
+        }
       }
     }
     prepare();
