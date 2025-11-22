@@ -18,7 +18,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import AppHeader from "../common/AppHeader";
+import { BackButton } from "../common/BackButton";
 
 type SortValue = "asc" | "desc" | undefined;
 
@@ -261,8 +261,9 @@ const AllProducts = () => {
   ].filter(Boolean) as { label: string; onClear: () => void }[];
 
   const FiltersHeader = (
-    <View className="pt-3 pb-4">
-      <View className="flex-row gap-2">
+    <View className="pt-3 pb-4 bg-background">
+      <View className="flex-row items-center gap-2">
+        <BackButton />
         {/* Search */}
         <View className="flex-1 flex-row items-center px-4 py-3 bg-white border border-[#E5E7EB] rounded-2xl">
           <Ionicons name="search-outline" size={18} color="#9CA3AF" />
@@ -628,7 +629,7 @@ const AllProducts = () => {
 
   return (
     <SafeAreaView edges={["top"]} className="flex-1 bg-background">
-      <AppHeader title="All products" right={<View className="w-8" />} />
+      {/* <AppHeader title="All products" right={<View className="w-8" />} /> */}
 
       {!isLoading && (!products || products.length === 0) && (
         <View className="px-5">{FiltersHeader}</View>
@@ -644,6 +645,7 @@ const AllProducts = () => {
         numColumns={2}
         gap={12}
         ListHeaderComponent={FiltersHeader}
+        stickyHeaderIndices={[0]}
         contentContainerStyle={{
           paddingHorizontal: 16,
           paddingTop: 4,

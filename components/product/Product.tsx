@@ -5,13 +5,13 @@ import { PRODUCTS_PROTECTED, PRODUCTS_PUBLIC } from "@/constants/urls";
 import { ProductService } from "@/services/api";
 import { IProductResponse } from "@/services/product/product.types";
 
+import { useAuth } from "@/providers/auth";
 import { AppToast } from "@/utils/toast";
 import { Ionicons } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
+import { router } from "expo-router";
 import { useEffect } from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
-import { router } from "expo-router";
-import { useAuth } from "@/providers/auth";
 
 export default function Product() {
   const { user } = useAuth();
@@ -24,7 +24,8 @@ export default function Product() {
     isSuccess: productIsSuccess,
   } = useQuery<IProductResponse>({
     queryKey: ["products", "id"],
-    queryFn: () => ProductService.fetchProducts(PAGINATION_DEFAULT),
+    queryFn: () =>
+      ProductService.fetchProducts({ ...PAGINATION_DEFAULT, limit: 4 }),
     retry: 2,
     staleTime: FIVE_MINUTES,
   });

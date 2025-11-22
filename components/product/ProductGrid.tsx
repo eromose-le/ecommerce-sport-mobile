@@ -31,6 +31,7 @@ interface ProductGridProps {
 
   ListHeaderComponent?: FlatListProps<GridItem>["ListHeaderComponent"];
   contentContainerStyle?: FlatListProps<GridItem>["contentContainerStyle"];
+  stickyHeaderIndices?: FlatListProps<GridItem>["stickyHeaderIndices"];
 }
 
 export const ProductGrid: React.FC<ProductGridProps> = ({
@@ -49,6 +50,7 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
 
   ListHeaderComponent,
   contentContainerStyle,
+  stickyHeaderIndices,
 }) => {
   const { width } = useWindowDimensions();
 
@@ -82,6 +84,7 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
       showsHorizontalScrollIndicator={false}
       onEndReached={onEndReached}
       onEndReachedThreshold={0.4}
+      stickyHeaderIndices={stickyHeaderIndices}
       contentContainerStyle={{
         gap,
         paddingBottom: 4,
