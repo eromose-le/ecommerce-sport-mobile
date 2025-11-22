@@ -30,7 +30,7 @@ export default function Cart() {
     return <CartEmpty />;
   }
   return (
-    <View className="flex-1 px-5 pt-5 bg-background">
+    <View className="flex-1 px-5 pt-0 bg-background">
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 120 }}
@@ -76,8 +76,8 @@ export default function Cart() {
             </Text>
           </View>
           <TouchableOpacity className="px-5 py-4 bg-black rounded-2xl">
-            <Text className="text-sm text-white rounded-md font-jost-semibold">
-              Check out now
+            <Text className="text-base text-white rounded-md font-jost-semibold">
+              Check out
             </Text>
           </TouchableOpacity>
         </View>
