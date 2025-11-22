@@ -1,5 +1,4 @@
 import AppLoader from "@/components/common/AppLoader";
-import { BackButton } from "@/components/common/BackButton";
 import Modal from "@/components/common/Modal";
 import PrimaryButton from "@/components/common/PrimaryButton";
 import SecondaryButton from "@/components/common/SecondaryButton";
@@ -7,8 +6,9 @@ import { ProductGrid } from "@/components/product/ProductGrid";
 import { FIVE_MINUTES, PAGINATION_DEFAULT } from "@/constants";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { CategoryService, ProductService } from "@/services/api";
+import { Product } from "@/services/product/product.types";
 import { Ionicons } from "@expo/vector-icons";
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import React, { useMemo, useState } from "react";
 import {
   ScrollView,
@@ -18,6 +18,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import AppHeader from "../common/AppHeader";
 
 type SortValue = "asc" | "desc" | undefined;
 
@@ -70,7 +71,7 @@ const defaultFilter: FilterState = {
   colors: [],
   sizes: [],
   page: PAGINATION_DEFAULT.page,
-  limit: 12,
+  limit: PAGINATION_DEFAULT.limit,
 };
 
 const AllProducts = () => {
@@ -139,19 +140,39 @@ const AllProducts = () => {
     ]
   );
 
-  const { data, isLoading, isFetching, error, refetch, isRefetching } =
-    useQuery({
-      queryKey: ["products", "all", queryParams],
-      queryFn: () => ProductService.fetchProducts(queryParams),
-      // keepPreviousData: true,
-      retry: 1,
-      staleTime: FIVE_MINUTES,
-    });
+  const {
+    data,
+    isLoading,
+    error,
+    refetch,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery({
+    queryKey: ["products", "all", queryParams],
+    queryFn: ({ pageParam = 1 }) =>
+      ProductService.fetchProducts({ ...queryParams, page: pageParam }),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+      const current = lastPage?.data?.currentPage ?? 1;
+      const pageCount = lastPage?.data?.pageCount ?? 1;
+      const next = current + 1;
+      return next <= pageCount ? next : undefined;
+    },
+    retry: 1,
+    staleTime: FIVE_MINUTES,
+  });
 
-  const products = data?.data?.results || [];
-  const currentPage = data?.data?.currentPage || filter.page;
-  const totalPages = data?.data?.pageCount || 1;
-  const totalCount = data?.data?.count || products.length;
+  const products: Product[] = useMemo(
+    () => data?.pages?.flatMap((page) => page?.data?.results || []) ?? [],
+    [data]
+  );
+
+  const currentPage =
+    data?.pages?.[data?.pages?.length - 1]?.data?.currentPage || 1;
+  const totalPages =
+    data?.pages?.[data?.pages?.length - 1]?.data?.pageCount || 1;
+  const totalCount = data?.pages?.[0]?.data?.count || products.length;
 
   const updateFilter = (partial: Partial<FilterState>) => {
     setFilter((prev) => ({
@@ -189,15 +210,6 @@ const AllProducts = () => {
       minPrice: range[0],
       maxPrice: range[1],
     });
-  };
-
-  const handleChangePage = (direction: "prev" | "next") => {
-    if (direction === "prev" && currentPage > 1) {
-      setFilter((prev) => ({ ...prev, page: prev.page - 1 }));
-    }
-    if (direction === "next" && currentPage < totalPages) {
-      setFilter((prev) => ({ ...prev, page: prev.page + 1 }));
-    }
   };
 
   const clearFilters = () => setFilter(defaultFilter);
@@ -323,7 +335,7 @@ const AllProducts = () => {
     </View>
   );
 
-  const FilterModalContent = (
+  const filterModalContent = (
     <View className="gap-4">
       <Text className="text-2xl font-jost-semibold text-primary">
         Filter & Sort
@@ -616,17 +628,16 @@ const AllProducts = () => {
 
   return (
     <SafeAreaView edges={["top"]} className="flex-1 bg-background">
-      <View className="flex-row items-center gap-3 px-4 pt-2 pb-3">
-        <BackButton />
-        <Text className="text-lg font-jost-semibold text-primary">
-          All products
-        </Text>
-      </View>
+      <AppHeader title="All products" right={<View className="w-8" />} />
+
+      {!isLoading && (!products || products.length === 0) && (
+        <View className="px-5">{FiltersHeader}</View>
+      )}
 
       <ProductGrid
         data={products}
-        loading={isLoading || isRefetching}
-        loadingMore={false}
+        loading={isLoading}
+        loadingMore={isFetchingNextPage}
         error={error}
         onRetry={refetch}
         scrollEnabled
@@ -636,44 +647,14 @@ const AllProducts = () => {
         contentContainerStyle={{
           paddingHorizontal: 16,
           paddingTop: 4,
-          paddingBottom: 110,
+          paddingBottom: 24,
+        }}
+        onEndReached={() => {
+          if (hasNextPage && !isFetchingNextPage) {
+            fetchNextPage();
+          }
         }}
       />
-
-      {/* Pagination footer */}
-      <View className="absolute left-0 right-0 bottom-0 px-8 py-4 bg-white border-t border-[#E5E7EB]">
-        <View className="flex-row items-center justify-between">
-          <SecondaryButton
-            title="Prev"
-            onPress={() => handleChangePage("prev")}
-            disabled={currentPage <= 1}
-            textClassName={`text-sm font-jost-semibold ${
-              currentPage <= 1 ? "text-secondary" : "text-primary"
-            }`}
-            className={`px-4 py-3 rounded-2xl border ${
-              currentPage <= 1 ? "border-[#bcbcbd]" : "border-black"
-            }`}
-          />
-
-          <View className="items-center">
-            <Text className="mb-1 text-sm text-secondary font-jost">
-              Page {currentPage} of {totalPages}
-            </Text>
-            <Text className="text-xs font-jost text-secondary">
-              {totalCount ? `${totalCount} items` : ""}
-            </Text>
-          </View>
-
-          <SecondaryButton
-            title="Next"
-            onPress={() => handleChangePage("next")}
-            disabled={currentPage >= totalPages}
-            className={`px-4 py-3 rounded-2xl border ${
-              currentPage >= totalPages ? "border-[#bcbcbd]" : "border-black"
-            }`}
-          />
-        </View>
-      </View>
 
       <Modal
         visible={showFilters}
@@ -687,12 +668,12 @@ const AllProducts = () => {
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{ gap: 8, paddingVertical: 4 }}
           >
-            {FilterModalContent}
+            {filterModalContent}
           </ScrollView>
         </SafeAreaView>
       </Modal>
 
-      {(isLoading || isFetching) && (
+      {isLoading && (
         <View className="absolute inset-0 items-center justify-center pointer-events-none">
           <AppLoader />
         </View>

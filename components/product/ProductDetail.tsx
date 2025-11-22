@@ -1,10 +1,9 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams } from "expo-router";
-import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { useState } from "react";
+import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 
 import CartButton from "@/components/cart/CartButton";
-import { BackButton } from "@/components/common/BackButton";
 import ProductAttributes from "@/components/product/ProductAttributes";
 import ProductDetailActions from "@/components/product/ProductDetailActions";
 import ProductGallery from "@/components/product/ProductGallery";
@@ -13,6 +12,7 @@ import ReviewModal from "@/components/review/ReviewModal";
 import { formatCurrency } from "@/utils/currency";
 import { Logger } from "@/utils/logger";
 import { SafeAreaView } from "react-native-safe-area-context";
+import AppHeader from "../common/AppHeader";
 import ProductSpecifications from "./ProductSpecifications";
 
 export default function ProductDetail() {
@@ -33,15 +33,10 @@ export default function ProductDetail() {
           stickyHeaderIndices={[0]}
         >
           {/* Header */}
-          <View className="flex-row items-center justify-between px-4 py-4 bg-background">
-            <BackButton className="" />
-
-            <Text className="text-xl font-jost-medium text-primary">
-              Product {item.modelNumber}
-            </Text>
-
-            <CartButton />
-          </View>
+          <AppHeader
+            title={`Product ${item.modelNumber}`}
+            right={<CartButton />}
+          />
 
           <ProductGallery images={item?.medias?.[0]?.images} />
 

@@ -1,5 +1,5 @@
 import { Product } from "@/services/product/product.types";
-import React from "react";
+import React, { useMemo } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -12,22 +12,25 @@ import { ErrorState } from "../common/ErrorState";
 import { ProductCard } from "./ProductCard";
 import { SkeletonCard } from "./SkeletonCard";
 
+type SkeletonItem = { id: string; skeleton: true };
+type GridItem = Product | SkeletonItem;
+
 interface ProductGridProps {
   data: Product[];
   horizontal?: boolean;
   numColumns?: number;
   scrollEnabled?: boolean;
   gap?: number;
-  loading?: boolean; // NEW → Show skeletons
-  loadingMore?: boolean; // NEW → Infinite scroll loader
+  loading?: boolean; // Show skeletons
+  loadingMore?: boolean; // Infinite scroll loader
   onEndReached?: () => void;
-  skeletonCount?: number; // NEW → How many skeletons to show
+  skeletonCount?: number; // How many skeletons to show
 
   error?: any;
   onRetry?: () => void;
 
-  ListHeaderComponent?: FlatListProps<Product>["ListHeaderComponent"];
-  contentContainerStyle?: FlatListProps<Product>["contentContainerStyle"];
+  ListHeaderComponent?: FlatListProps<GridItem>["ListHeaderComponent"];
+  contentContainerStyle?: FlatListProps<GridItem>["contentContainerStyle"];
 }
 
 export const ProductGrid: React.FC<ProductGridProps> = ({
@@ -54,30 +57,26 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
     : (width - gap * (numColumns - 1) - 35) / numColumns;
 
   // Show skeletons while loading
-  const skeletons = Array.from({ length: skeletonCount }).map((_, i) => ({
-    id: `skeleton-${i}`,
-    skeleton: true,
-  }));
+  const skeletons: SkeletonItem[] = useMemo(
+    () =>
+      Array.from({ length: skeletonCount }).map((_, i) => ({
+        id: `skeleton-${i}`,
+        skeleton: true as const,
+      })),
+    [skeletonCount]
+  );
 
   if (error) {
-    return (
-      <>
-        <ErrorState error={error} onRetry={onRetry} />
-      </>
-    );
+    return <ErrorState error={error} onRetry={onRetry} />;
   }
 
   if (!loading && (!data || data.length === 0)) {
-    return (
-      <>
-        <EmptyState error={"No Product Found"} onRetry={onRetry} />;
-      </>
-    );
+    return <EmptyState error={"No Product Found"} onRetry={onRetry} />;
   }
 
   return (
     <FlatList
-      data={loading ? skeletons : data}
+      data={(loading ? skeletons : data) as GridItem[]}
       horizontal={horizontal}
       scrollEnabled={scrollEnabled}
       showsHorizontalScrollIndicator={false}
@@ -86,7 +85,7 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
       contentContainerStyle={{
         gap,
         paddingBottom: 4,
-        ...contentContainerStyle,
+        ...(contentContainerStyle as any),
       }}
       numColumns={horizontal ? undefined : numColumns}
       columnWrapperStyle={
@@ -96,15 +95,15 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
             }
           : undefined
       }
-      keyExtractor={(item: any, index) =>
-        (item?.id ?? item?.key ?? `item-${index}`).toString()
+      keyExtractor={(item: GridItem, index) =>
+        (item as any)?.id ? String((item as any).id) : `item-${index}`
       }
       renderItem={({ item, index }) =>
-        item.skeleton ? (
+        (item as SkeletonItem).skeleton ? (
           <SkeletonCard width={cardWidth} horizontal={horizontal} />
         ) : (
           <ProductCard
-            product={item}
+            product={item as Product}
             width={cardWidth}
             horizontal={horizontal}
             index={index}
