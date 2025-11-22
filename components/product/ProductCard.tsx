@@ -64,7 +64,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         <Image
           source={resolveImageSource(product?.displayImage)}
           className={`w-full ${horizontal ? "h-32" : "h-40"} bg-[#F5F5F7]`}
-          resizeMode="contain"
+          resizeMode="cover"
         />
 
         <Text

@@ -6,10 +6,8 @@ import { ProductService } from "@/services/api";
 import { IProductResponse } from "@/services/product/product.types";
 
 import { useAuth } from "@/providers/auth";
-import { AppToast } from "@/utils/toast";
 import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
-import { useEffect } from "react";
 import { View } from "react-native";
 import SecondaryButton from "../common/SecondaryButton";
 
@@ -21,7 +19,6 @@ export default function Product() {
     isLoading: productIsLoading,
     error: productError,
     refetch: productRefetch,
-    isSuccess: productIsSuccess,
   } = useQuery<IProductResponse>({
     queryKey: ["products", "id"],
     queryFn: () =>
@@ -29,12 +26,6 @@ export default function Product() {
     retry: 2,
     staleTime: FIVE_MINUTES,
   });
-
-  useEffect(() => {
-    if (productIsSuccess) {
-      AppToast.success(`Product retived!`);
-    }
-  }, [productData, productIsSuccess]);
 
   const productsResponse = productData?.data?.results || [];
 

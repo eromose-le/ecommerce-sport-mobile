@@ -679,7 +679,10 @@ const AllProducts = () => {
       </Modal>
 
       {isLoading && (
-        <View className="absolute inset-0 items-center justify-center pointer-events-none">
+        <View
+          pointerEvents="none"
+          className="absolute inset-0 items-center justify-center"
+        >
           <AppLoader />
         </View>
       )}
