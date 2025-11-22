@@ -19,6 +19,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { BackButton } from "../common/BackButton";
+import TextField from "../common/TextField";
 
 type SortValue = "asc" | "desc" | undefined;
 
@@ -382,29 +383,31 @@ const AllProducts = () => {
           Price range
         </Text>
         <View className="flex-row items-center gap-3">
-          <View className="flex-1 flex-row gap-2 px-3 py-3 bg-[#F9FAFB] rounded-2xl border border-[#E5E7EB]">
-            <Text className="mb-1 text-xs text-secondary font-jost">Min</Text>
-            <TextInput
+          <View className="flex-1">
+            <TextField
+              label="Minimum"
               keyboardType="numeric"
-              placeholder="0"
+              placeholder="₦0"
+              autoCapitalize="none"
               value={filter.minPrice ? String(filter.minPrice) : ""}
               onChangeText={(text) =>
                 updateFilter({ minPrice: text ? Number(text) : undefined })
               }
-              className="text-base font-jost text-primary"
             />
           </View>
+
           <Ionicons name="remove" size={16} color="#9CA3AF" />
-          <View className="flex-1 flex-row gap-2 px-3 py-3 bg-[#F9FAFB] rounded-2xl border border-[#E5E7EB]">
-            <Text className="mb-1 text-xs text-secondary font-jost">Max</Text>
-            <TextInput
+
+          <View className="flex-1">
+            <TextField
+              label="Maximum"
               keyboardType="numeric"
-              placeholder="50000"
+              placeholder="₦50000"
+              autoCapitalize="none"
               value={filter.maxPrice ? String(filter.maxPrice) : ""}
               onChangeText={(text) =>
                 updateFilter({ maxPrice: text ? Number(text) : undefined })
               }
-              className="text-base font-jost text-primary"
             />
           </View>
         </View>
