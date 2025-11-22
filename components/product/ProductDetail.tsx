@@ -90,7 +90,7 @@ export default function ProductDetail() {
             </View>
 
             {/* ACTION BUTTONS */}
-            <ProductDetailActions />
+            <ProductDetailActions product={item} />
           </View>
 
           {/* KEY ATTRIBUTES */}

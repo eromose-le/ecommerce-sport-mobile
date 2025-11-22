@@ -34,9 +34,9 @@ npm run reset-project
 10. add amount format ✅
 11. cart page func ✅
 12. all product page with filter (see all button) and filter ✅
-13. categories
-14. wire product detail screen
-15. image slider
+13. categories ✅
+14. image slider
+15. wire product detail screen
 16. checkout page
 17. paystack integration
 18. 

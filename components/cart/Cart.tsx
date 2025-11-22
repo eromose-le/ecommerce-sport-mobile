@@ -65,18 +65,18 @@ export default function Cart() {
             {formatCurrency(total)}
           </Text>
         </View>
-        <View className="flex-row items-center justify-between">
+        <View className="flex-row items-center justify-between gap-0">
           <View>
             <Text className="text-sm font-jost-semibold text-primary">
               Shipping ({shippingPercentage}%)
             </Text>
-            <Text className="text-xs text-secondary font-jost">
+            <Text className="text-xs text-secondary font-jost text-wrap">
               Fee: {formatCurrency(shippingFee)} · Subtotal:{" "}
               {formatCurrency(subtotal)}
             </Text>
           </View>
-          <TouchableOpacity className="px-8 py-4 bg-black rounded-2xl">
-            <Text className="text-white rounded-md font-jost-semibold">
+          <TouchableOpacity className="px-5 py-4 bg-black rounded-2xl">
+            <Text className="text-sm text-white rounded-md font-jost-semibold">
               Check out now
             </Text>
           </TouchableOpacity>

@@ -1,18 +1,45 @@
 import CartIcon from "@/assets/icons/cart.svg";
-import { useRouter } from "expo-router";
-import React, { FC } from "react";
-import { Text, TouchableOpacity, View } from "react-native";
-import { SvgIcon } from "../common/SvgIcon";
 import { CART_PROTECTED, CART_PUBLIC } from "@/constants/urls";
+import { showCartQtyValue } from "@/helpers/cart";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import { useCartStore } from "@/store/useCartStore";
-import { showCartQtyValue } from "@/helpers/cart";
+import { useRouter } from "expo-router";
+import React, { FC, useEffect } from "react";
+import { Text, TouchableOpacity } from "react-native";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSequence,
+  withSpring,
+  withTiming,
+} from "react-native-reanimated";
+import { SvgIcon } from "../common/SvgIcon";
 
 const CartButton: FC = () => {
   const router = useRouter();
   const { user } = useAuthUser();
   const cart = useCartStore((state) => state.cart);
   const badge = showCartQtyValue(cart);
+
+  const showBadge = badge.status;
+  const scale = useSharedValue(showBadge ? 1 : 0);
+
+  useEffect(() => {
+    if (showBadge) {
+      scale.value = withSequence(
+        withTiming(0, { duration: 0 }),
+        withTiming(1.25, { duration: 140 }),
+        withSpring(1, { damping: 8, stiffness: 150 })
+      );
+    } else {
+      scale.value = withTiming(0, { duration: 180 });
+    }
+  }, [scale, showBadge]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+    opacity: scale.value,
+  }));
 
   return (
     <TouchableOpacity
@@ -21,11 +48,14 @@ const CartButton: FC = () => {
     >
       <SvgIcon Icon={CartIcon} size={22} color={"#000"} />
       {badge.status ? (
-        <View className="absolute items-center justify-center min-w-[20px] h-5 px-1 bg-red-500 rounded-full -bottom-1 -right-1">
+        <Animated.View
+          style={animatedStyle}
+          className="absolute items-center justify-center min-w-[20px] h-5 px-1 bg-red-500 rounded-full -bottom-1 -right-1"
+        >
           <Text className="text-xs text-white font-jost-semibold">
             {badge.value}
           </Text>
-        </View>
+        </Animated.View>
       ) : null}
     </TouchableOpacity>
   );
