@@ -344,10 +344,10 @@ const AllProducts = () => {
 
       <View className="gap-2">
         <Text className="text-sm font-jost-medium text-primary">
-          Price range pick
+          Pick price range
         </Text>
 
-        <View className="flex-row flex-wrap">
+        <View className="flex-row flex-wrap gap-2">
           {PRICE_PRESETS.map((preset) => {
             const isActive =
               filter.minPrice === preset.range[0] &&

@@ -7,11 +7,11 @@ import { IProductResponse } from "@/services/product/product.types";
 
 import { useAuth } from "@/providers/auth";
 import { AppToast } from "@/utils/toast";
-import { Ionicons } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { useEffect } from "react";
-import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { View } from "react-native";
+import SecondaryButton from "../common/SecondaryButton";
 
 export default function Product() {
   const { user } = useAuth();
@@ -44,7 +44,7 @@ export default function Product() {
   return (
     <>
       {/* Categories */}
-      <View className="mt-5 mb-7">
+      {/* <View className="mt-5 mb-7">
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -65,10 +65,10 @@ export default function Product() {
             </TouchableOpacity>
           ))}
         </ScrollView>
-      </View>
+      </View> */}
 
       {/* Best Selling Section */}
-      <View className="mb-8">
+      <View className="mt-2 mb-8">
         <Title
           title="New arrival"
           actionText="See all"
@@ -89,6 +89,13 @@ export default function Product() {
             scrollEnabled={false}
           />
         </View>
+
+        <SecondaryButton
+          title="See all products"
+          onPress={handleSeeAll}
+          textClassName="text-primary underline"
+          className="border-transparent"
+        />
       </View>
 
       {/* Recently Viewed Section */}
