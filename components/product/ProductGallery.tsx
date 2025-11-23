@@ -1,10 +1,12 @@
 import { Ionicons } from "@expo/vector-icons";
+import * as Linking from "expo-linking";
 import { VideoView, useVideoPlayer } from "expo-video";
 import React, { useEffect, useMemo, useState } from "react";
 import {
   Dimensions,
   Image,
   ScrollView,
+  Text,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -16,6 +18,7 @@ type MediaItem = {
   isVideo?: boolean;
   videoUrl?: string;
   poster?: string;
+  completeVideo?: string;
 };
 
 type ProductGalleryProps = {
@@ -33,20 +36,29 @@ export default function ProductGallery({
       if (uri) items.push({ uri, isVideo: false });
     };
 
-    const pushVideo = (thumb?: string, videoUrl?: string) => {
+    const pushVideo = (
+      thumb?: string,
+      videoUrl?: string,
+      completeVideo?: string
+    ) => {
       if (thumb || videoUrl) {
         items.push({
           uri: thumb || videoUrl,
           isVideo: true,
           videoUrl,
           poster: thumb,
+          completeVideo,
         });
       }
     };
 
     (medias || []).forEach((media: any) => {
       if (media?.type === "video") {
-        pushVideo(media?.displayImage, media?.links?.introVideo);
+        pushVideo(
+          media?.displayImage,
+          media?.links?.introVideo,
+          media?.links?.completeVideo
+        );
       } else if (Array.isArray(media?.images) && media.images.length) {
         media.images.forEach((img: string) => pushImage(img));
       } else if (media?.displayImage) {
@@ -66,6 +78,7 @@ export default function ProductGallery({
   }, [images, medias]);
 
   const [activeIndex, setActiveIndex] = useState(0);
+  const [showVideoLink, setShowVideoLink] = useState(false);
   const videoUrl = parsedMedia[activeIndex]?.isVideo
     ? parsedMedia[activeIndex]?.videoUrl || parsedMedia[activeIndex]?.uri
     : undefined;
@@ -80,6 +93,8 @@ export default function ProductGallery({
     if (!parsedMedia.length) return;
     const current = parsedMedia[Math.min(activeIndex, parsedMedia.length - 1)];
 
+    setShowVideoLink(false);
+
     let interval: ReturnType<typeof setInterval> | undefined;
     let cleanupListener: (() => void) | undefined;
 
@@ -88,7 +103,7 @@ export default function ProductGallery({
         player.loop = false;
         player.play();
         const sub = player.addListener("playToEnd", () => {
-          setActiveIndex((prev) => (prev + 1) % parsedMedia.length);
+          setShowVideoLink(true);
         });
         cleanupListener = () => sub?.remove?.();
       }
@@ -127,6 +142,19 @@ export default function ProductGallery({
               <Ionicons name="play" size={28} color="#fff" />
             </View>
           </View>
+          {showVideoLink && current?.completeVideo ? (
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={() => Linking.openURL(current.completeVideo as string)}
+              className="absolute inset-0 items-center justify-center px-6 bg-black/60"
+            >
+              <View className="px-4 py-3 bg-white rounded-2xl">
+                <Text className="text-sm font-jost-medium text-primary">
+                  Watch the full video
+                </Text>
+              </View>
+            </TouchableOpacity>
+          ) : null}
         </View>
       ) : (
         <Image
