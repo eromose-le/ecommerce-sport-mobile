@@ -5,11 +5,9 @@ import { FIVE_MINUTES } from "@/constants";
 import { SEARCH_PROTECTED } from "@/constants/urls";
 import { UserService } from "@/services/api";
 import { IUserResponse } from "@/services/user/user.types";
-import { AppToast } from "@/utils/toast";
 import { Ionicons } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
-import { useEffect } from "react";
 import {
   ActivityIndicator,
   ScrollView,
@@ -20,19 +18,12 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function ProtectedHome() {
-  const { data, isLoading, error, refetch, isSuccess } =
-    useQuery<IUserResponse>({
-      queryKey: ["users", "me"],
-      queryFn: UserService.fetchMe,
-      retry: 2,
-      staleTime: FIVE_MINUTES,
-    });
-
-  useEffect(() => {
-    if (isSuccess && data?.data?.firstName) {
-      AppToast.success(`${data.data.firstName}'s profile retrieved!`);
-    }
-  }, [data, isSuccess]);
+  const { data, isLoading, error, refetch } = useQuery<IUserResponse>({
+    queryKey: ["users", "me"],
+    queryFn: UserService.fetchMe,
+    retry: 2,
+    staleTime: FIVE_MINUTES,
+  });
 
   const userResponse = data?.data || null;
   const userName =

@@ -5,7 +5,6 @@ import { ReviewService } from "@/services/api";
 import { Review } from "@/services/review/review.types";
 import { safeFormatDate } from "@/utils/date";
 import { resolveImageSource } from "@/utils/images";
-import { Logger } from "@/utils/logger";
 import { Ionicons } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
 import React, { useEffect, useState } from "react";
@@ -32,8 +31,6 @@ export default function ProductReviews({
 }: ProductReviewsProps) {
   const [page, setPage] = useState(1);
   const stringProductId = productId ? String(productId) : undefined;
-
-  Logger.warn("stringProductId", stringProductId);
 
   useEffect(() => {
     setPage(1);

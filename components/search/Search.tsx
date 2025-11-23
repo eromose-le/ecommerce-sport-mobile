@@ -101,7 +101,7 @@ export default function Search() {
         >
           <LoadingContent
             loading={isLoading || isFetching}
-            loadingClassName="flex absolute p-0 m-0 left-44"
+            loadingClassName="flex-1 flex-col items-center justify-center"
             error={error}
             onRetry={refetch}
             data={productsResponse}
