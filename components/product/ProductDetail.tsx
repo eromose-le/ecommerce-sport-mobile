@@ -110,6 +110,7 @@ export default function ProductDetail() {
     return <AppLoader />;
   }
 
+  Logger.info("medias", item?.medias);
   return (
     <SafeAreaView className="flex-1 bg-background">
       <View className="flex-1 bg-white">
@@ -123,7 +124,10 @@ export default function ProductDetail() {
             right={<CartButton />}
           />
 
-          <ProductGallery images={item?.medias?.[0]?.images} />
+          <ProductGallery
+            images={item?.medias?.[0]?.images}
+            medias={item?.medias}
+          />
 
           <Formik
             enableReinitialize
