@@ -1,18 +1,15 @@
+import { KeyValuePair } from "@/types/global";
 import { getKeyValue } from "@/utils/object";
 import React from "react";
 import { Text, View } from "react-native";
 
-export default function ProductAttributes({
-  attributes,
-}: {
-  attributes: { title: string; text: string }[];
-}) {
+export default function ProductAttributes({ attributes }: any) {
   return (
     <View className="px-4 mt-8">
       <Text className="mb-3 text-lg font-jost-bold">Key attributes</Text>
 
       <View className="border">
-        {attributes?.map((attr, i) => (
+        {attributes?.map((attr: KeyValuePair, i: number) => (
           <View
             key={i}
             className="flex-row bg-white border-b border-b-black last:border-b-0"

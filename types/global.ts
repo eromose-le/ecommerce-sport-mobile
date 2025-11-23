@@ -1,3 +1,7 @@
+export type KeyValuePair = {
+  [key: string]: string;
+};
+
 export type ServerResponse<T> = Partial<{
   message: string;
   data: T;

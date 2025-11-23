@@ -2,6 +2,7 @@ import { PaginatedServerResponse } from "@/types/global";
 
 export interface Product {
   id: string;
+  modelNumber: string;
 
   images: string[];
   variations: string[];
@@ -26,9 +27,13 @@ export interface Product {
   isDeleted?: boolean;
   sizes?: any[];
   colors?: any[];
+  weights?: any[];
+  dimensions?: any[];
   medias?: ProductMedia[];
 
-  variant: any;
+  variants?: any;
+  types?: any;
+  orders?: any;
 }
 
 export interface ProductAttribute {

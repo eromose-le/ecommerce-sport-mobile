@@ -7,7 +7,7 @@ export default function ProductSpecifications({
   modelNumber,
 }: {
   modelNumber: string;
-  specifications: { title: string; text: string }[];
+  specifications: any;
 }) {
   return (
     <View className="px-4 mt-8">
