@@ -5,8 +5,10 @@ import {
   showTotalPrice,
   showTotalPriceInCart,
 } from "@/helpers/cart";
+import { CHECKOUT } from "@/constants/urls";
 import { useCartStore } from "@/store/useCartStore";
 import { formatCurrency } from "@/utils/currency";
+import { router } from "expo-router";
 import React, { useMemo } from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 
@@ -75,7 +77,11 @@ export default function Cart() {
               {formatCurrency(subtotal)}
             </Text>
           </View>
-          <TouchableOpacity className="px-5 py-4 bg-black rounded-2xl">
+          <TouchableOpacity
+            className="px-5 py-4 bg-black rounded-2xl"
+            onPress={() => router.push(CHECKOUT)}
+            activeOpacity={0.8}
+          >
             <Text className="text-base text-white rounded-md font-jost-semibold">
               Check out
             </Text>

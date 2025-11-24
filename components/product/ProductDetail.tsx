@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 
@@ -26,6 +26,7 @@ import { EmptyState } from "../common/EmptyState";
 import { LoadingContent } from "../common/LoadingContent";
 import { RecommendedProducts } from "./RecommendedProducts";
 import ProductSpecifications from "./ProductSpecifications";
+import { CHECKOUT } from "@/constants/urls";
 
 export default function ProductDetail() {
   const params = useLocalSearchParams<{
@@ -36,6 +37,7 @@ export default function ProductDetail() {
   const initialItem = params?.product ? JSON.parse(params.product) : null;
   const productId = params?.id || initialItem?.id;
   const [isReviewOpen, setIsReviewOpen] = useState(false);
+  const [submitIntent, setSubmitIntent] = useState<"add" | "start">("add");
   const { addToCart } = useCartStore();
 
   const { data, isLoading, isFetching, error, refetch } = useQuery({
@@ -181,6 +183,9 @@ export default function ProductDetail() {
                   true
                 );
                 AppToast.success(`Added to Cart`);
+                if (submitIntent === "start") {
+                  router.push(CHECKOUT);
+                }
               }}
             >
               {({ values, setFieldValue, handleSubmit }) => {
@@ -398,8 +403,14 @@ export default function ProductDetail() {
                     {/* ACTION BUTTONS */}
                     <ProductDetailActions
                       product={item}
-                      onAddToCart={handleSubmit}
-                      onStartOrder={handleSubmit}
+                      onAddToCart={() => {
+                        setSubmitIntent("add");
+                        handleSubmit();
+                      }}
+                      onStartOrder={() => {
+                        setSubmitIntent("start");
+                        handleSubmit();
+                      }}
                     />
                   </View>
                 );

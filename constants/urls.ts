@@ -16,6 +16,7 @@ export const PRODUCTS_PUBLIC = "/(public)/products";
 export const PRODUCT_DETAIL = "/product/[id]";
 export const PROFILE = "/(protected)/(tabs-protected)/profile";
 export const PROFILE_DETAIL = "/(protected)/profile/[id]";
+export const CHECKOUT = "/(protected)/checkout";
 
 // auth
 export const SIGN_IN = "/(auth)/sign-in";
