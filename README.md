@@ -37,10 +37,10 @@ npm run reset-project
 13. categories ✅
 14. image slider ✅
 15. wire product detail screen ✅
-16. checkout page
-17. delivery / shiping fee
-18. paystack integration
-19. 
+16. add similar product section to product-detail page
+17. checkout page
+18. delivery / shiping fee
+19. paystack integration
  -->
-<!--  
+<!--
  -->
