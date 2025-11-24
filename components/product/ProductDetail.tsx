@@ -24,6 +24,7 @@ import * as Yup from "yup";
 import AppHeader from "../common/AppHeader";
 import { EmptyState } from "../common/EmptyState";
 import { LoadingContent } from "../common/LoadingContent";
+import { RecommendedProducts } from "./RecommendedProducts";
 import ProductSpecifications from "./ProductSpecifications";
 
 export default function ProductDetail() {
@@ -404,6 +405,12 @@ export default function ProductDetail() {
                 );
               }}
             </Formik>
+
+            <RecommendedProducts
+              categoryId={item?.categoryId}
+              subcategoryId={item?.subcategoryId}
+              currentProductId={item?.id}
+            />
 
             {/* KEY ATTRIBUTES */}
             <ProductAttributes attributes={item?.keyattribute} />
