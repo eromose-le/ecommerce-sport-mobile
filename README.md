@@ -35,11 +35,12 @@ npm run reset-project
 11. cart page func ✅
 12. all product page with filter (see all button) and filter ✅
 13. categories ✅
-14. image slider
-15. wire product detail screen
+14. image slider ✅
+15. wire product detail screen ✅
 16. checkout page
-17. paystack integration
-18. 
+17. delivery / shiping fee
+18. paystack integration
+19. 
  -->
-<!-- codex init
+<!--  
  -->

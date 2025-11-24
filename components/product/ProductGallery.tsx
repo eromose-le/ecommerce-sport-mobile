@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import * as Linking from "expo-linking";
 import { VideoView, useVideoPlayer } from "expo-video";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   Dimensions,
   Image,
@@ -10,6 +10,11 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+
+import { Logger } from "@/utils/logger";
+import * as MediaLibrary from "expo-media-library";
+import ViewShot, { captureRef } from "react-native-view-shot";
+import Logo from "../common/Logo";
 
 const { width } = Dimensions.get("window");
 
@@ -79,9 +84,13 @@ export default function ProductGallery({
 
   const [activeIndex, setActiveIndex] = useState(0);
   const [showVideoLink, setShowVideoLink] = useState(false);
-  const videoUrl = parsedMedia[activeIndex]?.isVideo
-    ? parsedMedia[activeIndex]?.videoUrl || parsedMedia[activeIndex]?.uri
+
+  const current = parsedMedia[Math.min(activeIndex, parsedMedia.length - 1)];
+
+  const videoUrl = current?.isVideo
+    ? current?.videoUrl || current?.uri
     : undefined;
+
   const player = useVideoPlayer(videoUrl ?? null, (playerInstance) => {
     if (playerInstance) {
       playerInstance.loop = false;
@@ -120,7 +129,30 @@ export default function ProductGallery({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeIndex, parsedMedia.length, player]);
 
-  const current = parsedMedia[Math.min(activeIndex, parsedMedia.length - 1)];
+  // -----------------------------------------
+  // Watermark + Download Logic
+  // -----------------------------------------
+  const viewShotRef = useRef(null);
+
+  const saveImage = async () => {
+    try {
+      const { status } = await MediaLibrary.requestPermissionsAsync();
+      if (status !== "granted") {
+        alert("Permission is required to save images.");
+        return;
+      }
+
+      const uri = await captureRef(viewShotRef, {
+        format: "jpg",
+        quality: 0.9,
+      });
+
+      await MediaLibrary.saveToLibraryAsync(uri);
+      alert("Image saved to gallery!");
+    } catch (error) {
+      Logger.error("SAVE ERROR:", error);
+    }
+  };
 
   return (
     <View className="items-center justify-start px-4">
@@ -157,16 +189,61 @@ export default function ProductGallery({
           ) : null}
         </View>
       ) : (
-        <Image
-          source={
-            current?.uri
-              ? { uri: current.uri }
-              : require("@/assets/images/logo.png")
-          }
-          className="bg-gray-200 rounded-3xl"
-          style={{ width: width - 60, height: width - 60 }}
-          resizeMode="cover"
-        />
+        <>
+          {/* IMAGE WITH WATERMARK + CAPTURE */}
+          <ViewShot
+            ref={viewShotRef}
+            options={{ format: "jpg", quality: 0.9 }}
+            style={{
+              width: width - 60,
+              height: width - 60,
+              borderRadius: 24,
+              overflow: "hidden",
+            }}
+          >
+            <Image
+              source={
+                current?.uri
+                  ? { uri: current.uri }
+                  : require("@/assets/images/logo.png")
+              }
+              style={{ width: "100%", height: "100%" }}
+              resizeMode="cover"
+            />
+
+            {/* WATERMARK */}
+            <View
+              style={{
+                position: "absolute",
+                top: 15,
+                left: 10,
+                paddingHorizontal: 10,
+                paddingVertical: 4,
+                backgroundColor: "rgba(0,0,0,0.4)",
+                borderRadius: 4,
+              }}
+            >
+              <Logo size={40} />
+            </View>
+          </ViewShot>
+
+          {/* DOWNLOAD BUTTON */}
+          <TouchableOpacity
+            onPress={saveImage}
+            style={{
+              position: "absolute",
+              top: 15,
+              right: 40,
+              marginTop: 0,
+              paddingVertical: 6,
+              paddingHorizontal: 13,
+              backgroundColor: "rgba(0,0,0,0.4)",
+              borderRadius: 4,
+            }}
+          >
+            <Ionicons name="cloud-download" size={30} color="#fff" />
+          </TouchableOpacity>
+        </>
       )}
 
       <ScrollView

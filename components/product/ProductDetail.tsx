@@ -107,10 +107,6 @@ export default function ProductDetail() {
     return accumulateAmounts([basePrice, ...modifiers]) * (values.qty || 1);
   };
 
-  // if (isLoading || isFetching) {
-  //   return <AppLoader />;
-  // }
-
   return (
     <SafeAreaView className="flex-1 bg-background">
       <View className="flex-1 bg-white">
