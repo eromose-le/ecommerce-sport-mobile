@@ -1,5 +1,7 @@
+import { Logger } from "@/utils/logger";
 import { Ionicons } from "@expo/vector-icons";
 import * as Linking from "expo-linking";
+import * as MediaLibrary from "expo-media-library";
 import { VideoView, useVideoPlayer } from "expo-video";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -10,9 +12,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-
-import { Logger } from "@/utils/logger";
-import * as MediaLibrary from "expo-media-library";
 import ViewShot, { captureRef } from "react-native-view-shot";
 import Logo from "../common/Logo";
 
@@ -29,11 +28,13 @@ type MediaItem = {
 type ProductGalleryProps = {
   images?: string[];
   medias?: any[];
+  isActivePage?: boolean;
 };
 
 export default function ProductGallery({
   images = [],
   medias = [],
+  isActivePage = false,
 }: ProductGalleryProps) {
   const parsedMedia: MediaItem[] = useMemo(() => {
     const items: MediaItem[] = [];
@@ -84,9 +85,9 @@ export default function ProductGallery({
 
   const [activeIndex, setActiveIndex] = useState(0);
   const [showVideoLink, setShowVideoLink] = useState(false);
+  const [isMuted, setIsMuted] = useState(true); // default muted
 
   const current = parsedMedia[Math.min(activeIndex, parsedMedia.length - 1)];
-
   const videoUrl = current?.isVideo
     ? current?.videoUrl || current?.uri
     : undefined;
@@ -94,21 +95,29 @@ export default function ProductGallery({
   const player = useVideoPlayer(videoUrl ?? null, (playerInstance) => {
     if (playerInstance) {
       playerInstance.loop = false;
-      playerInstance.play();
+      playerInstance.muted = isMuted;
+      if (isActivePage) {
+        playerInstance.play();
+      }
     }
   });
 
   useEffect(() => {
+    if (player) {
+      player.muted = isMuted;
+    }
+  }, [isMuted, player]);
+
+  useEffect(() => {
     if (!parsedMedia.length) return;
     const current = parsedMedia[Math.min(activeIndex, parsedMedia.length - 1)];
-
     setShowVideoLink(false);
 
     let interval: ReturnType<typeof setInterval> | undefined;
     let cleanupListener: (() => void) | undefined;
 
     if (current?.isVideo) {
-      if (player) {
+      if (player && isActivePage) {
         player.loop = false;
         player.play();
         const sub = player.addListener("playToEnd", () => {
@@ -127,11 +136,11 @@ export default function ProductGallery({
       cleanupListener?.();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeIndex, parsedMedia.length, player]);
+  }, [activeIndex, parsedMedia.length, player, isActivePage]);
 
-  // -----------------------------------------
-  // Watermark + Download Logic
-  // -----------------------------------------
+  // ----------------------------
+  // Watermark + download logic
+  // ----------------------------
   const viewShotRef = useRef(null);
 
   const saveImage = async () => {
@@ -169,12 +178,36 @@ export default function ProductGallery({
             nativeControls
             contentFit="contain"
           />
-          <View className="absolute inset-0 items-center justify-center pointer-events-none">
-            <View className="items-center justify-center rounded-full w-14 h-14 bg-black/40">
-              <Ionicons name="play" size={28} color="#fff" />
+
+          {/* Play overlay only when muted */}
+          {isMuted && (
+            <View className="absolute inset-0 items-center justify-center pointer-events-none">
+              <View className="items-center justify-center rounded-full w-14 h-14 bg-black/40">
+                <Ionicons name="play" size={28} color="#fff" />
+              </View>
             </View>
-          </View>
-          {showVideoLink && current?.completeVideo ? (
+          )}
+
+          {/* Unmute button */}
+          <TouchableOpacity
+            onPress={() => setIsMuted((prev) => !prev)}
+            style={{
+              position: "absolute",
+              bottom: 15,
+              right: 15,
+              padding: 6,
+              borderRadius: 20,
+              backgroundColor: "rgba(0,0,0,0.4)",
+            }}
+          >
+            <Ionicons
+              name={isMuted ? "volume-mute" : "volume-high"}
+              size={22}
+              color="#fff"
+            />
+          </TouchableOpacity>
+
+          {showVideoLink && current?.completeVideo && (
             <TouchableOpacity
               activeOpacity={0.8}
               onPress={() => Linking.openURL(current.completeVideo as string)}
@@ -186,7 +219,7 @@ export default function ProductGallery({
                 </Text>
               </View>
             </TouchableOpacity>
-          ) : null}
+          )}
         </View>
       ) : (
         <>
@@ -246,6 +279,7 @@ export default function ProductGallery({
         </>
       )}
 
+      {/* Thumbnail scroll */}
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -271,13 +305,13 @@ export default function ProductGallery({
               className="w-16 h-16 bg-gray-200 rounded-lg"
               resizeMode="cover"
             />
-            {media?.isVideo ? (
+            {media?.isVideo && (
               <View className="absolute inset-0 items-center justify-center">
                 <View className="items-center justify-center w-6 h-6 rounded-full bg-black/70">
                   <Ionicons name="play" size={14} color="#fff" />
                 </View>
               </View>
-            ) : null}
+            )}
           </TouchableOpacity>
         ))}
       </ScrollView>
