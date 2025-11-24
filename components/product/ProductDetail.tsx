@@ -15,6 +15,7 @@ import { Product } from "@/services/product/product.types";
 import { useCartStore } from "@/store/useCartStore";
 import { formatCurrency } from "@/utils/currency";
 import { Logger } from "@/utils/logger";
+import { AppToast } from "@/utils/toast";
 import { useQuery } from "@tanstack/react-query";
 import classNames from "classnames";
 import { Formik } from "formik";
@@ -178,6 +179,7 @@ export default function ProductDetail() {
                   } as any,
                   true
                 );
+                AppToast.success(`Added to Cart`);
               }}
             >
               {({ values, setFieldValue, handleSubmit }) => {
