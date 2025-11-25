@@ -25,9 +25,12 @@ const ReviewModal = ({
       variant="bottom"
       occupyFullBottom
       dismissOnBackdropPress={false}
-      // contentHeight="42%"
+      contentHeight="42%"
     >
-      <SafeAreaView className="relative">
+      <SafeAreaView
+        className="relative bg-background"
+        edges={["top", "left", "right", "bottom"]}
+      >
         <View className="flex-row items-baseline justify-between gap-2 mb-4">
           <View className="flex-1">
             <Text className="text-lg font-jost-semibold text-primary">

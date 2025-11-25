@@ -1,6 +1,7 @@
-import AppHeader from "@/components/common/AppHeader";
 import CartCard from "@/components/cart/CartCard";
 import CartEmpty from "@/components/cart/CartEmpty";
+import AppHeader from "@/components/common/AppHeader";
+import Modal from "@/components/common/Modal";
 import PrimaryButton from "@/components/common/PrimaryButton";
 import TextField from "@/components/common/TextField";
 import {
@@ -12,27 +13,27 @@ import {
   showTotalPrice,
   showTotalPriceInCart,
 } from "@/helpers/cart";
-import { TABS_PROTECTED } from "@/constants/urls";
+import { useAuth } from "@/providers/auth";
 import { PaymentService } from "@/services/api";
 import { useCartStore } from "@/store/useCartStore";
-import { useAuth } from "@/providers/auth";
 import { formatCurrency } from "@/utils/currency";
 import { AppToast } from "@/utils/toast";
+import * as Linking from "expo-linking";
+import { router } from "expo-router";
+import * as WebBrowser from "expo-web-browser";
 import { useFormik } from "formik";
-import * as Yup from "yup";
 import { useMemo, useState } from "react";
 import {
   FlatList,
   KeyboardAvoidingView,
-  Modal,
   Platform,
   ScrollView,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
-import * as WebBrowser from "expo-web-browser";
-import { router } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context";
+import * as Yup from "yup";
 
 type FormValues = {
   firstName: string;
@@ -41,6 +42,17 @@ type FormValues = {
   phoneNumber: string;
   address: string;
   state: string;
+};
+
+type CartOrderPayload = {
+  userId?: string | number;
+  items: {
+    productId: string | number;
+    quantity: number;
+    size?: string;
+    color?: string;
+  }[];
+  variant: any;
 };
 
 const checkoutSchema = Yup.object({
@@ -56,9 +68,11 @@ const checkoutSchema = Yup.object({
 });
 
 export default function ProtectedCheckout() {
-  const { cart, incrementQty, decrementQty, removeFromCart, clearCart } =
-    useCartStore();
+  const { cart, incrementQty, decrementQty, removeFromCart } = useCartStore();
   const { user } = useAuth();
+
+  // Needed so WebBrowser can close once redirected back to the app
+  WebBrowser.maybeCompleteAuthSession();
   const [paymentOption, setPaymentOption] = useState<"FULL" | "PARTIAL">(
     "FULL"
   );
@@ -104,12 +118,21 @@ export default function ProtectedCheckout() {
 
       setLoadingPayment(true);
       try {
-        const metadata = {
+        // Use the Expo deep link (scheme://) so Paystack can bounce back into the app
+        const redirectUrl = Linking.createURL("/");
+        const callbackUrl = redirectUrl;
+        const cartPayload: CartOrderPayload = {
+          userId: user?.id,
           items: cart.map((item) => ({
             productId: item.id,
             quantity: item?.variant?.qty || 1,
-            variant: item.variant,
+            size: item?.variant?.size || (item?.variant as any)?.sizes,
+            color: item?.variant?.color || (item?.variant as any)?.colors,
           })),
+          variant: cart?.[0]?.variant,
+        };
+        const metadata = {
+          items: cartPayload,
           shippingFee,
           shippingState: values.state,
           checkoutAmount,
@@ -118,6 +141,16 @@ export default function ProtectedCheckout() {
             paymentOption === "PARTIAL" ? PARTIAL_PAYMENT_DISCOUNT : 100,
           contact: values,
           subtotal,
+          redirectUrl,
+          callbackUrl,
+          offlineUser: {
+            email: values.email,
+            address: values.address,
+            state: values.state,
+            firstName: values.firstName,
+            lastName: values.lastName,
+            phoneNumber: values.phoneNumber,
+          },
         };
 
         const initResponse = await PaymentService.initiatePayment({
@@ -128,6 +161,8 @@ export default function ProtectedCheckout() {
           paymentOption,
           metadata,
           gatewayName: "PAYSTACK",
+          redirectUrl,
+          callbackUrl,
         });
 
         const authorizationUrl =
@@ -136,7 +171,12 @@ export default function ProtectedCheckout() {
           initResponse?.data?.authorization_url;
         const reference =
           initResponse?.data?.reference ||
-          (initResponse as any)?.reference;
+          (initResponse as any)?.reference ||
+          (metadata as any)?.reference;
+        const backendReference =
+          initResponse?.data?.backendReference ||
+          (initResponse as any)?.backendReference ||
+          reference;
 
         if (!authorizationUrl || !reference) {
           throw new Error(
@@ -144,32 +184,22 @@ export default function ProtectedCheckout() {
           );
         }
 
-        const browserResult = await WebBrowser.openBrowserAsync(
-          authorizationUrl
-        );
-
-        if (browserResult.type === "cancel") {
-          AppToast.failed("Payment was cancelled.");
-          return;
-        }
-
-        const verifyResponse = await PaymentService.finalizePayment({
-          reference,
-          metadata,
-          transactionLog: browserResult,
+        router.push({
+          pathname: "/(protected)/paystack-webview",
+          params: {
+            url: authorizationUrl,
+            reference,
+            backendReference,
+            metadata: JSON.stringify(metadata),
+            payableAmount: String(payableAmount),
+            checkoutAmount: String(checkoutAmount),
+            shippingFee: String(shippingFee),
+            shippingState: values.state,
+            paymentOption,
+            redirectUrl,
+            callbackUrl,
+          },
         });
-
-        if (verifyResponse?.success === false) {
-          throw new Error(
-            verifyResponse?.message || "Payment verification failed."
-          );
-        }
-
-        AppToast.success(
-          verifyResponse?.message || "Payment verified successfully."
-        );
-        clearCart();
-        router.push(TABS_PROTECTED);
       } catch (error: any) {
         const msg =
           error?.response?.data?.error ||
@@ -257,7 +287,7 @@ export default function ProtectedCheckout() {
   };
 
   return (
-    <View className="flex-1 bg-background">
+    <SafeAreaView className="flex-1 bg-background">
       <AppHeader title="Checkout" />
 
       <KeyboardAvoidingView
@@ -379,7 +409,8 @@ export default function ProtectedCheckout() {
                 </View>
                 <View className="flex-row justify-between">
                   <Text className="text-base font-jost-medium">
-                    Amount to pay ({paymentOption === "PARTIAL" ? "30%" : "100%"})
+                    Amount to pay (
+                    {paymentOption === "PARTIAL" ? "30%" : "100%"})
                   </Text>
                   <Text className="text-base font-jost-semibold">
                     {formatCurrency(payableAmount)}
@@ -413,8 +444,8 @@ export default function ProtectedCheckout() {
               <PrimaryButton
                 title={
                   paymentOption === "PARTIAL"
-                ? `Pay ${formatCurrency(payableAmount)} (30%)`
-                : `Pay ${formatCurrency(payableAmount)}`
+                    ? `Pay ${formatCurrency(payableAmount)} (30%)`
+                    : `Pay ${formatCurrency(payableAmount)}`
                 }
                 onPress={() => handleSubmit()}
                 loading={loadingPayment || isSubmitting}
@@ -431,23 +462,26 @@ export default function ProtectedCheckout() {
 
       <Modal
         visible={selectStateOpen}
-        animationType="slide"
-        onRequestClose={() => setSelectStateOpen(false)}
+        onClose={() => setSelectStateOpen(false)}
+        contentHeight="90%"
       >
-        <View className="flex-1 bg-white">
-          <View className="flex-row items-center justify-between px-4 py-4 border-b border-gray-200">
-            <Text className="text-lg font-jost-semibold">Select state</Text>
-            <TouchableOpacity onPress={() => setSelectStateOpen(false)}>
-              <Text className="text-sm text-secondary font-jost">Close</Text>
-            </TouchableOpacity>
+        <SafeAreaView
+          className="relative flex-1 bg-background"
+          edges={["top", "left", "right", "bottom"]}
+        >
+          <View className="flex-row items-baseline justify-between gap-2 mb-4">
+            <Text className="text-lg font-jost-semibold text-primary">
+              Select state
+            </Text>
           </View>
+
           <FlatList
             data={SHIPPING_STATE_OPTIONS}
             keyExtractor={(item) => item.value}
             renderItem={renderStateOption}
           />
-        </View>
+        </SafeAreaView>
       </Modal>
-    </View>
+    </SafeAreaView>
   );
 }

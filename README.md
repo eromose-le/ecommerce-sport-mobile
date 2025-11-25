@@ -19,6 +19,7 @@ npm run reset-project
 ```
 
 - rnfes
+- trfce
 - npx expo start -c
 
 <!--
