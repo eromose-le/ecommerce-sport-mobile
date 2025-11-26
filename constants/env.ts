@@ -3,6 +3,7 @@ type EnvironmentName = "local" | "staging" | "production";
 type EnvironmentConfig = {
   apiUrl: string;
   appVersion: string;
+  paystackPublicKey: string;
 };
 
 const defaultApiUrl =
@@ -13,14 +14,17 @@ const ENVIRONMENTS: Record<EnvironmentName, EnvironmentConfig> = {
   local: {
     apiUrl: process.env.EXPO_PUBLIC_LOCAL_API_URL ?? defaultApiUrl,
     appVersion: defaultAppVersion,
+    paystackPublicKey: process.env.EXPO_PUBLIC_PAYSTACK_PUBLIC_KEY!,
   },
   staging: {
     apiUrl: process.env.EXPO_PUBLIC_STAGING_API_URL ?? defaultApiUrl,
     appVersion: defaultAppVersion,
+    paystackPublicKey: process.env.EXPO_PUBLIC_STAGING_PAYSTACK_PUBLIC_KEY!,
   },
   production: {
     apiUrl: process.env.EXPO_PUBLIC_PROD_API_URL ?? defaultApiUrl,
     appVersion: defaultAppVersion,
+    paystackPublicKey: process.env.EXPO_PUBLIC_PROD_PAYSTACK_PUBLIC_KEY!,
   },
 };
 

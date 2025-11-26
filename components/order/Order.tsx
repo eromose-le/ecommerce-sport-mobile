@@ -18,7 +18,7 @@ const Order = () => {
     queryFn: () =>
       OrderService.fetchOrders({
         userId: user?.id as string,
-        sort: "asc",
+        sort: "desc",
         page,
         limit,
       }),

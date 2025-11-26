@@ -1,10 +1,12 @@
 import AppProtectedHeader from "@/components/common/AppProtectedHeader";
 import { LoadingContent } from "@/components/common/LoadingContent";
+import PrimaryButton from "@/components/common/PrimaryButton";
 import Product from "@/components/product/Product";
 import { FIVE_MINUTES } from "@/constants";
 import { SEARCH_PROTECTED } from "@/constants/urls";
 import { UserService } from "@/services/api";
 import { IUserResponse } from "@/services/user/user.types";
+import { Logger } from "@/utils/logger";
 import { Ionicons } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
@@ -15,9 +17,31 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { usePaystack } from "react-native-paystack-webview";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function ProtectedHome() {
+  const { popup } = usePaystack();
+
+  const paynow = () => {
+    popup.newTransaction({
+      email: "erons.a.gberaese@gmail.com",
+      amount: 100,
+      reference: `TXN${Date.now()}`,
+      onSuccess: async (res) => {
+        Logger.success("Success", res);
+      },
+      onCancel: () => {
+        Logger.warn("User cancelled transaction");
+      },
+      onError: (res) => {
+        Logger.warn("Error occured", res);
+      },
+      onLoad: (res) => {
+        Logger.info("Webview loaded", res);
+      },
+    });
+  };
   const { data, isLoading, error, refetch } = useQuery<IUserResponse>({
     queryKey: ["users", "me"],
     queryFn: UserService.fetchMe,
@@ -39,6 +63,7 @@ export default function ProtectedHome() {
       edges={["top", "left", "right"]}
       className="flex-1 bg-background"
     >
+      <PrimaryButton title="Pay" onPress={paynow} />
       <ScrollView
         className="flex-1 px-5"
         showsVerticalScrollIndicator={false}

@@ -4,6 +4,7 @@ import AppHeader from "@/components/common/AppHeader";
 import Modal from "@/components/common/Modal";
 import PrimaryButton from "@/components/common/PrimaryButton";
 import TextField from "@/components/common/TextField";
+import { TABS_PROTECTED } from "@/constants/urls";
 import {
   MINIMUM_CHECKOUT_AMOUNT,
   PARTIAL_PAYMENT_DISCOUNT,
@@ -14,13 +15,12 @@ import {
   showTotalPriceInCart,
 } from "@/helpers/cart";
 import { useAuth } from "@/providers/auth";
-import { PaymentService } from "@/services/api";
+import { OrderService, PaymentService } from "@/services/api";
 import { useCartStore } from "@/store/useCartStore";
 import { formatCurrency } from "@/utils/currency";
+import { Logger } from "@/utils/logger";
 import { AppToast } from "@/utils/toast";
-import * as Linking from "expo-linking";
 import { router } from "expo-router";
-import * as WebBrowser from "expo-web-browser";
 import { useFormik } from "formik";
 import { useMemo, useState } from "react";
 import {
@@ -32,6 +32,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { usePaystack } from "react-native-paystack-webview";
 import { SafeAreaView } from "react-native-safe-area-context";
 import * as Yup from "yup";
 
@@ -68,11 +69,11 @@ const checkoutSchema = Yup.object({
 });
 
 export default function ProtectedCheckout() {
-  const { cart, incrementQty, decrementQty, removeFromCart } = useCartStore();
+  const { cart, incrementQty, decrementQty, removeFromCart, clearCart } =
+    useCartStore();
   const { user } = useAuth();
+  const { popup } = usePaystack();
 
-  // Needed so WebBrowser can close once redirected back to the app
-  WebBrowser.maybeCompleteAuthSession();
   const [paymentOption, setPaymentOption] = useState<"FULL" | "PARTIAL">(
     "FULL"
   );
@@ -118,9 +119,7 @@ export default function ProtectedCheckout() {
 
       setLoadingPayment(true);
       try {
-        // Use the Expo deep link (scheme://) so Paystack can bounce back into the app
-        const redirectUrl = Linking.createURL("/");
-        const callbackUrl = redirectUrl;
+        // Assemble metadata for backend/accounting
         const cartPayload: CartOrderPayload = {
           userId: user?.id,
           items: cart.map((item) => ({
@@ -141,8 +140,6 @@ export default function ProtectedCheckout() {
             paymentOption === "PARTIAL" ? PARTIAL_PAYMENT_DISCOUNT : 100,
           contact: values,
           subtotal,
-          redirectUrl,
-          callbackUrl,
           offlineUser: {
             email: values.email,
             address: values.address,
@@ -153,6 +150,7 @@ export default function ProtectedCheckout() {
           },
         };
 
+        // Step 1: initialize on backend to get references
         const initResponse = await PaymentService.initiatePayment({
           amount: payableAmount,
           currency: "NGN",
@@ -161,43 +159,122 @@ export default function ProtectedCheckout() {
           paymentOption,
           metadata,
           gatewayName: "PAYSTACK",
-          redirectUrl,
-          callbackUrl,
         });
 
-        const authorizationUrl =
-          initResponse?.data?.authorizationUrl ||
-          (initResponse as any)?.authorizationUrl ||
-          initResponse?.data?.authorization_url;
-        const reference =
+        const paystackReference =
           initResponse?.data?.reference ||
           (initResponse as any)?.reference ||
-          (metadata as any)?.reference;
+          (metadata as any)?.reference ||
+          `TXN${Date.now()}`;
+
         const backendReference =
           initResponse?.data?.backendReference ||
           (initResponse as any)?.backendReference ||
-          reference;
+          paystackReference;
 
-        if (!authorizationUrl || !reference) {
+        if (!paystackReference) {
           throw new Error(
             initResponse?.message || "Unable to start payment with Paystack"
           );
         }
 
-        router.push({
-          pathname: "/(protected)/paystack-webview",
-          params: {
-            url: authorizationUrl,
-            reference,
+        const paystackAmountKobo = Math.max(
+          0,
+          Math.round(Number(payableAmount || 0))
+        );
+
+        const finalizeAndCreateOrder = async (
+          transactionLog?: any,
+          refOverride?: string
+        ) => {
+          const finalReference =
+            refOverride ||
+            transactionLog?.reference ||
+            transactionLog?.data?.reference ||
+            paystackReference;
+
+          if (!finalReference) {
+            throw new Error("Missing payment reference");
+          }
+
+          const verifyResponse = await PaymentService.finalizePayment({
+            reference: finalReference,
             backendReference,
-            metadata: JSON.stringify(metadata),
-            payableAmount: String(payableAmount),
-            checkoutAmount: String(checkoutAmount),
-            shippingFee: String(shippingFee),
-            shippingState: values.state,
+            metadata,
+            transactionLog,
+          });
+
+          if (verifyResponse?.success === false) {
+            throw new Error(
+              verifyResponse?.message || "Payment verification failed."
+            );
+          }
+
+          const orderPayload = {
+            userId: user?.id,
+            items: metadata?.items?.items || cartPayload.items,
+            variant: metadata?.items?.variant,
             paymentOption,
-            redirectUrl,
-            callbackUrl,
+            amountToPay: payableAmount,
+            checkoutAmount,
+            shippingFee,
+            shippingState: values.state,
+            paymentReference: finalReference,
+            backendReference,
+            paymentGateway: "PAYSTACK",
+            partialPercentage: metadata?.partialPercentage,
+            offlineUser: metadata?.offlineUser,
+            metadata,
+          };
+
+          const orderResponse =
+            await OrderService.createOrderData(orderPayload);
+
+          if (orderResponse?.success === false) {
+            throw new Error(
+              orderResponse?.message || "Order creation failed after payment."
+            );
+          }
+
+          AppToast.success(
+            orderResponse?.message ||
+              verifyResponse?.message ||
+              "Payment verified and order created."
+          );
+          clearCart();
+          router.replace(TABS_PROTECTED);
+        };
+
+        popup.newTransaction({
+          email: values.email || user?.email || "",
+          amount: paystackAmountKobo, // Paystack expects the smallest currency unit
+          reference: paystackReference,
+          metadata,
+          onSuccess: async (res) => {
+            try {
+              await finalizeAndCreateOrder(res, res?.reference);
+            } catch (err: any) {
+              const msg =
+                err?.response?.data?.error ||
+                err?.message ||
+                "Unable to finalize payment.";
+              AppToast.failed(msg);
+            } finally {
+              setLoadingPayment(false);
+            }
+          },
+          onCancel: () => {
+            Logger.warn("User cancelled transaction");
+            AppToast.info("Payment cancelled");
+            setLoadingPayment(false);
+          },
+          onError: (res) => {
+            Logger.warn("Paystack error", res);
+            AppToast.failed("Payment failed, please try again.");
+            setLoadingPayment(false);
+          },
+          onLoad: (res) => {
+            Logger.info("Paystack webview loaded", res);
           },
         });
       } catch (error: any) {
@@ -206,7 +283,6 @@ export default function ProtectedCheckout() {
           error?.message ||
           "Unable to complete payment.";
         AppToast.failed(msg);
-      } finally {
         setLoadingPayment(false);
       }
     },

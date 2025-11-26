@@ -1,40 +1,12 @@
-import { api } from "../api/api";
 import { Logger } from "@/utils/logger";
 import { AxiosRequestConfig } from "axios";
-
-export type InitializePaymentPayload = {
-  userId?: string | number;
-  amount: number;
-  currency: string;
-  email: string;
-  metadata?: any;
-  gatewayName?: string;
-  paymentOption?: "FULL" | "PARTIAL";
-} & Record<string, any>;
-
-export type InitializePaymentResponse = {
-  success?: boolean;
-  message?: string;
-  data?: {
-    authorizationUrl?: string;
-    authorization_url?: string;
-    reference?: string;
-    [key: string]: any;
-  };
-};
-
-export type FinalizePaymentPayload = {
-  reference: string;
-  backendReference?: string;
-  transactionLog?: any;
-  metadata?: any;
-};
-
-export type FinalizePaymentResponse = {
-  success?: boolean;
-  message?: string;
-  data?: any;
-};
+import { api } from "../api/api";
+import {
+  FinalizePaymentPayload,
+  FinalizePaymentResponse,
+  InitializePaymentPayload,
+  InitializePaymentResponse,
+} from "./payment.types";
 
 export const initiatePayment = async (
   payload: InitializePaymentPayload,
