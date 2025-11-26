@@ -3,6 +3,7 @@ import { ErrorBoundary } from "@/components/common/ErrorBoundary";
 import { toastConfig } from "@/components/common/ToastConfig";
 import { AppEnv } from "@/constants/env";
 import { AuthProvider, useAuth } from "@/providers/auth";
+import { PaystackProvider } from "@/providers/paystack";
 import { QueryProvider } from "@/providers/query";
 import { Logger } from "@/utils/logger";
 import {
@@ -17,7 +18,6 @@ import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
 import { Platform, View } from "react-native";
-import { PaystackProvider } from "react-native-paystack-webview";
 import ToastManager from "toastify-react-native";
 import "./global.css";
 
@@ -79,19 +79,7 @@ function RootContent() {
 export default function RootLayout() {
   return (
     <ErrorBoundary>
-      <PaystackProvider
-        key={Date.now()}
-        debug
-        publicKey={AppEnv.config.paystackPublicKey}
-        currency="NGN"
-        defaultChannels={[
-          "card",
-          "mobile_money",
-          "bank_transfer",
-          "ussd",
-          "qr",
-        ]}
-      >
+      <PaystackProvider>
         <QueryProvider>
           <AuthProvider>
             <RootContent />

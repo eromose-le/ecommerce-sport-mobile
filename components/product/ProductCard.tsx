@@ -85,10 +85,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           <>
             {discountCap ? (
               <View className="space-y-0.5">
-                <Text className="text-base text-primary font-jost-semibold">
+                <Text className="text-base line-through text-secondary font-jost-medium">
                   {formatCurrency(product?.price || 0)}
                 </Text>
-                <Text className="text-base line-through text-secondary font-jost-medium">
+                <Text className="text-base text-primary font-jost-semibold">
                   {formatCurrency(product?.salesPrice || 0)}
                 </Text>
               </View>

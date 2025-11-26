@@ -16,6 +16,10 @@ import {
 } from "@/helpers/cart";
 import { useAuth } from "@/providers/auth";
 import { OrderService, PaymentService } from "@/services/api";
+import {
+  InitializePayment,
+  PaystackVerifyTransactionRes,
+} from "@/services/payment/payment.types";
 import { useCartStore } from "@/store/useCartStore";
 import { formatCurrency } from "@/utils/currency";
 import { Logger } from "@/utils/logger";
@@ -83,6 +87,49 @@ export default function ProtectedCheckout() {
 
   const isEmpty = useMemo(() => (cart?.length || 0) === 0, [cart]);
   const subtotal = useMemo(() => showTotalPriceInCart(cart), [cart]);
+
+  const verifyTransaction = async (reference: string): Promise<boolean> => {
+    const secretKey = "sk_test_c284d2e10acad883b5ac344cdda42d61fe762334";
+
+    try {
+      const response = await fetch(
+        `https://api.paystack.co/transaction/verify/${reference}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${secretKey}`,
+          },
+        }
+      );
+
+      const data: PaystackVerifyTransactionRes = await response.json();
+
+      return data?.status || false;
+    } catch (error) {
+      console.error("Transaction verification error:", error);
+      AppToast.failed("Failed to verify transaction.");
+      return false;
+    } finally {
+    }
+  };
+
+  const verifyTransactionBackend = async (
+    initializePaymentPayload: InitializePayment
+  ): Promise<boolean> => {
+    try {
+      const data = await PaymentService.finalizePayment(
+        initializePaymentPayload
+      );
+      Logger.warn("verifyTransactionBackend ----", data);
+      return !!data;
+    } catch (error) {
+      console.error("Backend transaction verification error:", error);
+      AppToast.failed("Failed to verify transaction on the backend.");
+      return false;
+    } finally {
+    }
+  };
 
   const formik = useFormik<FormValues>({
     initialValues: {
@@ -152,82 +199,12 @@ export default function ProtectedCheckout() {
           },
         };
 
-        const generateReference = () => {
-          const randomChunk = Math.random().toString(36).slice(2, 10);
-          const uuidChunk =
-            typeof crypto !== "undefined" && "randomUUID" in crypto
-              ? (crypto as any).randomUUID().slice(0, 8)
-              : "";
-          return `TXN-${Date.now()}-${randomChunk}${uuidChunk ? `-${uuidChunk}` : ""}`;
-        };
-
-        const clientReference = generateReference();
-
-        // Step 1: initialize on backend to get references and avoid duplicates
-        const initResponse = await PaymentService.initiatePayment({
-          amount: payableAmount,
-          currency: "NGN",
-          email: values.email || user?.email || "",
-          userId: user?.id,
-          paymentOption,
-          metadata,
-          gatewayName: "PAYSTACK",
-          reference: clientReference,
-        });
-
-        const paystackReference =
-          initResponse?.data?.reference ||
-          (initResponse as any)?.reference ||
-          (metadata as any)?.reference ||
-          clientReference;
-
-        const backendReference =
-          initResponse?.data?.backendReference ||
-          (initResponse as any)?.backendReference ||
-          paystackReference;
-
-        if (!paystackReference) {
-          throw new Error(
-            initResponse?.message || "Unable to start payment with Paystack"
-          );
-        }
-
         const paystackAmountKobo = Math.max(
           0,
-          Math.round(Number(payableAmount || 0) * 100)
+          Math.round(Number(payableAmount || 0))
         );
 
-        let finalized = false;
-        const finalizeAndCreateOrder = async (
-          transactionLog?: any,
-          refOverride?: string
-        ) => {
-          if (finalized) return;
-          finalized = true;
-          setFinalizingPayment(true);
-          const finalReference =
-            refOverride ||
-            transactionLog?.reference ||
-            transactionLog?.data?.reference ||
-            paystackReference;
-
-          if (!finalReference) {
-            throw new Error("Missing payment reference");
-          }
-
-          const verifyResponse = await PaymentService.finalizePayment({
-            reference: finalReference,
-            backendReference,
-            metadata,
-            transactionLog,
-          });
-
-          if (verifyResponse?.success === false) {
-            throw new Error(
-              verifyResponse?.message || "Payment verification failed."
-            );
-          }
-
+        const finalizeAndCreateOrder = async () => {
           const orderPayload = {
             userId: user?.id,
             items: metadata?.items?.items || cartPayload.items,
@@ -239,8 +216,6 @@ export default function ProtectedCheckout() {
             checkoutAmount,
             shippingFee,
             shippingState: values.state,
-            paymentReference: finalReference,
-            backendReference,
             paymentGateway: "PAYSTACK",
             partialPercentage: metadata?.partialPercentage,
             offlineUser: metadata?.offlineUser,
@@ -250,6 +225,8 @@ export default function ProtectedCheckout() {
           const orderResponse =
             await OrderService.createOrderData(orderPayload);
 
+          Logger.info("orderResponse -----", orderResponse);
+
           if (orderResponse?.success === false) {
             throw new Error(
               orderResponse?.message || "Order creation failed after payment."
@@ -257,9 +234,7 @@ export default function ProtectedCheckout() {
           }
 
           AppToast.success(
-            orderResponse?.message ||
-              verifyResponse?.message ||
-              "Payment verified and order created."
+            orderResponse?.message || "Payment verified and order created."
           );
           clearCart();
           router.replace(TABS_PROTECTED);
@@ -268,11 +243,48 @@ export default function ProtectedCheckout() {
         popup.newTransaction({
           email: values.email || user?.email || "",
           amount: paystackAmountKobo, // Paystack expects the smallest currency unit
-          reference: paystackReference,
+          reference: `TXN_${Date.now()}`,
           metadata,
-          onSuccess: async (res) => {
+          onSuccess: async (response) => {
+            const initResponse = await PaymentService.initiatePayment({
+              userId: user?.id,
+              amount: payableAmount,
+              currency: "NGN",
+              gatewayName: "PAYSTACK",
+              email: values.email || user?.email || "",
+              paymentOption,
+              metadata,
+            });
+            Logger.success("initResponse -----", initResponse);
+            Logger.warn("onSuccessResponse -----", response);
             try {
-              await finalizeAndCreateOrder(res, res?.reference);
+              const initializePaymentPayload: InitializePayment = {
+                reference: response?.reference || "",
+                backendReference: initResponse?.data?.backendReference || "",
+                transactionLog: response,
+              };
+
+              const isVerified = await verifyTransaction(
+                initializePaymentPayload?.reference
+              );
+              Logger.info("isVerified ----", isVerified);
+              const isBackendVerified = await verifyTransactionBackend(
+                initializePaymentPayload
+              );
+
+              Logger.info("isBackendVerified ----", isBackendVerified);
+
+              if (isVerified && isBackendVerified) {
+                AppToast.info("Creating order.");
+
+                await finalizeAndCreateOrder();
+              } else {
+                AppToast.failed("Transaction verification failed.");
+                console.error("Transaction verification failed.", {
+                  isVerified,
+                  isBackendVerified,
+                });
+              }
             } catch (err: any) {
               const msg =
                 err?.response?.data?.error ||

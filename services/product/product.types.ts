@@ -31,6 +31,7 @@ export interface Product {
   dimensions?: any[];
   medias?: ProductMedia[];
 
+  variant: any,
   variants?: any;
   types?: any;
   orders?: any;
