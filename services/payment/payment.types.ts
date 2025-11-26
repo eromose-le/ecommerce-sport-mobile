@@ -32,8 +32,6 @@ export type FinalizePaymentResponse = {
   data?: any;
 };
 
-
-
 type IPaystackLog = {
   start_time: number;
   time_spent: number;
@@ -116,7 +114,6 @@ export type PaystackVerifyTransactionRes = {
   status: boolean;
 };
 
-
 export interface PaystackTransaction {
   reference: string;
   status: string;
@@ -128,9 +125,9 @@ export interface PaystackTransaction {
   redirecturl?: string;
 }
 
-
 export interface InitializePayment {
   reference: string;
   backendReference: string;
   transactionLog: PaystackTransaction;
+  metadata: any;
 }

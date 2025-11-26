@@ -83,14 +83,11 @@ export default function ProtectedCheckout() {
   );
   const [selectStateOpen, setSelectStateOpen] = useState(false);
   const [loadingPayment, setLoadingPayment] = useState(false);
-  const [finalizingPayment, setFinalizingPayment] = useState(false);
 
   const isEmpty = useMemo(() => (cart?.length || 0) === 0, [cart]);
   const subtotal = useMemo(() => showTotalPriceInCart(cart), [cart]);
 
   const verifyTransaction = async (reference: string): Promise<boolean> => {
-    const secretKey = "sk_test_c284d2e10acad883b5ac344cdda42d61fe762334";
-
     try {
       const response = await fetch(
         `https://api.paystack.co/transaction/verify/${reference}`,
@@ -98,7 +95,7 @@ export default function ProtectedCheckout() {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${secretKey}`,
+            Authorization: `Bearer ${process.env.EXPO_PUBLIC_PAYSTACK_SECRET_KEY ?? ""}`,
           },
         }
       );
@@ -107,10 +104,9 @@ export default function ProtectedCheckout() {
 
       return data?.status || false;
     } catch (error) {
-      console.error("Transaction verification error:", error);
+      Logger.error("Transaction verification error", error);
       AppToast.failed("Failed to verify transaction.");
       return false;
-    } finally {
     }
   };
 
@@ -121,13 +117,11 @@ export default function ProtectedCheckout() {
       const data = await PaymentService.finalizePayment(
         initializePaymentPayload
       );
-      Logger.warn("verifyTransactionBackend ----", data);
       return !!data;
     } catch (error) {
-      console.error("Backend transaction verification error:", error);
+      Logger.error("Backend transaction verification error", error);
       AppToast.failed("Failed to verify transaction on the backend.");
       return false;
-    } finally {
     }
   };
 
@@ -178,7 +172,8 @@ export default function ProtectedCheckout() {
           })),
           variant: cart?.[0]?.variant,
         };
-        const metadata = {
+
+        const metadata: Record<string, any> = {
           items: cartPayload,
           shippingFee,
           shippingState: values.state,
@@ -199,12 +194,87 @@ export default function ProtectedCheckout() {
           },
         };
 
+        const generateReference = () => {
+          const randomChunk = Math.random().toString(36).slice(2, 10);
+          const uuidChunk =
+            typeof crypto !== "undefined" && "randomUUID" in crypto
+              ? (crypto as any).randomUUID().slice(0, 8)
+              : "";
+          return `TXN-${Date.now()}-${randomChunk}${uuidChunk ? `-${uuidChunk}` : ""}`;
+        };
+
+        const clientReference = generateReference();
+
+        // Initialize on backend to get authoritative references
+        const initResponse = await PaymentService.initiatePayment({
+          amount: payableAmount,
+          currency: "NGN",
+          email: values.email || user?.email || "",
+          userId: user?.id,
+          paymentOption,
+          metadata,
+          gatewayName: "PAYSTACK",
+          reference: clientReference,
+        });
+
+        const paystackReference =
+          initResponse?.data?.reference ||
+          (initResponse as any)?.reference ||
+          clientReference;
+
+        const backendReference =
+          initResponse?.data?.backendReference ||
+          (initResponse as any)?.backendReference ||
+          paystackReference;
+
+        metadata.reference = paystackReference;
+        metadata.backendReference = backendReference;
+
+        if (!paystackReference) {
+          throw new Error(
+            initResponse?.message || "Unable to start payment with Paystack"
+          );
+        }
+
         const paystackAmountKobo = Math.max(
           0,
           Math.round(Number(payableAmount || 0))
         );
 
-        const finalizeAndCreateOrder = async () => {
+        let finalized = false;
+        const finalizeAndCreateOrder = async (
+          transactionLog?: any,
+          refOverride?: string
+        ) => {
+          if (finalized) return;
+          finalized = true;
+
+          const finalReference =
+            refOverride ||
+            transactionLog?.reference ||
+            transactionLog?.data?.reference ||
+            paystackReference;
+
+          if (!finalReference) {
+            throw new Error("Missing payment reference");
+          }
+
+          const initializePaymentPayload: InitializePayment = {
+            reference: finalReference,
+            backendReference,
+            transactionLog,
+            metadata,
+          };
+
+          const isVerified = await verifyTransaction(finalReference);
+          const isBackendVerified = await verifyTransactionBackend(
+            initializePaymentPayload
+          );
+
+          if (!isVerified || !isBackendVerified) {
+            throw new Error("Transaction verification failed.");
+          }
+
           const orderPayload = {
             userId: user?.id,
             items: metadata?.items?.items || cartPayload.items,
@@ -216,6 +286,8 @@ export default function ProtectedCheckout() {
             checkoutAmount,
             shippingFee,
             shippingState: values.state,
+            paymentReference: finalReference,
+            backendReference,
             paymentGateway: "PAYSTACK",
             partialPercentage: metadata?.partialPercentage,
             offlineUser: metadata?.offlineUser,
@@ -224,8 +296,6 @@ export default function ProtectedCheckout() {
 
           const orderResponse =
             await OrderService.createOrderData(orderPayload);
-
-          Logger.info("orderResponse -----", orderResponse);
 
           if (orderResponse?.success === false) {
             throw new Error(
@@ -243,48 +313,12 @@ export default function ProtectedCheckout() {
         popup.newTransaction({
           email: values.email || user?.email || "",
           amount: paystackAmountKobo, // Paystack expects the smallest currency unit
-          reference: `TXN_${Date.now()}`,
+          reference: paystackReference,
           metadata,
           onSuccess: async (response) => {
-            const initResponse = await PaymentService.initiatePayment({
-              userId: user?.id,
-              amount: payableAmount,
-              currency: "NGN",
-              gatewayName: "PAYSTACK",
-              email: values.email || user?.email || "",
-              paymentOption,
-              metadata,
-            });
-            Logger.success("initResponse -----", initResponse);
-            Logger.warn("onSuccessResponse -----", response);
+            Logger.warn("Paystack success", response);
             try {
-              const initializePaymentPayload: InitializePayment = {
-                reference: response?.reference || "",
-                backendReference: initResponse?.data?.backendReference || "",
-                transactionLog: response,
-              };
-
-              const isVerified = await verifyTransaction(
-                initializePaymentPayload?.reference
-              );
-              Logger.info("isVerified ----", isVerified);
-              const isBackendVerified = await verifyTransactionBackend(
-                initializePaymentPayload
-              );
-
-              Logger.info("isBackendVerified ----", isBackendVerified);
-
-              if (isVerified && isBackendVerified) {
-                AppToast.info("Creating order.");
-
-                await finalizeAndCreateOrder();
-              } else {
-                AppToast.failed("Transaction verification failed.");
-                console.error("Transaction verification failed.", {
-                  isVerified,
-                  isBackendVerified,
-                });
-              }
+              await finalizeAndCreateOrder(response, response?.reference);
             } catch (err: any) {
               const msg =
                 err?.response?.data?.error ||
@@ -293,20 +327,17 @@ export default function ProtectedCheckout() {
               AppToast.failed(msg);
             } finally {
               setLoadingPayment(false);
-              setFinalizingPayment(false);
             }
           },
           onCancel: () => {
             Logger.warn("User cancelled transaction");
             AppToast.info("Payment cancelled");
             setLoadingPayment(false);
-            setFinalizingPayment(false);
           },
           onError: (res) => {
             Logger.warn("Paystack error", res);
             AppToast.failed("Payment failed, please try again.");
             setLoadingPayment(false);
-            setFinalizingPayment(false);
           },
           onLoad: (res) => {
             Logger.info("Paystack webview loaded", res);
@@ -319,7 +350,6 @@ export default function ProtectedCheckout() {
           "Unable to complete payment.";
         AppToast.failed(msg);
         setLoadingPayment(false);
-        setFinalizingPayment(false);
       }
     },
   });
