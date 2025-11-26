@@ -318,7 +318,7 @@ const AllProducts = () => {
           ))}
           <TouchableOpacity
             onPress={clearFilters}
-            className="flex-row items-center gap-1 px-3 py-1 rounded-full bg-red-50"
+            className="flex-row items-center justify-center gap-1 px-3 py-1 rounded-full bg-red-50"
           >
             <Ionicons name="refresh" size={12} color="#EF4444" />
             <Text className="text-xs text-red-500 font-jost-medium">Clear</Text>
