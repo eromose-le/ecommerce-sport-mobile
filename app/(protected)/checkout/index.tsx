@@ -79,6 +79,7 @@ export default function ProtectedCheckout() {
   );
   const [selectStateOpen, setSelectStateOpen] = useState(false);
   const [loadingPayment, setLoadingPayment] = useState(false);
+  const [finalizingPayment, setFinalizingPayment] = useState(false);
 
   const isEmpty = useMemo(() => (cart?.length || 0) === 0, [cart]);
   const subtotal = useMemo(() => showTotalPriceInCart(cart), [cart]);
@@ -140,6 +141,7 @@ export default function ProtectedCheckout() {
             paymentOption === "PARTIAL" ? PARTIAL_PAYMENT_DISCOUNT : 100,
           contact: values,
           subtotal,
+          amountToPay: payableAmount,
           offlineUser: {
             email: values.email,
             address: values.address,
@@ -150,7 +152,18 @@ export default function ProtectedCheckout() {
           },
         };
 
-        // Step 1: initialize on backend to get references
+        const generateReference = () => {
+          const randomChunk = Math.random().toString(36).slice(2, 10);
+          const uuidChunk =
+            typeof crypto !== "undefined" && "randomUUID" in crypto
+              ? (crypto as any).randomUUID().slice(0, 8)
+              : "";
+          return `TXN-${Date.now()}-${randomChunk}${uuidChunk ? `-${uuidChunk}` : ""}`;
+        };
+
+        const clientReference = generateReference();
+
+        // Step 1: initialize on backend to get references and avoid duplicates
         const initResponse = await PaymentService.initiatePayment({
           amount: payableAmount,
           currency: "NGN",
@@ -159,13 +172,14 @@ export default function ProtectedCheckout() {
           paymentOption,
           metadata,
           gatewayName: "PAYSTACK",
+          reference: clientReference,
         });
 
         const paystackReference =
           initResponse?.data?.reference ||
           (initResponse as any)?.reference ||
           (metadata as any)?.reference ||
-          `TXN${Date.now()}`;
+          clientReference;
 
         const backendReference =
           initResponse?.data?.backendReference ||
@@ -180,13 +194,17 @@ export default function ProtectedCheckout() {
 
         const paystackAmountKobo = Math.max(
           0,
-          Math.round(Number(payableAmount || 0))
+          Math.round(Number(payableAmount || 0) * 100)
         );
 
+        let finalized = false;
         const finalizeAndCreateOrder = async (
           transactionLog?: any,
           refOverride?: string
         ) => {
+          if (finalized) return;
+          finalized = true;
+          setFinalizingPayment(true);
           const finalReference =
             refOverride ||
             transactionLog?.reference ||
@@ -216,6 +234,8 @@ export default function ProtectedCheckout() {
             variant: metadata?.items?.variant,
             paymentOption,
             amountToPay: payableAmount,
+            amountPaid: payableAmount,
+            amountDue: Math.max(checkoutAmount - payableAmount, 0),
             checkoutAmount,
             shippingFee,
             shippingState: values.state,
@@ -261,17 +281,20 @@ export default function ProtectedCheckout() {
               AppToast.failed(msg);
             } finally {
               setLoadingPayment(false);
+              setFinalizingPayment(false);
             }
           },
           onCancel: () => {
             Logger.warn("User cancelled transaction");
             AppToast.info("Payment cancelled");
             setLoadingPayment(false);
+            setFinalizingPayment(false);
           },
           onError: (res) => {
             Logger.warn("Paystack error", res);
             AppToast.failed("Payment failed, please try again.");
             setLoadingPayment(false);
+            setFinalizingPayment(false);
           },
           onLoad: (res) => {
             Logger.info("Paystack webview loaded", res);
@@ -284,6 +307,7 @@ export default function ProtectedCheckout() {
           "Unable to complete payment.";
         AppToast.failed(msg);
         setLoadingPayment(false);
+        setFinalizingPayment(false);
       }
     },
   });
