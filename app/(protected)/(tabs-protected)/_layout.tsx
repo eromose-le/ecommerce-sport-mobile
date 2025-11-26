@@ -1,7 +1,7 @@
 import CartIcon from "@/assets/icons/cart.svg";
 import HomeIcon from "@/assets/icons/home.svg";
-import NotificationIcon from "@/assets/icons/notification.svg";
 import ProfileIcon from "@/assets/icons/profile.svg";
+import ShopIcon from "@/assets/icons/shop.svg";
 import { TabBarIcon } from "@/components/common/TabBarIcon";
 import { showCartQtyValue } from "@/helpers/cart";
 import { tabScreenOptions } from "@/helpers/tab-screen-options";
@@ -52,9 +52,9 @@ export default function ProtectedTabs() {
       <Tabs.Screen
         name="notification"
         options={tabScreenOptions({
-          Icon: NotificationIcon,
-          label: "Notifications",
-          title: "Notifications",
+          Icon: ShopIcon,
+          label: "Orders",
+          title: "Orders",
           rightAction: () => <View className="w-10" />,
           showBack: false,
         })}

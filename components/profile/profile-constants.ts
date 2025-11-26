@@ -28,11 +28,11 @@ export const settingsLinks: ProfileLink[] = [
     label: "Delivery address",
     icon: "location-outline",
   },
-  {
-    key: profileKeys.notifications,
-    label: "Notifications",
-    icon: "notifications-outline",
-  },
+  // {
+  //   key: profileKeys.notifications,
+  //   label: "Notifications",
+  //   icon: "notifications-outline",
+  // },
 ];
 
 export const helpLinks: ProfileLink[] = [
