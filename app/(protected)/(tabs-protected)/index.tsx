@@ -1,5 +1,6 @@
 import AppProtectedHeader from "@/components/common/AppProtectedHeader";
 import { LoadingContent } from "@/components/common/LoadingContent";
+import TailwindVariantPreview from "@/components/common/TailwindVariantPreview";
 import Product from "@/components/product/Product";
 import { FIVE_MINUTES } from "@/constants";
 import { SEARCH_PROTECTED } from "@/constants/urls";
@@ -39,6 +40,8 @@ export default function ProtectedHome() {
       edges={["top", "left", "right"]}
       className="flex-1 bg-background"
     >
+      <TailwindVariantPreview />
+
       <ScrollView
         className="flex-1 px-5"
         showsVerticalScrollIndicator={false}
