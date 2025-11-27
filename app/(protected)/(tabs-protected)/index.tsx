@@ -2,6 +2,7 @@ import AppProtectedHeader from "@/components/common/AppProtectedHeader";
 import { LoadingContent } from "@/components/common/LoadingContent";
 import TailwindVariantPreview from "@/components/common/TailwindVariantPreview";
 import Product from "@/components/product/Product";
+import { Container } from "@/components/ui";
 import { FIVE_MINUTES } from "@/constants";
 import { SEARCH_PROTECTED } from "@/constants/urls";
 import { UserService } from "@/services/api";
@@ -43,17 +44,19 @@ export default function ProtectedHome() {
       <TailwindVariantPreview />
 
       <ScrollView
-        className="flex-1 px-5"
+        className="flex-1"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 50 }}
         stickyHeaderIndices={[1]}
         keyboardShouldPersistTaps="handled"
       >
         {/* Header Logo */}
-        <AppProtectedHeader />
+        <Container padding="md" background="default">
+          <AppProtectedHeader />
+        </Container>
 
         {/* Sticky Search Section */}
-        <View className="z-50 pt-2 pb-3 bg-background">
+        <Container className="z-50" padding="md" background="default">
           <View className="flex-row items-center gap-1 mb-3">
             <Text className="text-sm font-light text-secondary font-jost">
               What are you buying today,
@@ -99,9 +102,11 @@ export default function ProtectedHome() {
             </Text>
             <Ionicons name="search-outline" size={20} color="black" />
           </TouchableOpacity>
-        </View>
+        </Container>
 
-        <Product />
+        <Container padding="md" background="default">
+          <Product />
+        </Container>
       </ScrollView>
     </SafeAreaView>
   );

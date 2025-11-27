@@ -1,5 +1,6 @@
+import { useThemedStyles } from "@/providers/theme";
 import React, { useState } from "react";
-import { Text, TextInput, type TextInputProps, View } from "react-native";
+import { Text, TextInput, View, type TextInputProps } from "react-native";
 import {
   inputFieldVariants,
   inputHelperVariants,
@@ -65,6 +66,7 @@ const Input: React.FC<InputProps> = ({
   ...rest
 }) => {
   const [isFocused, setIsFocused] = useState(false);
+  const themed = useThemedStyles();
 
   const isEditable = disabled ? false : editable;
   const hasError = typeof error === "string" ? error.length > 0 : !!error;
@@ -73,7 +75,8 @@ const Input: React.FC<InputProps> = ({
   const resolvedValue =
     value === undefined || value === null ? "" : String(value);
   const resolvedPlaceholder = placeholder ?? label;
-  const resolvedPlaceholderColor = placeholderTextColor ?? "#9CA3AF";
+  const resolvedPlaceholderColor =
+    placeholderTextColor ?? themed.placeholderColor;
 
   const hasLeft = !!leftElement;
   const hasRight = !!rightElement;
@@ -92,7 +95,11 @@ const Input: React.FC<InputProps> = ({
   });
 
   const labelClass = inputLabelVariants({
-    tone: labelTone,
+    tone:
+      labelTone ??
+      (["primary", "inverse", "secondary"].includes(themed.labelTone as string)
+        ? (themed.labelTone as "primary" | "secondary" | "inverse")
+        : undefined),
     uppercase: labelUppercase,
     className: labelClassName,
   });
@@ -104,7 +111,9 @@ const Input: React.FC<InputProps> = ({
     multiline,
     hasLeft,
     hasRight,
-    className: inputClassName,
+    className: [themed.inputClassName, inputClassName]
+      .filter(Boolean)
+      .join(" "),
   });
 
   const helperClass = inputHelperVariants({

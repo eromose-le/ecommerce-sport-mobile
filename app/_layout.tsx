@@ -5,6 +5,7 @@ import { AppEnv } from "@/constants/env";
 import { AuthProvider, useAuth } from "@/providers/auth";
 import { PaystackProvider } from "@/providers/paystack";
 import { QueryProvider } from "@/providers/query";
+import { ThemeProvider } from "@/providers/theme";
 import { Logger } from "@/utils/logger";
 import {
   Jost_400Regular,
@@ -79,14 +80,16 @@ function RootContent() {
 export default function RootLayout() {
   return (
     <ErrorBoundary>
-      <PaystackProvider>
-        <QueryProvider>
-          <AuthProvider>
-            <RootContent />
-            <ToastManager config={toastConfig} />
-          </AuthProvider>
-        </QueryProvider>
-      </PaystackProvider>
+      <ThemeProvider>
+        <PaystackProvider>
+          <QueryProvider>
+            <AuthProvider>
+              <RootContent />
+              <ToastManager config={toastConfig} />
+            </AuthProvider>
+          </QueryProvider>
+        </PaystackProvider>
+      </ThemeProvider>
     </ErrorBoundary>
   );
 }

@@ -1,5 +1,6 @@
 import React from "react";
 import { View, type ViewProps } from "react-native";
+import { useThemedStyles } from "@/providers/theme";
 import { containerVariants, type ContainerVariants } from "./variants";
 
 type ContainerProps = ViewProps & ContainerVariants;
@@ -15,6 +16,14 @@ const Container: React.FC<ContainerProps> = ({
   fullHeight,
   ...rest
 }) => {
+  const themed = useThemedStyles();
+  const surfaceClass =
+    background === "muted"
+      ? themed.mutedSurface
+      : background === "surface" || background === "default"
+        ? themed.surface
+        : "";
+  const mergedClassName = [surfaceClass, className].filter(Boolean).join(" ");
   return (
     <View
       className={containerVariants({
@@ -24,7 +33,7 @@ const Container: React.FC<ContainerProps> = ({
         gap,
         border,
         fullHeight,
-        className,
+        className: mergedClassName,
       })}
       {...rest}
     >

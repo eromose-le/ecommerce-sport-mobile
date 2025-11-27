@@ -1,5 +1,6 @@
 import React from "react";
 import { Text, type TextProps } from "react-native";
+import { useThemedStyles } from "@/providers/theme";
 import { headingVariants, type HeadingVariants } from "./variants";
 
 type HeadingProps = TextProps & HeadingVariants & { children: React.ReactNode };
@@ -15,11 +16,13 @@ const Heading: React.FC<HeadingProps> = ({
   uppercase,
   ...rest
 }) => {
+  const themed = useThemedStyles();
+  const resolvedTone = tone ?? themed.headingTone;
   return (
     <Text
       className={headingVariants({
         level,
-        tone,
+        tone: resolvedTone,
         align,
         weight,
         spacing,

@@ -1,5 +1,5 @@
+import { useTheme, useThemedStyles } from "@/providers/theme";
 import { Ionicons } from "@expo/vector-icons";
-import { useColorScheme } from "nativewind";
 import React from "react";
 import { ScrollView, Switch, Text, View } from "react-native";
 import {
@@ -16,53 +16,9 @@ import {
   TextArea,
 } from "../ui";
 
-const themeStyles = {
-  light: {
-    pageBg: "bg-background",
-    surface: "bg-white border-[#0000001A]",
-    mutedSurface: "bg-light-100 border border-[#0000001A]",
-    headingTone: "primary" as const,
-    bodyTone: "secondary" as const,
-    labelTone: "secondary" as const,
-    inputClassName: "",
-    placeholderColor: "#9CA3AF",
-    iconMuted: "#6B7280",
-    successIcon: "#10B981",
-    primaryButtonClass: "",
-    primaryTextClass: "",
-    primarySpinnerColor: "#fff",
-    secondaryButtonClass: "",
-    secondaryTextClass: "",
-    secondarySpinnerColor: "#000",
-    linkTextClass: "",
-    linkSpinnerColor: "#000",
-  },
-  dark: {
-    pageBg: "bg-[#0b0b0f]",
-    surface: "bg-[#0f172a] border-[#1f2937]",
-    mutedSurface: "bg-[#111827] border border-[#1f2937]",
-    headingTone: "inverse" as const,
-    bodyTone: "muted" as const,
-    labelTone: "inverse" as const,
-    inputClassName: "bg-[#0f172a] border-[#1f2937] text-white",
-    placeholderColor: "#9CA3AF",
-    iconMuted: "#cbd5e1",
-    successIcon: "#34d399",
-    primaryButtonClass: "border border-white/10",
-    primaryTextClass: "",
-    primarySpinnerColor: "#fff",
-    secondaryButtonClass: "border-white/70",
-    secondaryTextClass: "text-white",
-    secondarySpinnerColor: "#f3f4f6",
-    linkTextClass: "text-white",
-    linkSpinnerColor: "#f3f4f6",
-  },
-};
-
 const TailwindVariantPreview = () => {
-  const { colorScheme, setColorScheme } = useColorScheme();
-  const themeKey = colorScheme === "dark" ? "dark" : "light";
-  const theme = themeStyles[themeKey];
+  const { theme: themeKey, setTheme } = useTheme();
+  const theme = useThemedStyles();
 
   return (
     <ScrollView
@@ -80,9 +36,7 @@ const TailwindVariantPreview = () => {
             </BodyText>
             <Switch
               value={themeKey === "dark"}
-              onValueChange={(value) =>
-                setColorScheme(value ? "dark" : "light")
-              }
+              onValueChange={(value) => setTheme(value ? "dark" : "light")}
               trackColor={{ false: "#E5E7EB", true: "#111827" }}
               thumbColor={themeKey === "dark" ? "#F9FAFB" : "#111827"}
               ios_backgroundColor="#E5E7EB"
@@ -259,14 +213,18 @@ const TailwindVariantPreview = () => {
           <Input
             label="Default"
             placeholder="Type here"
-            labelTone={theme.labelTone}
+            labelTone={
+              theme.labelTone === "muted" ? "secondary" : theme.labelTone
+            }
             inputClassName={theme.inputClassName}
             placeholderTextColor={theme.placeholderColor}
           />
           <Input
             label="With icons"
             placeholder="you@example.com"
-            labelTone={theme.labelTone}
+            labelTone={
+              theme.labelTone === "muted" ? "secondary" : theme.labelTone
+            }
             inputClassName={theme.inputClassName}
             placeholderTextColor={theme.placeholderColor}
             leftElement={
@@ -284,7 +242,9 @@ const TailwindVariantPreview = () => {
             label="Error state"
             placeholder="Something is wrong"
             error="Helper text for an error"
-            labelTone={theme.labelTone}
+            labelTone={
+              theme.labelTone === "muted" ? "secondary" : theme.labelTone
+            }
             inputClassName={theme.inputClassName}
             placeholderTextColor={theme.placeholderColor}
           />
@@ -293,7 +253,9 @@ const TailwindVariantPreview = () => {
             value="Disabled value"
             editable={false}
             helperText="Read only"
-            labelTone={theme.labelTone}
+            labelTone={
+              theme.labelTone === "muted" ? "secondary" : theme.labelTone
+            }
             inputClassName={theme.inputClassName}
             placeholderTextColor={theme.placeholderColor}
           />
@@ -302,7 +264,9 @@ const TailwindVariantPreview = () => {
             placeholder="Multi-line entry"
             helperText="Helper text"
             numberOfLines={4}
-            labelTone={theme.labelTone}
+            labelTone={
+              theme.labelTone === "muted" ? "secondary" : theme.labelTone
+            }
             inputClassName={theme.inputClassName}
             placeholderTextColor={theme.placeholderColor}
           />

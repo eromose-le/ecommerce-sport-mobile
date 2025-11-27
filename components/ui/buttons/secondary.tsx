@@ -1,5 +1,6 @@
 import React from "react";
 import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
+import { useThemedStyles } from "@/providers/theme";
 import {
   buttonContainerVariants,
   buttonLabelVariants,
@@ -34,6 +35,9 @@ export default function SecondaryButton({
   uppercase,
   spinnerColor = "#000",
 }: Props) {
+  const themed = useThemedStyles();
+  const resolvedSpinner = spinnerColor ?? themed.secondarySpinnerColor;
+
   const isDisabled = !!disabled || !!loading;
   const containerClass = buttonContainerVariants({
     variant: "secondary",
@@ -41,14 +45,18 @@ export default function SecondaryButton({
     fullWidth,
     align,
     disabled: isDisabled,
-    className,
+    className: [themed.secondaryButtonClass, className]
+      .filter(Boolean)
+      .join(" "),
   });
 
   const labelClass = buttonLabelVariants({
     variant: "secondary",
     size,
     uppercase,
-    className: textClassName,
+    className: [themed.secondaryTextClass, textClassName]
+      .filter(Boolean)
+      .join(" "),
   });
 
   return (
@@ -61,7 +69,7 @@ export default function SecondaryButton({
       <View className="flex-row items-center justify-center gap-2">
         {loading ? (
           <>
-            <ActivityIndicator color={spinnerColor} size="small" />
+            <ActivityIndicator color={resolvedSpinner} size="small" />
             <Text className={labelClass}>{loadingText}</Text>
           </>
         ) : (

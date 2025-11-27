@@ -1,5 +1,6 @@
 import React from "react";
 import { Text, type TextProps } from "react-native";
+import { useThemedStyles } from "@/providers/theme";
 import { labelVariants, type LabelVariants } from "./variants";
 
 type LabelProps = TextProps &
@@ -14,9 +15,16 @@ const Label: React.FC<LabelProps> = ({
   required,
   ...rest
 }) => {
+  const themed = useThemedStyles();
+  const resolvedTone = tone ?? themed.labelTone;
   return (
     <Text
-      className={labelVariants({ tone, weight, uppercase, className })}
+      className={labelVariants({
+        tone: resolvedTone,
+        weight,
+        uppercase,
+        className,
+      })}
       {...rest}
     >
       {children}

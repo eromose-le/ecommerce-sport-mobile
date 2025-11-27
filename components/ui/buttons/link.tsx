@@ -1,5 +1,6 @@
 import React from "react";
 import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
+import { useThemedStyles } from "@/providers/theme";
 import {
   buttonContainerVariants,
   buttonLabelVariants,
@@ -30,8 +31,11 @@ export default function LinkButton({
   size = "md",
   align,
   uppercase,
-  spinnerColor = "#000",
+  spinnerColor,
 }: Props) {
+  const themed = useThemedStyles();
+  const resolvedSpinner = spinnerColor ?? themed.linkSpinnerColor;
+
   const isDisabled = !!disabled || !!loading;
 
   const containerClass = buttonContainerVariants({
@@ -46,7 +50,9 @@ export default function LinkButton({
     variant: "link",
     size,
     uppercase,
-    className: textClassName,
+    className: [themed.linkTextClass, textClassName]
+      .filter(Boolean)
+      .join(" "),
   });
 
   return (
@@ -57,7 +63,9 @@ export default function LinkButton({
       className={containerClass}
     >
       <View className="flex-row items-center gap-2">
-        {loading ? <ActivityIndicator color={spinnerColor} size="small" /> : null}
+        {loading ? (
+          <ActivityIndicator color={resolvedSpinner} size="small" />
+        ) : null}
         <Text className={labelClass}>{loading ? loadingText : title}</Text>
       </View>
     </TouchableOpacity>
