@@ -40,7 +40,7 @@ const Order = () => {
 
   return (
     <ScrollView
-      className="flex-1 px-6 pt-6"
+      className="flex-1 px-2 bg-background"
       contentContainerStyle={{ paddingBottom: 32 }}
       refreshControl={
         <RefreshControl refreshing={isRefetching} onRefresh={() => refetch()} />

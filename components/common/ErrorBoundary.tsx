@@ -1,7 +1,8 @@
-import React from "react";
-import { Text, TouchableOpacity, View } from "react-native";
-import AppLoader from "./AppLoader";
 import { Logger } from "@/utils/logger";
+import React from "react";
+import { Text, View } from "react-native";
+import { PrimaryButton } from "../ui";
+import AppLoader from "./AppLoader";
 
 type ErrorBoundaryProps = {
   children: React.ReactNode;
@@ -40,16 +41,13 @@ export class ErrorBoundary extends React.Component<
       return (
         <View className="items-center justify-center flex-1 px-6">
           <AppLoader />
-          <Text className="mt-4 text-center text-sm text-secondary font-jost">
+          <Text className="mt-4 text-sm text-center text-secondary font-jost">
             Something went wrong. You can try again.
           </Text>
-          <TouchableOpacity
-            onPress={this.handleReset}
-            className="mt-3 px-4 py-2 rounded-2xl bg-black"
-            activeOpacity={0.8}
-          >
-            <Text className="text-white font-jost-medium text-sm">Retry</Text>
-          </TouchableOpacity>
+
+          <View className="mt-3">
+            <PrimaryButton size="sm" title="Retry" onPress={this.handleReset} />
+          </View>
         </View>
       );
     }

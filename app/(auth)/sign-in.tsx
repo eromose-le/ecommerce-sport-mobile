@@ -1,10 +1,9 @@
 import DirectLeftIcon from "@/assets/icons/direct-left.svg";
 import AppLoader from "@/components/common/AppLoader";
 import PasswordField from "@/components/common/PasswordField";
-import PrimaryButton from "@/components/common/PrimaryButton";
-import SecondaryButton from "@/components/common/SecondaryButton";
 import { SvgIcon } from "@/components/common/SvgIcon";
 import TextField from "@/components/common/TextField";
+import { LinkButton, PrimaryButton } from "@/components/ui";
 import {
   FORGOT_PASSWORD,
   ON_BOARDING,
@@ -235,7 +234,7 @@ export default function SignIn() {
                   disabled={!formik.isValid}
                   className="w-full"
                 />
-                <SecondaryButton
+                <LinkButton
                   title="Forgot password ?"
                   disabled={loginMutation.isPending}
                   onPress={() =>
@@ -244,8 +243,6 @@ export default function SignIn() {
                       params: { email: formik.values.email.trim() },
                     })
                   }
-                  textClassName="text-primary underline"
-                  className="bg-white border-transparent w-fit"
                 />
               </View>
 
@@ -279,19 +276,15 @@ export default function SignIn() {
               </View>
 
               <View className="flex-row items-center justify-center gap-3 mb-8">
-                <SecondaryButton
+                <LinkButton
                   title="Create Account"
                   onPress={handleRegister}
                   disabled={loginMutation.isPending}
-                  textClassName="text-primary underline"
-                  className="border-transparent"
                 />
-                <SecondaryButton
+                <LinkButton
                   title="Skip for now?"
                   onPress={handleSkip}
                   disabled={loginMutation.isPending}
-                  textClassName="text-secondary underline"
-                  className="border-transparent"
                 />
               </View>
             </ScrollView>

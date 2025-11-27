@@ -1,6 +1,6 @@
-import PrimaryButton from "@/components/common/PrimaryButton";
 import ScrollableForm from "@/components/common/ScrollableForm";
 import TextField from "@/components/common/TextField";
+import { PrimaryButton } from "@/components/ui";
 import { useUpdateProfileMutation } from "@/hooks/useUpdateProfileMutation";
 import { useAuth } from "@/providers/auth";
 import { IUpdateUserPayload } from "@/services/user/user.types";

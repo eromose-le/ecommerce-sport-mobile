@@ -1,7 +1,6 @@
 import GoodIcon from "@/assets/icons/good.svg";
-import PrimaryButton from "@/components/common/PrimaryButton";
-import SecondaryButton from "@/components/common/SecondaryButton";
 import { SvgIcon } from "@/components/common/SvgIcon";
+import { LinkButton, PrimaryButton } from "@/components/ui";
 import { SIGN_IN, SIGN_UP } from "@/constants/urls";
 import { onboardingSlides } from "@/lib/dummy-data";
 import { useAuth } from "@/providers/auth";
@@ -79,11 +78,10 @@ export default function OnBoarding() {
         style={{ position: "absolute", top: 0, right: 0, left: 0, zIndex: 50 }}
       >
         <View className="flex-row justify-end px-4 mt-2">
-          <SecondaryButton
+          <LinkButton
+            textClassName="text-white"
             title="Skip"
             onPress={skipLogin}
-            textClassName="text-white text-lg underline font-jost-semibold"
-            className="bg-transparent border-transparent w-fit"
           />
         </View>
       </SafeAreaView>
@@ -132,7 +130,7 @@ export default function OnBoarding() {
             className="w-full"
           />
 
-          <SecondaryButton
+          <LinkButton
             title="Log in"
             onPress={() => {
               router.push({
@@ -140,8 +138,6 @@ export default function OnBoarding() {
                 params: { fromOnboarding: "true" },
               });
             }}
-            textClassName="text-primary underline"
-            className="bg-white border-transparent w-fit"
           />
         </View>
       </SafeAreaView>

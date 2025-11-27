@@ -9,7 +9,7 @@ import { useAuth } from "@/providers/auth";
 import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { View } from "react-native";
-import SecondaryButton from "../common/SecondaryButton";
+import { LinkButton } from "../ui";
 
 export default function Product() {
   const { user } = useAuth();
@@ -81,12 +81,7 @@ export default function Product() {
           />
         </View>
 
-        <SecondaryButton
-          title="See all products"
-          onPress={handleSeeAll}
-          textClassName="text-primary underline"
-          className="border-transparent"
-        />
+        <LinkButton title="See all products" onPress={handleSeeAll} />
       </View>
 
       {/* Recently Viewed Section */}

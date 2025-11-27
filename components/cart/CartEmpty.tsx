@@ -3,8 +3,9 @@ import { PRODUCTS_PROTECTED, PRODUCTS_PUBLIC } from "@/constants/urls";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import { useRouter } from "expo-router";
 import React from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import { Text, View } from "react-native";
 import { SvgIcon } from "../common/SvgIcon";
+import { PrimaryButton } from "../ui";
 
 const CartEmpty = () => {
   const { user } = useAuthUser();
@@ -21,12 +22,14 @@ const CartEmpty = () => {
         </Text>
       </View>
 
-      <TouchableOpacity
-        onPress={() => router.push(user ? PRODUCTS_PROTECTED : PRODUCTS_PUBLIC)}
-        className="px-8 py-4 mt-4 bg-black rounded"
-      >
-        <Text className="text-white font-jost-medium">Shop now</Text>
-      </TouchableOpacity>
+      <View className="mt-4">
+        <PrimaryButton
+          title="Shop now"
+          onPress={() =>
+            router.push(user ? PRODUCTS_PROTECTED : PRODUCTS_PUBLIC)
+          }
+        />
+      </View>
     </View>
   );
 };

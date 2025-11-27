@@ -1,5 +1,5 @@
-import React, { forwardRef, useMemo } from "react";
-import { Text, TextInput, TextInputProps, TouchableOpacity, View } from "react-native";
+import React, { useMemo } from "react";
+import { Text, TextInput, TouchableOpacity, View } from "react-native";
 
 type OtpInputProps = {
   length: number;
@@ -39,7 +39,9 @@ const OtpInput: React.FC<OtpInputProps> = ({
   };
 
   return (
-    <View className={`flex-row items-center justify-between gap-3 ${containerClassName}`}>
+    <View
+      className={`flex-row items-center justify-between gap-3 ${containerClassName}`}
+    >
       {digits.map((digit, idx) => (
         <TouchableOpacity
           key={`otp-digit-${idx}`}
@@ -50,7 +52,9 @@ const OtpInput: React.FC<OtpInputProps> = ({
           onPress={() => handlePress(idx)}
           disabled={!editable}
         >
-          <Text className={`text-xl font-jost-medium text-primary ${textClassName}`}>
+          <Text
+            className={`text-xl font-jost-medium text-primary ${textClassName}`}
+          >
             {digit}
           </Text>
         </TouchableOpacity>

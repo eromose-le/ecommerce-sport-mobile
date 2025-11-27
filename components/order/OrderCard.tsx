@@ -7,7 +7,7 @@ import OrderStatus from "./OrderStatus";
 
 const OrderCard = ({ order }: { order: Order }) => {
   return (
-    <View className="p-4 mb-6 bg-white border border-gray-200 rounded-2xl">
+    <View className="p-4 mb-1 bg-white rounded">
       <View className="flex-row items-center justify-between mb-4">
         <View>
           <Text className="max-w-[250px] text-base font-jost-semibold text-primary text-wrap">

@@ -5,6 +5,7 @@ import { resolveImageSource } from "@/utils/images";
 import { router } from "expo-router";
 import React, { useMemo, useState } from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
+import { SecondaryButton } from "../ui";
 
 const OrderItemRow = ({
   order,
@@ -47,7 +48,7 @@ const OrderItemRow = ({
 
   return (
     <View
-      className={`flex-row items-center gap-4 py-3 ${
+      className={`flex-row items-center gap-3 py-3 ${
         isFirst ? "pt-0" : "border-t border-gray-100"
       }`}
     >
@@ -84,12 +85,7 @@ const OrderItemRow = ({
           </View>
         ) : null}
 
-        <TouchableOpacity
-          onPress={handleViewProduct}
-          className="px-4 py-2 border rounded-full border-primary"
-        >
-          <Text className="text-xs font-jost-medium text-primary">View</Text>
-        </TouchableOpacity>
+        <SecondaryButton size="sm" title="View" onPress={handleViewProduct} />
       </View>
 
       {canReview && productId ? (

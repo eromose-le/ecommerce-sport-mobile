@@ -6,6 +6,7 @@ import {
 } from "@/components/profile/profile-constants";
 import ProfileRow from "@/components/profile/ProfileRow";
 import ProfileSection from "@/components/profile/ProfileSection";
+import { LinkButton } from "@/components/ui";
 import { AppEnv } from "@/constants/env";
 import { NOTIFICATION_PROTECTED, PROFILE_DETAIL } from "@/constants/urls";
 import { useAuth } from "@/providers/auth";
@@ -131,11 +132,10 @@ export default function ProtectedProfile() {
           <View className="flex-row items-center gap-2">
             {legalLinks.map((link, index) => (
               <View className="flex-row items-center gap-2" key={link.key}>
-                <TouchableOpacity onPress={() => handleLinkPress(link)}>
-                  <Text className="text-sm underline text-primary font-jost-medium">
-                    {link.label}
-                  </Text>
-                </TouchableOpacity>
+                <LinkButton
+                  title={link.label}
+                  onPress={() => handleLinkPress(link)}
+                />
                 {index < legalLinks.length - 1 && (
                   <Text className="text-secondary">|</Text>
                 )}

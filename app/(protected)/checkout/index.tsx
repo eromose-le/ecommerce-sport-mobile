@@ -2,8 +2,8 @@ import CartCard from "@/components/cart/CartCard";
 import CartEmpty from "@/components/cart/CartEmpty";
 import AppHeader from "@/components/common/AppHeader";
 import Modal from "@/components/common/Modal";
-import PrimaryButton from "@/components/common/PrimaryButton";
 import TextField from "@/components/common/TextField";
+import { PrimaryButton } from "@/components/ui";
 import { TABS_PROTECTED } from "@/constants/urls";
 import {
   MINIMUM_CHECKOUT_AMOUNT,

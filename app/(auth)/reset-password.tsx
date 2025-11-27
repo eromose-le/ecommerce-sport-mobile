@@ -1,7 +1,6 @@
 import AppLoader from "@/components/common/AppLoader";
 import PasswordField from "@/components/common/PasswordField";
-import PrimaryButton from "@/components/common/PrimaryButton";
-import SecondaryButton from "@/components/common/SecondaryButton";
+import { LinkButton, PrimaryButton, SecondaryButton } from "@/components/ui";
 import { FORGOT_PASSWORD, SIGN_IN } from "@/constants/urls";
 import { AuthService } from "@/services/api";
 import {
@@ -20,7 +19,6 @@ import {
   ScrollView,
   Text,
   TextInput,
-  TouchableOpacity,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -140,19 +138,16 @@ export default function ResetPassword() {
       {Array.from({ length: OTP_LENGTH }).map((_, idx) => {
         const digit = formik.values.code[idx] ?? "";
         const isFilled = digit !== "";
+
         return (
-          <TouchableOpacity
+          <SecondaryButton
+            title={digit}
             key={`reset-otp-${idx}`}
             onPress={() => hiddenInputRef.current?.focus()}
-            activeOpacity={0.8}
             className={`flex-1 items-center justify-center rounded border ${
               isFilled ? "border-primary" : "border-[#DEE2E6]"
             } h-14 bg-white`}
-          >
-            <Text className="text-xl font-jost-medium text-primary">
-              {digit}
-            </Text>
-          </TouchableOpacity>
+          />
         );
       })}
       <TextInput
@@ -203,7 +198,7 @@ export default function ResetPassword() {
                 </Text>
               ) : null}
               <View className="flex-row mt-0 ml-auto w-fit">
-                <SecondaryButton
+                <LinkButton
                   title={
                     resendMutation.isPending
                       ? "Sending..."
@@ -213,8 +208,6 @@ export default function ResetPassword() {
                   }
                   onPress={handleResend}
                   disabled={resendDisabled || resendMutation.isPending}
-                  textClassName="text-xs text-right text-primary font-jost-medium underline p-0 m-0"
-                  className="p-0 m-0 border-transparent"
                 />
               </View>
             </View>
@@ -257,18 +250,14 @@ export default function ResetPassword() {
               disabled={!formik.isValid}
             />
 
-            <SecondaryButton
+            <LinkButton
               title="Back to Forgot Password"
               onPress={() => router.replace(FORGOT_PASSWORD)}
-              textClassName="text-primary underline"
-              className="bg-white border-transparent w-fit"
             />
 
-            <SecondaryButton
+            <LinkButton
               title="Return to Login"
               onPress={() => router.replace(SIGN_IN)}
-              textClassName="text-secondary underline"
-              className="mt-1 bg-white border-transparent"
             />
           </View>
         </ScrollView>

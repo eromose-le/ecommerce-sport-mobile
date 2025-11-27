@@ -1,7 +1,6 @@
 import LabeledInput from "@/components/common/LabeledInput";
-import PrimaryButton from "@/components/common/PrimaryButton";
-import SecondaryButton from "@/components/common/SecondaryButton";
 import StarRating from "@/components/review/StarRating";
+import { PrimaryButton, SecondaryButton } from "@/components/ui";
 import { useAuth } from "@/providers/auth";
 import { ReviewService } from "@/services/api";
 import { CreateReviewPayload } from "@/services/review/review.types";

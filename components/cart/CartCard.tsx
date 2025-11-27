@@ -122,7 +122,7 @@ const CartCard: React.FC<CartCardProps> = ({
   };
 
   return (
-    <View className="flex-1 mb-8 overflow-hidden">
+    <View className="flex-1 mb-1 overflow-hidden">
       {/* Right side background */}
       <View className="absolute inset-y-0 right-0 items-center justify-center px-4 bg-red-50 rounded-2xl">
         <Ionicons name="trash-outline" size={20} color="#ef4444" />
@@ -136,7 +136,7 @@ const CartCard: React.FC<CartCardProps> = ({
       <Animated.View
         style={{ transform: [{ translateX }] }}
         {...panResponder.panHandlers}
-        className="flex-row items-center gap-4 bg-white rounded-2xl"
+        className="flex-row items-center gap-4 p-4 bg-white rounded"
         onLayout={(e) => {
           setCardWidth(e.nativeEvent.layout.width);
         }}

@@ -1,7 +1,6 @@
 import AppLoader from "@/components/common/AppLoader";
 import LabeledInput from "@/components/common/LabeledInput";
-import PrimaryButton from "@/components/common/PrimaryButton";
-import SecondaryButton from "@/components/common/SecondaryButton";
+import { LinkButton, PrimaryButton } from "@/components/ui";
 import { RESET_PASSWORD, SIGN_IN } from "@/constants/urls";
 import { AuthService } from "@/services/api";
 import { IRequestPasswordResetPayload } from "@/services/auth/auth.types";
@@ -111,11 +110,9 @@ export default function ForgotPassword() {
               className="mt-2"
             />
 
-            <SecondaryButton
+            <LinkButton
               title="Back to Login"
               onPress={() => router.replace(SIGN_IN)}
-              textClassName="text-primary underline"
-              className="border-transparent"
             />
           </View>
         </ScrollView>

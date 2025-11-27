@@ -1,6 +1,7 @@
-import React from "react";
-import { ScrollView, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useColorScheme } from "nativewind";
+import React from "react";
+import { ScrollView, Switch, Text, View } from "react-native";
 import {
   BodyText,
   Card,
@@ -15,156 +16,353 @@ import {
   TextArea,
 } from "../ui";
 
+const themeStyles = {
+  light: {
+    pageBg: "bg-background",
+    surface: "bg-white border-[#0000001A]",
+    mutedSurface: "bg-light-100 border border-[#0000001A]",
+    headingTone: "primary" as const,
+    bodyTone: "secondary" as const,
+    labelTone: "secondary" as const,
+    inputClassName: "",
+    placeholderColor: "#9CA3AF",
+    iconMuted: "#6B7280",
+    successIcon: "#10B981",
+    primaryButtonClass: "",
+    primaryTextClass: "",
+    primarySpinnerColor: "#fff",
+    secondaryButtonClass: "",
+    secondaryTextClass: "",
+    secondarySpinnerColor: "#000",
+    linkTextClass: "",
+    linkSpinnerColor: "#000",
+  },
+  dark: {
+    pageBg: "bg-[#0b0b0f]",
+    surface: "bg-[#0f172a] border-[#1f2937]",
+    mutedSurface: "bg-[#111827] border border-[#1f2937]",
+    headingTone: "inverse" as const,
+    bodyTone: "muted" as const,
+    labelTone: "inverse" as const,
+    inputClassName: "bg-[#0f172a] border-[#1f2937] text-white",
+    placeholderColor: "#9CA3AF",
+    iconMuted: "#cbd5e1",
+    successIcon: "#34d399",
+    primaryButtonClass: "border border-white/10",
+    primaryTextClass: "",
+    primarySpinnerColor: "#fff",
+    secondaryButtonClass: "border-white/70",
+    secondaryTextClass: "text-white",
+    secondarySpinnerColor: "#f3f4f6",
+    linkTextClass: "text-white",
+    linkSpinnerColor: "#f3f4f6",
+  },
+};
+
 const TailwindVariantPreview = () => {
+  const { colorScheme, setColorScheme } = useColorScheme();
+  const themeKey = colorScheme === "dark" ? "dark" : "light";
+  const theme = themeStyles[themeKey];
+
   return (
     <ScrollView
-      className="flex-1 bg-background"
+      className={`flex-1 ${theme.pageBg}`}
       contentContainerStyle={{ paddingBottom: 32 }}
     >
-      <Container padding="sm" gap="md" className="bg-background">
-        <Heading level="h1" weight="bold">
-          UI Variant Gallery
-        </Heading>
-        <BodyText tone="secondary">
+      <Container padding="sm" gap="md" className={theme.pageBg}>
+        <Row justify="between" align="center">
+          <Heading level="h1" weight="bold" tone={theme.headingTone}>
+            UI Variant Gallery
+          </Heading>
+          <Row align="center" gap="sm">
+            <BodyText tone={theme.bodyTone} weight="medium">
+              Dark mode
+            </BodyText>
+            <Switch
+              value={themeKey === "dark"}
+              onValueChange={(value) =>
+                setColorScheme(value ? "dark" : "light")
+              }
+              trackColor={{ false: "#E5E7EB", true: "#111827" }}
+              thumbColor={themeKey === "dark" ? "#F9FAFB" : "#111827"}
+              ios_backgroundColor="#E5E7EB"
+            />
+          </Row>
+        </Row>
+        <BodyText tone={theme.bodyTone}>
           Quick preview of the shared UI primitives and their variants.
         </BodyText>
 
         {/* Buttons */}
-        <Card padding="md" shadow="sm" className="gap-3">
-          <Heading level="h3">Buttons</Heading>
-          <BodyText tone="secondary">Primary</BodyText>
+        <Card padding="md" shadow="sm" className={`gap-3 ${theme.surface}`}>
+          <Heading level="h3" tone={theme.headingTone}>
+            Buttons
+          </Heading>
+          <BodyText tone={theme.bodyTone}>Primary</BodyText>
           <Row gap="sm" wrap>
-            <PrimaryButton title="Primary sm" size="sm" onPress={() => {}} />
-            <PrimaryButton title="Primary md" onPress={() => {}} />
-            <PrimaryButton title="Primary lg" size="lg" onPress={() => {}} />
+            <PrimaryButton
+              title="Primary sm"
+              size="sm"
+              onPress={() => {}}
+              className={theme.primaryButtonClass}
+              textClassName={theme.primaryTextClass}
+              spinnerColor={theme.primarySpinnerColor}
+            />
+            <PrimaryButton
+              title="Primary md"
+              onPress={() => {}}
+              className={theme.primaryButtonClass}
+              textClassName={theme.primaryTextClass}
+              spinnerColor={theme.primarySpinnerColor}
+            />
+            <PrimaryButton
+              title="Primary lg"
+              size="lg"
+              onPress={() => {}}
+              className={theme.primaryButtonClass}
+              textClassName={theme.primaryTextClass}
+              spinnerColor={theme.primarySpinnerColor}
+            />
             <PrimaryButton
               title="Loading"
               loading
               onPress={() => {}}
-              className="w-40"
+              className={`w-40 ${theme.primaryButtonClass}`}
+              textClassName={theme.primaryTextClass}
+              spinnerColor={theme.primarySpinnerColor}
             />
-            <PrimaryButton title="Disabled" disabled onPress={() => {}} />
+            <PrimaryButton
+              title="Disabled"
+              disabled
+              onPress={() => {}}
+              className={theme.primaryButtonClass}
+              textClassName={theme.primaryTextClass}
+              spinnerColor={theme.primarySpinnerColor}
+            />
           </Row>
 
-          <BodyText tone="secondary" className="mt-3">
+          <BodyText tone={theme.bodyTone} className="mt-3">
             Secondary
           </BodyText>
           <Row gap="sm" wrap>
-            <SecondaryButton title="Secondary sm" size="sm" onPress={() => {}} />
-            <SecondaryButton title="Secondary md" onPress={() => {}} />
-            <SecondaryButton title="Secondary lg" size="lg" onPress={() => {}} />
+            <SecondaryButton
+              title="Secondary sm"
+              size="sm"
+              onPress={() => {}}
+              className={theme.secondaryButtonClass}
+              textClassName={theme.secondaryTextClass}
+              spinnerColor={theme.secondarySpinnerColor}
+            />
+            <SecondaryButton
+              title="Secondary md"
+              onPress={() => {}}
+              className={theme.secondaryButtonClass}
+              textClassName={theme.secondaryTextClass}
+              spinnerColor={theme.secondarySpinnerColor}
+            />
+            <SecondaryButton
+              title="Secondary lg"
+              size="lg"
+              onPress={() => {}}
+              className={theme.secondaryButtonClass}
+              textClassName={theme.secondaryTextClass}
+              spinnerColor={theme.secondarySpinnerColor}
+            />
             <SecondaryButton
               title="Loading"
               loading
               onPress={() => {}}
-              className="w-40"
+              className={`w-40 ${theme.secondaryButtonClass}`}
+              textClassName={theme.secondaryTextClass}
+              spinnerColor={theme.secondarySpinnerColor}
             />
             <SecondaryButton
               title="Disabled"
               disabled
               onPress={() => {}}
+              className={theme.secondaryButtonClass}
+              textClassName={theme.secondaryTextClass}
+              spinnerColor={theme.secondarySpinnerColor}
             />
           </Row>
 
-          <BodyText tone="secondary" className="mt-3">
+          <BodyText tone={theme.bodyTone} className="mt-3">
             Link
           </BodyText>
           <Row gap="sm" wrap>
-            <LinkButton title="Plain link" onPress={() => {}} />
-            <LinkButton title="Uppercase" uppercase onPress={() => {}} />
+            <LinkButton
+              title="Plain link"
+              onPress={() => {}}
+              textClassName={theme.linkTextClass}
+              spinnerColor={theme.linkSpinnerColor}
+            />
+            <LinkButton
+              title="Uppercase"
+              uppercase
+              onPress={() => {}}
+              textClassName={theme.linkTextClass}
+              spinnerColor={theme.linkSpinnerColor}
+            />
             <LinkButton
               title="Loading"
               loading
               onPress={() => {}}
               loadingText="Loading..."
+              textClassName={theme.linkTextClass}
+              spinnerColor={theme.linkSpinnerColor}
             />
-            <LinkButton title="Disabled" disabled onPress={() => {}} />
+            <LinkButton
+              title="Disabled"
+              disabled
+              onPress={() => {}}
+              textClassName={theme.linkTextClass}
+              spinnerColor={theme.linkSpinnerColor}
+            />
           </Row>
         </Card>
 
         {/* Typography */}
-        <Card padding="md" shadow="sm" className="gap-2">
-          <Heading level="h3">Typography</Heading>
-          <Heading level="h1">Heading H1</Heading>
-          <Heading level="h2">Heading H2</Heading>
-          <Heading level="h3">Heading H3</Heading>
-          <Heading level="h4" tone="secondary">
+        <Card padding="md" shadow="sm" className={`gap-2 ${theme.surface}`}>
+          <Heading level="h3" tone={theme.headingTone}>
+            Typography
+          </Heading>
+          <Heading level="h1" tone={theme.headingTone}>
+            Heading H1
+          </Heading>
+          <Heading level="h2" tone={theme.headingTone}>
+            Heading H2
+          </Heading>
+          <Heading level="h3" tone={theme.headingTone}>
+            Heading H3
+          </Heading>
+          <Heading level="h4" tone={theme.bodyTone}>
             Heading H4 (secondary)
           </Heading>
-          <BodyText>Body default</BodyText>
-          <BodyText size="sm" tone="secondary">
+          <BodyText tone={theme.headingTone}>Body default</BodyText>
+          <BodyText size="sm" tone={theme.bodyTone}>
             Body small secondary
           </BodyText>
-          <BodyText size="lg" weight="semibold">
+          <BodyText size="lg" weight="semibold" tone={theme.headingTone}>
             Body large semibold
           </BodyText>
-          <Label>Label default</Label>
+          <Label tone={theme.labelTone}>Label default</Label>
           <Label tone="danger" required>
             Label required
           </Label>
         </Card>
 
         {/* Inputs */}
-        <Card padding="md" shadow="sm" className="gap-4">
-          <Heading level="h3">Inputs</Heading>
-          <Input label="Default" placeholder="Type here" />
+        <Card padding="md" shadow="sm" className={`gap-4 ${theme.surface}`}>
+          <Heading level="h3" tone={theme.headingTone}>
+            Inputs
+          </Heading>
+          <Input
+            label="Default"
+            placeholder="Type here"
+            labelTone={theme.labelTone}
+            inputClassName={theme.inputClassName}
+            placeholderTextColor={theme.placeholderColor}
+          />
           <Input
             label="With icons"
             placeholder="you@example.com"
-            leftElement={<Ionicons name="mail-outline" size={16} color="#6B7280" />}
-            rightElement={<Ionicons name="checkmark-circle" size={16} color="#10B981" />}
+            labelTone={theme.labelTone}
+            inputClassName={theme.inputClassName}
+            placeholderTextColor={theme.placeholderColor}
+            leftElement={
+              <Ionicons name="mail-outline" size={16} color={theme.iconMuted} />
+            }
+            rightElement={
+              <Ionicons
+                name="checkmark-circle"
+                size={16}
+                color={theme.successIcon}
+              />
+            }
           />
           <Input
             label="Error state"
             placeholder="Something is wrong"
             error="Helper text for an error"
+            labelTone={theme.labelTone}
+            inputClassName={theme.inputClassName}
+            placeholderTextColor={theme.placeholderColor}
           />
           <Input
             label="Disabled"
             value="Disabled value"
             editable={false}
             helperText="Read only"
+            labelTone={theme.labelTone}
+            inputClassName={theme.inputClassName}
+            placeholderTextColor={theme.placeholderColor}
           />
           <TextArea
             label="Text area"
             placeholder="Multi-line entry"
             helperText="Helper text"
             numberOfLines={4}
+            labelTone={theme.labelTone}
+            inputClassName={theme.inputClassName}
+            placeholderTextColor={theme.placeholderColor}
           />
         </Card>
 
         {/* Layout */}
-        <Card padding="md" shadow="sm" className="gap-4">
-          <Heading level="h3">Layout</Heading>
+        <Card padding="md" shadow="sm" className={`gap-4 ${theme.surface}`}>
+          <Heading level="h3" tone={theme.headingTone}>
+            Layout
+          </Heading>
           <Container
             padding="sm"
             background="muted"
             rounded="lg"
             gap="sm"
             border="subtle"
+            className={theme.mutedSurface}
           >
-            <BodyText>Container with padding/border/background.</BodyText>
+            <BodyText tone={theme.headingTone}>
+              Container with padding/border/background.
+            </BodyText>
             <Row gap="sm">
-              <PrimaryButton title="Action" size="sm" onPress={() => {}} />
-              <SecondaryButton title="Ghost" size="sm" onPress={() => {}} />
+              <PrimaryButton
+                title="Action"
+                size="sm"
+                onPress={() => {}}
+                className={theme.primaryButtonClass}
+                textClassName={theme.primaryTextClass}
+                spinnerColor={theme.primarySpinnerColor}
+              />
+              <SecondaryButton
+                title="Ghost"
+                size="sm"
+                onPress={() => {}}
+                className={theme.secondaryButtonClass}
+                textClassName={theme.secondaryTextClass}
+                spinnerColor={theme.secondarySpinnerColor}
+              />
             </Row>
           </Container>
 
-          <Card padding="sm" shadow="md" className="gap-2">
-            <Heading level="h4">Nested Card</Heading>
-            <BodyText tone="secondary">
+          <Card padding="sm" shadow="md" className={`gap-2 ${theme.surface}`}>
+            <Heading level="h4" tone={theme.headingTone}>
+              Nested Card
+            </Heading>
+            <BodyText tone={theme.bodyTone}>
               Card variant showing border + shadow.
             </BodyText>
             <Row gap="sm" justify="between">
-              <Label>Row left</Label>
-              <Label tone="secondary">Row right</Label>
+              <Label tone={theme.labelTone}>Row left</Label>
+              <Label tone={theme.bodyTone}>Row right</Label>
             </Row>
           </Card>
         </Card>
 
         {/* Native Text fallback to show baseline */}
         <View className="mt-2">
-          <Text className="text-xs text-secondary font-jost">
+          <Text
+            className={`text-xs font-jost ${themeKey === "dark" ? "text-gray-400" : "text-secondary"}`}
+          >
             Tailwind-variants preview ends.
           </Text>
         </View>

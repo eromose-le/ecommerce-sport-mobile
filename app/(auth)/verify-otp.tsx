@@ -1,7 +1,6 @@
 import AppLoader from "@/components/common/AppLoader";
 import OtpInput from "@/components/common/OtpInput";
-import PrimaryButton from "@/components/common/PrimaryButton";
-import SecondaryButton from "@/components/common/SecondaryButton";
+import { LinkButton, PrimaryButton, SecondaryButton } from "@/components/ui";
 import { SIGN_IN, TABS_PROTECTED } from "@/constants/urls";
 import { useAuth } from "@/providers/auth";
 import { AuthService } from "@/services/api";
@@ -201,12 +200,12 @@ export default function VerifyOtp() {
             />
           </View>
 
-          <SecondaryButton
-            title="Back to Login"
-            onPress={() => router.replace(SIGN_IN)}
-            textClassName="text-primary underline"
-            className="mt-6 border-transparent"
-          />
+          <View className="mt-4">
+            <LinkButton
+              title="Back to Login"
+              onPress={() => router.replace(SIGN_IN)}
+            />
+          </View>
         </ScrollView>
       </KeyboardAvoidingView>
 

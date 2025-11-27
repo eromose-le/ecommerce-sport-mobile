@@ -8,15 +8,10 @@ import { resolveImageSource } from "@/utils/images";
 import { Ionicons } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
 import React, { useEffect, useState } from "react";
-import {
-  ActivityIndicator,
-  Image,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { ActivityIndicator, Image, Text, View } from "react-native";
 import { EmptyState } from "../common/EmptyState";
 import ReviewPaginationButton from "../review/ReviewPaginationButton";
+import { SecondaryButton } from "../ui";
 
 type ProductReviewsProps = {
   productId?: string | number;
@@ -112,15 +107,11 @@ export default function ProductReviews({
         </Text>
 
         {onAddReview && (
-          <TouchableOpacity
+          <SecondaryButton
+            size="sm"
+            title="Write review"
             onPress={onAddReview}
-            className="px-3 py-1 border rounded-full border-primary"
-            activeOpacity={0.8}
-          >
-            <Text className="text-xs font-jost-medium text-primary">
-              Write review
-            </Text>
-          </TouchableOpacity>
+          />
         )}
       </View>
 

@@ -1,8 +1,7 @@
 import AppLoader from "@/components/common/AppLoader";
 import PasswordField from "@/components/common/PasswordField";
-import PrimaryButton from "@/components/common/PrimaryButton";
-import SecondaryButton from "@/components/common/SecondaryButton";
 import TextField from "@/components/common/TextField";
+import { LinkButton, PrimaryButton } from "@/components/ui";
 import { SIGN_IN, VERIFY_OTP } from "@/constants/urls";
 import { AuthService } from "@/services/api";
 import { ICreateUserPayload } from "@/services/auth/auth.types";
@@ -387,17 +386,17 @@ export default function SignUp() {
             />
           </View>
 
-          <SecondaryButton
-            title="Login"
-            onPress={() =>
-              router.push({
-                pathname: SIGN_IN,
-                params: { fromOnboarding: "true" },
-              })
-            }
-            textClassName="text-primary underline"
-            className="mt-4 border-transparent"
-          />
+          <View className="mt-4">
+            <LinkButton
+              title="Login"
+              onPress={() =>
+                router.push({
+                  pathname: SIGN_IN,
+                  params: { fromOnboarding: "true" },
+                })
+              }
+            />
+          </View>
         </ScrollView>
       </KeyboardAvoidingView>
 

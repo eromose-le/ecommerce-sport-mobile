@@ -1,8 +1,7 @@
 import AppLoader from "@/components/common/AppLoader";
 import Modal from "@/components/common/Modal";
-import PrimaryButton from "@/components/common/PrimaryButton";
-import SecondaryButton from "@/components/common/SecondaryButton";
 import { ProductGrid } from "@/components/product/ProductGrid";
+import { PrimaryButton, SecondaryButton } from "@/components/ui";
 import { FIVE_MINUTES, PAGINATION_DEFAULT } from "@/constants";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { CategoryService, ProductService } from "@/services/api";

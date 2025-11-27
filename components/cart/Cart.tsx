@@ -1,16 +1,17 @@
 import CartCard from "@/components/cart/CartCard";
 import CartEmpty from "@/components/cart/CartEmpty";
+import { CHECKOUT } from "@/constants/urls";
 import {
   showShippingFeePrice,
   showTotalPrice,
   showTotalPriceInCart,
 } from "@/helpers/cart";
-import { CHECKOUT } from "@/constants/urls";
 import { useCartStore } from "@/store/useCartStore";
 import { formatCurrency } from "@/utils/currency";
 import { router } from "expo-router";
 import React, { useMemo } from "react";
-import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { ScrollView, Text, View } from "react-native";
+import { PrimaryButton } from "../ui";
 
 export default function Cart() {
   const { cart, incrementQty, decrementQty, removeFromCart } = useCartStore();
@@ -32,7 +33,7 @@ export default function Cart() {
     return <CartEmpty />;
   }
   return (
-    <View className="flex-1 px-5 pt-0 bg-background">
+    <View className="flex-1 px-2 pt-0 bg-background">
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 120 }}
@@ -63,9 +64,7 @@ export default function Cart() {
           <Text className="text-base text-secondary font-jost">
             Subtotal + shipping
           </Text>
-          <Text className="text-xl font-bold">
-            {formatCurrency(total)}
-          </Text>
+          <Text className="text-xl font-bold">{formatCurrency(total)}</Text>
         </View>
         <View className="flex-row items-center justify-between gap-0">
           <View>
@@ -77,15 +76,10 @@ export default function Cart() {
               {formatCurrency(subtotal)}
             </Text>
           </View>
-          <TouchableOpacity
-            className="px-5 py-4 bg-black rounded-2xl"
+          <PrimaryButton
+            title="Check out"
             onPress={() => router.push(CHECKOUT)}
-            activeOpacity={0.8}
-          >
-            <Text className="text-base text-white rounded-md font-jost-semibold">
-              Check out
-            </Text>
-          </TouchableOpacity>
+          />
         </View>
       </View>
     </View>
