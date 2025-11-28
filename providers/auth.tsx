@@ -3,6 +3,7 @@ import { User } from "@/services/user/user.types";
 import { router } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import React, { createContext, useContext, useEffect, useState } from "react";
+import { Logger } from "@/utils/logger";
 
 interface AuthContextProps {
   user: User | null;
@@ -24,17 +25,31 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [skippedLogin, setSkippedLogin] = useState(false);
 
   useEffect(() => {
+    let isMounted = true;
+
     const load = async () => {
-      const storedUser = await SecureStore.getItemAsync("user");
-      const storedSkip = await SecureStore.getItemAsync("skippedLogin");
+      try {
+        const storedUser = await SecureStore.getItemAsync("user");
+        const storedSkip = await SecureStore.getItemAsync("skippedLogin");
 
-      if (storedUser) setUser(JSON.parse(storedUser));
-      if (storedSkip === "true") setSkippedLogin(true);
+        if (!isMounted) return;
 
-      setLoading(false);
+        if (storedUser) setUser(JSON.parse(storedUser));
+        if (storedSkip === "true") setSkippedLogin(true);
+      } catch (error) {
+        Logger.error("AuthProvider: failed to restore session", error);
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
     };
 
     load();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const skipLogin = async () => {

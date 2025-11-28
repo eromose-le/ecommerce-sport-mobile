@@ -8,7 +8,7 @@ import { Tabs } from "expo-router";
 import { View } from "react-native";
 
 export default function PublicTabs() {
-  const cart = useCartStore((state) => state.cart);
+  const cart = useCartStore((s) => s.cart);
   const badge = showCartQtyValue(cart);
 
   return (
@@ -16,6 +16,7 @@ export default function PublicTabs() {
       screenOptions={{
         headerShown: false,
         tabBarShowLabel: false,
+        lazy: false,
         tabBarStyle: {
           backgroundColor: "#fff",
           borderTopColor: "transparent",
@@ -23,14 +24,11 @@ export default function PublicTabs() {
           paddingTop: 10,
           paddingBottom: 5,
         },
-        lazy: false,
       }}
     >
       <Tabs.Screen
         name="index"
         options={{
-          title: "Home",
-          tabBarLabel: "Home",
           tabBarIcon: ({ focused }) => (
             <TabBarIcon Icon={HomeIcon} label="Home" focused={focused} />
           ),

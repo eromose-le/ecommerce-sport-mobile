@@ -1,8 +1,7 @@
 import AppLoader from "@/components/common/AppLoader";
 import { ErrorBoundary } from "@/components/common/ErrorBoundary";
 import { toastConfig } from "@/components/common/ToastConfig";
-import { AppEnv } from "@/constants/env";
-import { AuthProvider, useAuth } from "@/providers/auth";
+import { AuthProvider } from "@/providers/auth";
 import { PaystackProvider } from "@/providers/paystack";
 import { QueryProvider } from "@/providers/query";
 import { ThemeProvider } from "@/providers/theme";
@@ -16,10 +15,10 @@ import {
 } from "@expo-google-fonts/jost";
 import { Slot } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
-import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
 import { Platform, View } from "react-native";
 import ToastManager from "toastify-react-native";
+import { StatusBar } from "expo-status-bar";
 import "./global.css";
 
 if (Platform.OS !== "web") {
@@ -27,33 +26,39 @@ if (Platform.OS !== "web") {
 }
 
 function RootContent() {
-  const [appIsReady, setAppIsReady] = useState(false);
+  const [ready, setReady] = useState(false);
   const [fontsLoaded] = useFonts({
     Jost_400Regular,
     Jost_500Medium,
     Jost_600SemiBold,
     Jost_700Bold,
   });
-  const { loading } = useAuth();
 
   useEffect(() => {
-    async function prepare() {
-      if (!fontsLoaded || loading) return;
+    let isMounted = true;
 
-      setAppIsReady(true);
+    const init = async () => {
+      if (!fontsLoaded || !isMounted) return;
+
+      setReady(true);
 
       if (Platform.OS !== "web") {
         try {
           await SplashScreen.hideAsync();
-        } catch (error) {
-          Logger.error("Splash hide error", error);
+        } catch (e) {
+          Logger.error("Splash hide error", e);
         }
       }
-    }
-    prepare();
-  }, [fontsLoaded, loading]);
+    };
 
-  if (!fontsLoaded || loading || !appIsReady) {
+    init();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [fontsLoaded]);
+
+  if (!ready) {
     return (
       <View className="items-center justify-center flex-1 bg-white">
         <AppLoader />
@@ -61,13 +66,6 @@ function RootContent() {
       </View>
     );
   }
-
-  Logger.warn("LAYOUT", "(APP) ==::", {
-    fontsLoaded,
-    appIsReady,
-    loading,
-    env: AppEnv,
-  });
 
   return (
     <>

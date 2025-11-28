@@ -23,6 +23,7 @@ npm run reset-project
 - npx expo start -c
 
 <!--
+TASK LIST
 1.  web mobile product detail page spacing on key attribute and specification
 2.  night mood
 3. propagate the public index ✅
@@ -42,6 +43,16 @@ npm run reset-project
 17. checkout page
 18. delivery / shiping fee
 19. paystack integration
+
  -->
 <!--
+
+OPTIMIZATION TECHNIQUES
+1. Don't block ui thread, use transactions
+2. Use Flashlist or LegendList instead of Flatlist for better performance
+3. Clean memory leaks
+4. Minimize start up work and lazy load as I can
+5. avoid unnecessary renders
+6. Use reanimated for smooth animations
+7. measure performance and don't guess
  -->

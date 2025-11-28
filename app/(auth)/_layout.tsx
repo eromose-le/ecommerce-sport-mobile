@@ -1,24 +1,35 @@
-import { useAppState } from "@/hooks/useAppState";
-import { useAuthUser } from "@/hooks/useAuthUser";
-import { Logger } from "@/utils/logger";
-import { Stack } from "expo-router";
-import React from "react";
+import AppLoader from "@/components/common/AppLoader";
+import { ErrorBoundary } from "@/components/common/ErrorBoundary";
+import { TABS_PROTECTED, TABS_PUBLIC } from "@/constants/urls";
+import { useAuth } from "@/providers/auth";
+import { Redirect, Stack } from "expo-router";
+import { View } from "react-native";
 
 export default function AuthLayout() {
-  const appState = useAppState();
-  const userState = useAuthUser();
+  const { user, skippedLogin, loading } = useAuth();
 
-  Logger.warn("LAYOUT", "(AUTH) ==::", { appState, userState });
+  if (loading) {
+    return (
+      <View className="items-center justify-center flex-1 bg-white">
+        <AppLoader />
+      </View>
+    );
+  }
 
-  // Default: show public stack (SignIn / SignUp / OnBoarding)
+  if (user) return <Redirect href={TABS_PROTECTED} />;
+
+  if (skippedLogin) return <Redirect href={TABS_PUBLIC} />;
+
   return (
-    <Stack>
-      <Stack.Screen name="sign-in" options={{ headerShown: false }} />
-      <Stack.Screen name="sign-up" options={{ headerShown: false }} />
-      <Stack.Screen name="on-boarding" options={{ headerShown: false }} />
-      <Stack.Screen name="verify-otp" options={{ headerShown: false }} />
-      <Stack.Screen name="forgot-password" options={{ headerShown: false }} />
-      <Stack.Screen name="reset-password" options={{ headerShown: false }} />
-    </Stack>
+    <ErrorBoundary>
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="sign-in" />
+        <Stack.Screen name="sign-up" />
+        <Stack.Screen name="on-boarding" />
+        <Stack.Screen name="verify-otp" />
+        <Stack.Screen name="forgot-password" />
+        <Stack.Screen name="reset-password" />
+      </Stack>
+    </ErrorBoundary>
   );
 }
