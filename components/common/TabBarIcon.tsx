@@ -1,4 +1,5 @@
 import { SvgIcon } from "@/components/common/SvgIcon";
+import { useTheme } from "@/providers/theme";
 import React, { useEffect } from "react";
 import { Text, View } from "react-native";
 import Animated, {
@@ -29,7 +30,11 @@ export const TabBarIcon: React.FC<TabBarIconProps> = ({
   size = 24,
   badgeCount = 0,
 }) => {
-  const color = focused ? activeColor : inactiveColor;
+  const { isDark } = useTheme();
+  const resolvedActiveColor = isDark ? "#fff" : "#000";
+  const resolvedInActiveColor = inactiveColor;
+
+  const color = focused ? resolvedActiveColor : resolvedInActiveColor;
   const showBadge = badgeCount > 0;
 
   // Shared value for scale

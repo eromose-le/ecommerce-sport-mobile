@@ -2,19 +2,27 @@ import ScrollableForm from "@/components/common/ScrollableForm";
 import { faqs } from "@/constants";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import { TouchableOpacity, View } from "react-native";
+import { BodyText, Heading } from "@/components/ui";
+import { useThemedStyles, useTheme } from "@/providers/theme";
 
 const Faq = () => {
+  const theme = useThemedStyles();
+  const { isDark } = useTheme();
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   return (
     <ScrollableForm>
-      <Text className="mb-6 text-lg text-center font-jost-bold text-primary">
+      <Heading level="h3" align="center" weight="bold" tone={theme.headingTone} className="mb-6">
         Frequently Asked Questions
-      </Text>
+      </Heading>
       {faqs.map((faq, index) => (
         <View
           key={faq.question}
-          className="mb-3 bg-white border border-gray-100 shadow-sm rounded-2xl"
+          className="mb-3 rounded-2xl border shadow-sm"
+          style={{
+            borderColor: isDark ? "#1f2937" : "#e5e7eb",
+            backgroundColor: isDark ? "#0f172a" : "#ffffff",
+          }}
         >
           <TouchableOpacity
             onPress={() =>
@@ -22,19 +30,19 @@ const Faq = () => {
             }
             className="flex-row items-center justify-between px-4 py-3"
           >
-            <Text className="flex-1 pr-4 text-base font-jost-medium text-primary">
+            <BodyText size="md" weight="medium" tone={theme.headingTone} className="flex-1 pr-4">
               {faq.question}
-            </Text>
+            </BodyText>
             <Ionicons
               name={openIndex === index ? "chevron-up" : "chevron-down"}
               size={18}
-              color="#4B5563"
+              color={theme.iconMuted}
             />
           </TouchableOpacity>
           {openIndex === index && (
-            <Text className="px-4 pb-4 text-sm text-secondary">
+            <BodyText size="sm" tone={theme.labelTone} className="px-4 pb-4">
               {faq.answer}
-            </Text>
+            </BodyText>
           )}
         </View>
       ))}

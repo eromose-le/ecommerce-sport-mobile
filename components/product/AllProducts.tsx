@@ -1,24 +1,26 @@
 import AppLoader from "@/components/common/AppLoader";
 import Modal from "@/components/common/Modal";
 import { ProductGrid } from "@/components/product/ProductGrid";
-import { PrimaryButton, SecondaryButton } from "@/components/ui";
+import {
+  BodyText,
+  Heading,
+  PrimaryButton,
+  SecondaryButton,
+} from "@/components/ui";
 import { FIVE_MINUTES, PAGINATION_DEFAULT } from "@/constants";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
+import { useTheme, useThemedStyles } from "@/providers/theme";
 import { CategoryService, ProductService } from "@/services/api";
 import { Product } from "@/services/product/product.types";
 import { Ionicons } from "@expo/vector-icons";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import classNames from "classnames";
 import React, { useMemo, useState } from "react";
-import {
-  ScrollView,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { ScrollView, TextInput, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { BackButton } from "../common/BackButton";
 import TextField from "../common/TextField";
+import SafeContainer from "../ui/layout/safe-container";
 
 type SortValue = "asc" | "desc" | undefined;
 
@@ -75,8 +77,25 @@ const defaultFilter: FilterState = {
 };
 
 const AllProducts = () => {
+  const theme = useThemedStyles();
+  const { isDark } = useTheme();
   const [filter, setFilter] = useState<FilterState>(defaultFilter);
   const [showFilters, setShowFilters] = useState(false);
+
+  const getPillClass = (isActive: boolean) =>
+    classNames(
+      "px-4 py-2 rounded-full border",
+      isActive
+        ? isDark
+          ? "bg-white border-white"
+          : "bg-black border-black"
+        : isDark
+          ? "bg-transparent border-gray-600"
+          : "bg-white border-[#E5E7EB]"
+    );
+
+  const getPillTextTone = (isActive: boolean) =>
+    isActive ? (isDark ? "primary" : "inverse") : theme.bodyTone;
 
   const { data: categoriesData, isLoading: categoriesLoading } = useQuery({
     queryKey: ["categories"],
@@ -261,16 +280,24 @@ const AllProducts = () => {
   ].filter(Boolean) as { label: string; onClear: () => void }[];
 
   const FiltersHeader = (
-    <View className="pt-3 pb-4 bg-background">
-      <View className="flex-row items-center gap-2">
+    <View className={`${theme.pageBg} pt-3 pb-4`}>
+      <View className="flex-row items-center w-full gap-2">
         <BackButton />
         {/* Search */}
-        <View className="flex-1 flex-row items-center px-4 py-3 bg-white border border-[#E5E7EB] rounded-2xl">
-          <Ionicons name="search-outline" size={18} color="#9CA3AF" />
+        <View
+          className={classNames(
+            "flex-1 flex-row items-center px-4 py-3 rounded-2xl border",
+            theme.surface
+          )}
+        >
+          <Ionicons name="search-outline" size={18} color={theme.iconMuted} />
           <TextInput
             placeholder="Search products"
-            placeholderTextColor="#9CA3AF"
-            className="flex-1 ml-3 text-base text-primary font-jost"
+            placeholderTextColor={theme.placeholderColor}
+            className={classNames(
+              "flex-1 ml-3 text-base font-jost",
+              isDark ? "text-white" : "text-primary"
+            )}
             value={filter.q}
             onChangeText={(text) => updateFilter({ q: text })}
             autoCapitalize="none"
@@ -282,7 +309,7 @@ const AllProducts = () => {
               onPress={() => updateFilter({ q: "" })}
               hitSlop={8}
             >
-              <Ionicons name="close-circle" size={18} color="#9CA3AF" />
+              <Ionicons name="close-circle" size={18} color={theme.iconMuted} />
             </TouchableOpacity>
           )}
         </View>
@@ -291,15 +318,23 @@ const AllProducts = () => {
         <View className="ml-auto">
           <TouchableOpacity
             onPress={() => setShowFilters(true)}
-            className="flex-row items-center gap-2 px-4 py-4 border rounded-full border-[#E5E7EB] bg-white"
+            className={classNames(
+              "flex-row items-center gap-2 px-4 py-4 rounded-full border",
+              theme.surface
+            )}
           >
-            <Ionicons name="options" size={16} color="#111" />
-            <Text className="text-sm font-jost-medium text-primary">
+            <Ionicons
+              name="options"
+              size={16}
+              color={isDark ? "#e5e7eb" : "#111"}
+            />
+            <BodyText size="sm" weight="medium" tone={theme.headingTone}>
               Filters
-            </Text>
+            </BodyText>
           </TouchableOpacity>
         </View>
       </View>
+
       {/* Active filter badges */}
       {activeBadges.length > 0 && (
         <View className="flex-row flex-wrap gap-2 mt-3">
@@ -307,45 +342,59 @@ const AllProducts = () => {
             <TouchableOpacity
               key={badge.label}
               onPress={badge.onClear}
-              className="flex-row items-center gap-1 px-3 py-1 rounded-full bg-[#F3F4F6]"
+              className={classNames(
+                "flex-row items-center gap-1 px-3 py-1 rounded-full border",
+                isDark
+                  ? "bg-[#1f2937] border-[#374151]"
+                  : "bg-[#F3F4F6] border-[#E5E7EB]"
+              )}
             >
-              <Text className="text-xs font-jost-medium text-primary">
+              <BodyText size="xs" weight="medium" tone={theme.bodyTone}>
                 {badge.label}
-              </Text>
-              <Ionicons name="close" size={12} color="#6B7280" />
+              </BodyText>
+              <Ionicons name="close" size={12} color={theme.iconMuted} />
             </TouchableOpacity>
           ))}
           <TouchableOpacity
             onPress={clearFilters}
-            className="flex-row items-center justify-center gap-1 px-3 py-1 rounded-full bg-red-50"
+            className={classNames(
+              "flex-row items-center justify-center gap-1 px-3 py-1 rounded-full",
+              isDark ? "bg-[#3f1a1a]" : "bg-red-50"
+            )}
           >
-            <Ionicons name="refresh" size={12} color="#EF4444" />
-            <Text className="text-xs text-red-500 font-jost-medium">Clear</Text>
+            <Ionicons
+              name="refresh"
+              size={12}
+              color={isDark ? "#fca5a5" : "#EF4444"}
+            />
+            <BodyText size="xs" weight="medium" tone="danger">
+              Clear
+            </BodyText>
           </TouchableOpacity>
         </View>
       )}
 
       <View className="flex-row items-center justify-between mt-4">
-        <Text className="text-sm text-secondary font-jost">
+        <BodyText size="sm" tone={theme.labelTone}>
           Showing page {currentPage} of {totalPages}
-        </Text>
-        <Text className="text-sm text-secondary font-jost">
+        </BodyText>
+        <BodyText size="sm" tone={theme.labelTone}>
           {totalCount ? `${totalCount} items` : ""}
-        </Text>
+        </BodyText>
       </View>
     </View>
   );
 
   const filterModalContent = (
-    <View className="gap-4">
-      <Text className="text-2xl font-jost-semibold text-primary">
+    <SafeContainer className={`${theme.mutedSurface} gap-4`}>
+      <Heading level="h2" weight="bold" tone={theme.headingTone}>
         Filter & Sort
-      </Text>
+      </Heading>
 
       <View className="gap-2">
-        <Text className="text-sm font-jost-medium text-primary">
+        <BodyText size="sm" weight="semibold" tone={theme.headingTone}>
           Pick price range
-        </Text>
+        </BodyText>
 
         <View className="flex-row flex-wrap gap-2">
           {PRICE_PRESETS.map((preset) => {
@@ -358,19 +407,15 @@ const AllProducts = () => {
                 onPress={() =>
                   handlePresetPrice(preset.range as [number, number])
                 }
-                className={`px-4 py-2 rounded-full border ${
-                  isActive
-                    ? "bg-black border-black"
-                    : "bg-white border-[#E5E7EB]"
-                }`}
+                className={getPillClass(isActive)}
               >
-                <Text
-                  className={`text-sm font-jost-medium ${
-                    isActive ? "text-white" : "text-primary"
-                  }`}
+                <BodyText
+                  size="sm"
+                  weight="medium"
+                  tone={getPillTextTone(isActive)}
                 >
                   {preset.label}
-                </Text>
+                </BodyText>
               </TouchableOpacity>
             );
           })}
@@ -378,9 +423,9 @@ const AllProducts = () => {
       </View>
 
       <View className="gap-2">
-        <Text className="text-sm font-jost-medium text-primary">
+        <BodyText size="sm" weight="semibold" tone={theme.headingTone}>
           Price range
-        </Text>
+        </BodyText>
         <View className="flex-row items-center gap-3">
           <View className="flex-1">
             <TextField
@@ -395,7 +440,7 @@ const AllProducts = () => {
             />
           </View>
 
-          <Ionicons name="remove" size={16} color="#9CA3AF" />
+          <Ionicons name="remove" size={16} color={theme.iconMuted} />
 
           <View className="flex-1">
             <TextField
@@ -413,29 +458,27 @@ const AllProducts = () => {
       </View>
 
       <View className="gap-2">
-        <Text className="text-sm font-jost-medium text-primary">Category</Text>
+        <BodyText size="sm" weight="semibold" tone={theme.headingTone}>
+          Category
+        </BodyText>
         <View className="flex-row flex-wrap gap-2">
           <TouchableOpacity
             onPress={() => handleToggleCategory(undefined)}
-            className={`px-4 py-2 rounded-full border ${
-              !filter.category
-                ? "bg-black border-black"
-                : "bg-white border-[#E5E7EB]"
-            }`}
+            className={getPillClass(!filter.category)}
           >
-            <Text
-              className={`text-sm font-jost-medium ${
-                !filter.category ? "text-white" : "text-primary"
-              }`}
+            <BodyText
+              size="sm"
+              weight="medium"
+              tone={getPillTextTone(!filter.category)}
             >
               All
-            </Text>
+            </BodyText>
           </TouchableOpacity>
 
           {categoriesLoading && (
-            <Text className="text-xs text-secondary font-jost">
+            <BodyText size="xs" tone={theme.labelTone}>
               Loading categories...
-            </Text>
+            </BodyText>
           )}
 
           {categories.map((item) => {
@@ -444,19 +487,15 @@ const AllProducts = () => {
               <TouchableOpacity
                 key={`modal-cat-${item.id}`}
                 onPress={() => handleToggleCategory(item.id)}
-                className={`px-4 py-2 rounded-full border ${
-                  isActive
-                    ? "bg-black border-black"
-                    : "bg-white border-[#E5E7EB]"
-                }`}
+                className={getPillClass(isActive)}
               >
-                <Text
-                  className={`text-xs font-jost-medium ${
-                    isActive ? "text-white" : "text-primary"
-                  }`}
+                <BodyText
+                  size="xs"
+                  weight="medium"
+                  tone={getPillTextTone(isActive)}
                 >
                   {item.name}
-                </Text>
+                </BodyText>
               </TouchableOpacity>
             );
           })}
@@ -465,31 +504,27 @@ const AllProducts = () => {
 
       {filter.category ? (
         <View className="gap-2">
-          <Text className="text-sm font-jost-medium text-primary">
+          <BodyText size="sm" weight="semibold" tone={theme.headingTone}>
             Subcategory
-          </Text>
+          </BodyText>
           <View className="flex-row flex-wrap gap-2">
             <TouchableOpacity
               onPress={() => handleToggleSubcategory(undefined)}
-              className={`px-4 py-2 rounded-full border ${
-                !filter.subcategory
-                  ? "bg-[#111827] border-[#111827]"
-                  : "bg-white border-[#E5E7EB]"
-              }`}
+              className={getPillClass(!filter.subcategory)}
             >
-              <Text
-                className={`text-sm font-jost-medium ${
-                  !filter.subcategory ? "text-white" : "text-primary"
-                }`}
+              <BodyText
+                size="sm"
+                weight="medium"
+                tone={getPillTextTone(!filter.subcategory)}
               >
                 All
-              </Text>
+              </BodyText>
             </TouchableOpacity>
 
             {categoryDetailLoading && (
-              <Text className="text-xs text-secondary font-jost">
+              <BodyText size="xs" tone={theme.labelTone}>
                 Loading subcategories...
-              </Text>
+              </BodyText>
             )}
 
             {subcategories.map((item) => {
@@ -498,19 +533,15 @@ const AllProducts = () => {
                 <TouchableOpacity
                   key={`modal-sub-${item.id}`}
                   onPress={() => handleToggleSubcategory(item.id)}
-                  className={`px-4 py-2 rounded-full border ${
-                    isActive
-                      ? "bg-[#111827] border-[#111827]"
-                      : "bg-white border-[#E5E7EB]"
-                  }`}
+                  className={getPillClass(isActive)}
                 >
-                  <Text
-                    className={`text-xs font-jost-medium ${
-                      isActive ? "text-white" : "text-primary"
-                    }`}
+                  <BodyText
+                    size="xs"
+                    weight="medium"
+                    tone={getPillTextTone(isActive)}
                   >
                     {item.name}
-                  </Text>
+                  </BodyText>
                 </TouchableOpacity>
               );
             })}
@@ -519,7 +550,9 @@ const AllProducts = () => {
       ) : null}
 
       <View className="gap-2">
-        <Text className="text-sm font-jost-medium text-primary">Sort</Text>
+        <BodyText size="sm" weight="semibold" tone={theme.headingTone}>
+          Sort
+        </BodyText>
         <View className="flex-row flex-wrap gap-2">
           {SORT_OPTIONS.map((option) => {
             const isActive = filter.sort === option.value;
@@ -527,19 +560,15 @@ const AllProducts = () => {
               <TouchableOpacity
                 key={option.label}
                 onPress={() => updateFilter({ sort: option.value })}
-                className={`px-4 py-2 rounded-full border ${
-                  isActive
-                    ? "bg-black border-black"
-                    : "bg-white border-[#E5E7EB]"
-                }`}
+                className={getPillClass(isActive)}
               >
-                <Text
-                  className={`text-sm font-jost-medium ${
-                    isActive ? "text-white" : "text-primary"
-                  }`}
+                <BodyText
+                  size="sm"
+                  weight="medium"
+                  tone={getPillTextTone(isActive)}
                 >
                   {option.label}
-                </Text>
+                </BodyText>
               </TouchableOpacity>
             );
           })}
@@ -548,7 +577,9 @@ const AllProducts = () => {
 
       {/* Color */}
       <View className="gap-2">
-        <Text className="text-sm font-jost-medium text-primary">Color</Text>
+        <BodyText size="sm" weight="semibold" tone={theme.headingTone}>
+          Color
+        </BodyText>
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -560,19 +591,15 @@ const AllProducts = () => {
               <TouchableOpacity
                 key={`color-${item.value}`}
                 onPress={() => toggleArrayValue("colors", item.value)}
-                className={`px-4 py-2 rounded-full border ${
-                  isActive
-                    ? "bg-black border-black"
-                    : "bg-white border-[#E5E7EB]"
-                }`}
+                className={getPillClass(isActive)}
               >
-                <Text
-                  className={`text-sm font-jost-medium ${
-                    isActive ? "text-white" : "text-primary"
-                  }`}
+                <BodyText
+                  size="sm"
+                  weight="medium"
+                  tone={getPillTextTone(isActive)}
                 >
                   {item.label}
-                </Text>
+                </BodyText>
               </TouchableOpacity>
             );
           })}
@@ -581,9 +608,9 @@ const AllProducts = () => {
 
       {/* Size */}
       <View className="">
-        <Text className="gap-2 text-sm font-jost-medium text-primary">
+        <BodyText size="sm" weight="semibold" tone={theme.headingTone}>
           Size
-        </Text>
+        </BodyText>
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -595,19 +622,15 @@ const AllProducts = () => {
               <TouchableOpacity
                 key={`size-${item.value}`}
                 onPress={() => toggleArrayValue("sizes", item.value)}
-                className={`px-4 py-2 rounded-full border ${
-                  isActive
-                    ? "bg-black border-black"
-                    : "bg-white border-[#E5E7EB]"
-                }`}
+                className={getPillClass(isActive)}
               >
-                <Text
-                  className={`text-sm font-jost-medium ${
-                    isActive ? "text-white" : "text-primary"
-                  }`}
+                <BodyText
+                  size="sm"
+                  weight="medium"
+                  tone={getPillTextTone(isActive)}
                 >
                   {item.label}
-                </Text>
+                </BodyText>
               </TouchableOpacity>
             );
           })}
@@ -618,19 +641,28 @@ const AllProducts = () => {
         <SecondaryButton
           title="Close"
           onPress={() => setShowFilters(false)}
-          className="flex-1"
+          className={`${theme.pageBgInverse} flex-1 border border-black`}
+          textClassName={`${theme.secondaryTextClass}`}
+          spinnerColor={theme.secondarySpinnerColor}
         />
         <PrimaryButton
           title="Apply"
           onPress={() => setShowFilters(false)}
-          className="flex-1"
+          className={`${theme.pageBg} flex-1`}
+          textClassName={theme.primaryTextClass}
+          spinnerColor={theme.primarySpinnerColor}
         />
       </View>
-    </View>
+    </SafeContainer>
   );
 
   return (
-    <SafeAreaView edges={["top"]} className="flex-1 bg-background">
+    <SafeContainer
+      edges={["top"]}
+      padding="none"
+      gap="md"
+      className={`${theme.pageBg} flex-1`}
+    >
       {/* <AppHeader title="All products" right={<View className="w-8" />} /> */}
 
       {!isLoading && (!products || products.length === 0) && (
@@ -685,7 +717,7 @@ const AllProducts = () => {
           <AppLoader />
         </View>
       )}
-    </SafeAreaView>
+    </SafeContainer>
   );
 };
 

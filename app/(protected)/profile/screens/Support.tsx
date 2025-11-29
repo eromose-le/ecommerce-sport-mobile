@@ -1,10 +1,14 @@
-import { View, Text, TouchableOpacity, Linking } from 'react-native'
-import React from 'react'
-import ScrollableForm from '@/components/common/ScrollableForm';
-import { COMPANY_INFO } from '@/constants/company';
-import { Ionicons } from '@expo/vector-icons';
+import ScrollableForm from "@/components/common/ScrollableForm";
+import { BodyText, Heading } from "@/components/ui";
+import { COMPANY_INFO } from "@/constants/company";
+import { useTheme, useThemedStyles } from "@/providers/theme";
+import { Ionicons } from "@expo/vector-icons";
+import React from "react";
+import { Linking, TouchableOpacity, View } from "react-native";
 
 const Support = () => {
+  const theme = useThemedStyles();
+  const { isDark } = useTheme();
   const socialLinks = [
     {
       label: "Facebook",
@@ -27,15 +31,26 @@ const Support = () => {
 
   return (
     <ScrollableForm>
-      <Text className="mb-4 text-lg font-jost-bold text-primary">
+      <Heading
+        level="h3"
+        weight="bold"
+        tone={theme.headingTone}
+        className="mb-4"
+      >
         Contact us
-      </Text>
-      <Text className="mb-6 text-sm text-secondary">
+      </Heading>
+      <BodyText size="sm" tone={theme.labelTone} className="mb-6">
         Have questions or feedback? Reach out via any of the channels below and
         we&apos;ll be happy to help.
-      </Text>
+      </BodyText>
 
-      <View className="gap-3 p-4 bg-white border border-gray-100 shadow-sm rounded-2xl">
+      <View
+        className="gap-3 p-4 border shadow-sm rounded-2xl"
+        style={{
+          borderColor: isDark ? "#1f2937" : "#e5e7eb",
+          backgroundColor: isDark ? "#0f172a" : "#ffffff",
+        }}
+      >
         <ContactRow
           icon="call-outline"
           label={`${COMPANY_INFO.countryCode} ${COMPANY_INFO.phoneNumbers[0]}`}
@@ -57,26 +72,38 @@ const Support = () => {
         />
       </View>
 
-      <Text className="mt-8 text-sm font-jost-medium text-secondary">
+      <BodyText
+        size="sm"
+        weight="medium"
+        tone={theme.labelTone}
+        className="mt-8"
+      >
         Socials
-      </Text>
+      </BodyText>
       <View className="flex-row flex-wrap gap-3 mt-3">
         {socialLinks.map((link) => (
           <TouchableOpacity
             key={link.label}
-            className="flex-row items-center gap-2 px-4 py-2 border border-gray-200 rounded-full"
+            className="flex-row items-center gap-2 px-4 py-2 border rounded-full"
+            style={{ borderColor: isDark ? "#1f2937" : "#e5e7eb" }}
             onPress={() => Linking.openURL(link.url)}
           >
-            <Ionicons name={link.icon as any} size={18} color="#111" />
-            <Text className="text-sm text-primary">{link.label}</Text>
+            <Ionicons
+              name={link.icon as any}
+              size={18}
+              color={theme.headingTone === "inverse" ? "#f5f5f5" : "#111"}
+            />
+            <BodyText size="sm" tone={theme.headingTone}>
+              {link.label}
+            </BodyText>
           </TouchableOpacity>
         ))}
       </View>
     </ScrollableForm>
   );
-}
+};
 
-export default Support
+export default Support;
 
 const ContactRow = ({
   icon,
@@ -86,14 +113,22 @@ const ContactRow = ({
   icon: any;
   label: string;
   url?: string;
-}) => (
-  <TouchableOpacity
-    disabled={!url}
-    onPress={() => url && Linking.openURL(url)}
-    className="flex-row items-center gap-3"
-  >
-    <Ionicons name={icon} size={18} color="#4B5563" />
-    <Text className="flex-1 text-sm text-secondary">{label}</Text>
-    {url && <Ionicons name="open-outline" size={16} color="#9CA3AF" />}
-  </TouchableOpacity>
-);
+}) => {
+  const theme = useThemedStyles();
+
+  return (
+    <TouchableOpacity
+      disabled={!url}
+      onPress={() => url && Linking.openURL(url)}
+      className="flex-row items-center gap-3"
+    >
+      <Ionicons name={icon} size={18} color={theme.iconMuted} />
+      <BodyText size="sm" tone={theme.labelTone} className="flex-1">
+        {label}
+      </BodyText>
+      {url && (
+        <Ionicons name="open-outline" size={16} color={theme.iconMuted} />
+      )}
+    </TouchableOpacity>
+  );
+};

@@ -1,11 +1,14 @@
 import React from "react";
-import { View, type ViewProps } from "react-native";
+import {
+  SafeAreaView,
+  type SafeAreaViewProps,
+} from "react-native-safe-area-context";
 import { useThemedStyles } from "@/providers/theme";
 import { containerVariants, type ContainerVariants } from "./variants";
 
-type ContainerProps = ViewProps & ContainerVariants;
+type SafeContainerProps = SafeAreaViewProps & ContainerVariants;
 
-const Container: React.FC<ContainerProps> = ({
+const SafeContainer: React.FC<SafeContainerProps> = ({
   children,
   className,
   padding,
@@ -35,8 +38,9 @@ const Container: React.FC<ContainerProps> = ({
     : background ?? "transparent";
 
   const mergedClassName = [surfaceClass, className].filter(Boolean).join(" ");
+
   return (
-    <View
+    <SafeAreaView
       className={containerVariants({
         padding,
         background: resolvedBackground,
@@ -49,8 +53,8 @@ const Container: React.FC<ContainerProps> = ({
       {...rest}
     >
       {children}
-    </View>
+    </SafeAreaView>
   );
 };
 
-export default Container;
+export default SafeContainer;

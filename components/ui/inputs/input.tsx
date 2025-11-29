@@ -111,7 +111,7 @@ const Input: React.FC<InputProps> = ({
     multiline,
     hasLeft,
     hasRight,
-    className: [themed.inputClassName, inputClassName]
+    className: [themed.inputClassNameInverse, inputClassName]
       .filter(Boolean)
       .join(" "),
   });

@@ -3,11 +3,13 @@ import HomeIcon from "@/assets/icons/home.svg";
 import { TabBarIcon } from "@/components/common/TabBarIcon";
 import { showCartQtyValue } from "@/helpers/cart";
 import { tabScreenOptions } from "@/helpers/tab-screen-options";
+import { useTheme } from "@/providers/theme";
 import { useCartStore } from "@/store/useCartStore";
 import { Tabs } from "expo-router";
 import { View } from "react-native";
 
 export default function PublicTabs() {
+  const { isDark } = useTheme();
   const cart = useCartStore((s) => s.cart);
   const badge = showCartQtyValue(cart);
 
@@ -18,7 +20,7 @@ export default function PublicTabs() {
         tabBarShowLabel: false,
         lazy: false,
         tabBarStyle: {
-          backgroundColor: "#fff",
+          backgroundColor: isDark ? "#0B0B0F" : "#FFFFFF",
           borderTopColor: "transparent",
           height: 74,
           paddingTop: 10,
@@ -43,6 +45,7 @@ export default function PublicTabs() {
           rightAction: () => <View className="w-10" />,
           badgeCount: badge.value,
           showBack: false,
+          isDark,
         })}
       />
     </Tabs>

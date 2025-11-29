@@ -1,7 +1,8 @@
 import LabeledInput from "@/components/common/LabeledInput";
 import StarRating from "@/components/review/StarRating";
-import { PrimaryButton, SecondaryButton } from "@/components/ui";
+import { BodyText, PrimaryButton, SecondaryButton } from "@/components/ui";
 import { useAuth } from "@/providers/auth";
+import { useThemedStyles } from "@/providers/theme";
 import { ReviewService } from "@/services/api";
 import { CreateReviewPayload } from "@/services/review/review.types";
 import { getFormikTextFieldProps } from "@/utils/formik";
@@ -9,7 +10,7 @@ import { AppToast } from "@/utils/toast";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useFormik } from "formik";
 import React, { useMemo } from "react";
-import { Text, View } from "react-native";
+import { View } from "react-native";
 import { number, object, string } from "yup";
 
 type ReviewFormProps = {
@@ -40,6 +41,7 @@ const ReviewForm = ({
 }: ReviewFormProps) => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const theme = useThemedStyles();
 
   const initialValues = useMemo(
     () => ({
@@ -107,9 +109,9 @@ const ReviewForm = ({
   return (
     <View className="gap-5">
       <View className="gap-2">
-        <Text className="text-base font-jost-semibold text-primary">
+        <BodyText size="md" weight="semibold" tone={theme.headingTone}>
           Your rating
-        </Text>
+        </BodyText>
         <StarRating
           value={formik.values.rating}
           onChange={(val) => {
@@ -120,7 +122,9 @@ const ReviewForm = ({
           size={24}
         />
         {ratingError ? (
-          <Text className="text-xs text-red-500 font-jost">{ratingError}</Text>
+          <BodyText size="xs" tone="danger">
+            {ratingError}
+          </BodyText>
         ) : null}
       </View>
 
@@ -135,12 +139,12 @@ const ReviewForm = ({
           {...commentProps}
         />
         <View className="flex-row items-center justify-between mt-1">
-          <Text className="text-xs text-secondary font-jost">
+          <BodyText size="xs" tone={theme.labelTone}>
             {commentProps.helperText || "Optional"}
-          </Text>
-          <Text className="text-xs text-secondary font-jost">
+          </BodyText>
+          <BodyText size="xs" tone={theme.labelTone}>
             {`${commentProps.value?.length || 0}/1000`}
-          </Text>
+          </BodyText>
         </View>
       </View>
 
@@ -150,7 +154,9 @@ const ReviewForm = ({
             title="Cancel"
             onPress={onClose}
             disabled={isSubmitting}
-            className="flex-1 h-full"
+            className={`${theme.pageBgInverse} flex-1 h-full border border-black`}
+            textClassName={`${theme.secondaryTextClass}`}
+            spinnerColor={theme.secondarySpinnerColor}
           />
         )}
         <PrimaryButton
@@ -158,7 +164,9 @@ const ReviewForm = ({
           onPress={formik.submitForm}
           disabled={!isValid || isSubmitting}
           loading={isSubmitting}
-          className="flex-1 h-full"
+          className={`${theme.pageBg} flex-1 h-full`}
+          textClassName={theme.primaryTextClass}
+          spinnerColor={theme.primarySpinnerColor}
         />
       </View>
     </View>

@@ -1,3 +1,4 @@
+import { useThemedStyles } from "@/providers/theme";
 import { Product } from "@/services/product/product.types";
 import React, { useMemo } from "react";
 import {
@@ -52,6 +53,7 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
   contentContainerStyle,
   stickyHeaderIndices,
 }) => {
+  const theme = useThemedStyles();
   const { width } = useWindowDimensions();
 
   const cardWidth = horizontal
@@ -117,7 +119,7 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
       ListFooterComponent={
         loadingMore ? (
           <View className="items-center justify-center py-4">
-            <ActivityIndicator size="small" color="#000" />
+            <ActivityIndicator size="small" color={theme.primarySpinnerColor} />
           </View>
         ) : null
       }

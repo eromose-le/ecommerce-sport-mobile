@@ -4,10 +4,10 @@ export const headingVariants = tv({
   base: "font-jost-semibold",
   variants: {
     level: {
-      h1: "text-3xl",
-      h2: "text-2xl",
-      h3: "text-xl",
-      h4: "text-lg",
+      h1: "text-3xl", // 3xl
+      h2: "text-2xl", // 2xl
+      h3: "text-xl", // xl
+      h4: "text-lg", // lg
     },
     tone: {
       primary: "text-primary",

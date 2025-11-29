@@ -1,7 +1,9 @@
 import AppLoader from "@/components/common/AppLoader";
 import LabeledInput from "@/components/common/LabeledInput";
-import { LinkButton, PrimaryButton } from "@/components/ui";
+import { BodyText, Heading, LinkButton, PrimaryButton } from "@/components/ui";
+import SafeContainer from "@/components/ui/layout/safe-container";
 import { RESET_PASSWORD, SIGN_IN } from "@/constants/urls";
+import { useThemedStyles } from "@/providers/theme";
 import { AuthService } from "@/services/api";
 import { IRequestPasswordResetPayload } from "@/services/auth/auth.types";
 import { AppToast } from "@/utils/toast";
@@ -9,14 +11,7 @@ import { useMutation } from "@tanstack/react-query";
 import { router, useLocalSearchParams } from "expo-router";
 import { useFormik } from "formik";
 import { useState } from "react";
-import {
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  Text,
-  View,
-} from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
 import { InferType, object, string } from "yup";
 
 const forgotPasswordSchema = object({
@@ -29,6 +24,7 @@ const forgotPasswordSchema = object({
 type ForgotPasswordFormValues = InferType<typeof forgotPasswordSchema>;
 
 export default function ForgotPassword() {
+  const theme = useThemedStyles();
   const params = useLocalSearchParams<{ email?: string }>();
   const [loadingOverlay, setLoadingOverlay] = useState(false);
 
@@ -69,7 +65,7 @@ export default function ForgotPassword() {
   const handleSubmit = () => formik.handleSubmit();
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
+    <SafeContainer padding="sm" gap="md" className={`${theme.pageBg} flex-1`}>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         className="flex-1"
@@ -79,17 +75,18 @@ export default function ForgotPassword() {
           contentContainerStyle={{ paddingBottom: 60 }}
           showsVerticalScrollIndicator={false}
         >
-          <View className="mt-16">
-            <Text className="text-2xl text-center text-primary font-jost-bold">
+          <View className="mt-10">
+            <Heading level="h1" align="center" weight="bold" tone={theme.headingTone}>
               Forgot password
-            </Text>
-            <Text className="mt-3 text-xs text-center text-secondary font-jost">
+            </Heading>
+
+            <BodyText size="sm" align="center" tone={theme.labelTone}>
               Enter the email associated with your account and we&apos;ll email
               you a reset code.
-            </Text>
+            </BodyText>
           </View>
 
-          <View className="gap-3 mt-16">
+          <View className="gap-3 mt-14">
             <LabeledInput
               label="Email"
               placeholder="eg. name@domain.com"
@@ -101,19 +98,30 @@ export default function ForgotPassword() {
               error={formik.touched.email ? formik.errors.email : undefined}
             />
 
-            <PrimaryButton
-              title="Send code"
-              onPress={handleSubmit}
-              loading={requestMutation.isPending}
-              loadingText="Sending..."
-              disabled={!formik.isValid}
-              className="mt-2"
-            />
+            <View className="items-center w-full gap-2 mt-4">
+              <PrimaryButton
+                title="Send code"
+                onPress={handleSubmit}
+                loading={requestMutation.isPending}
+                loadingText="Sending..."
+                disabled={!formik.isValid}
+                className={`${theme.primaryButtonClass} w-full`}
+                textClassName={theme.primaryTextClassInverse}
+                spinnerColor={theme.primarySpinnerColor}
+              />
 
-            <LinkButton
-              title="Back to Login"
-              onPress={() => router.replace(SIGN_IN)}
-            />
+              <LinkButton
+                title="Back to Login"
+                onPress={() =>
+                  router.push({
+                    pathname: SIGN_IN,
+                    params: { fromOnboarding: "true" },
+                  })
+                }
+                textClassName={theme.linkTextClass}
+                spinnerColor={theme.linkSpinnerColor}
+              />
+            </View>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -123,6 +131,6 @@ export default function ForgotPassword() {
           <AppLoader />
         </View>
       )}
-    </SafeAreaView>
+    </SafeContainer>
   );
 }

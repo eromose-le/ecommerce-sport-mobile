@@ -1,6 +1,9 @@
+import { useTheme, useThemedStyles } from "@/providers/theme";
 import { getKeyValue } from "@/utils/object";
+import classNames from "classnames";
 import React from "react";
-import { Text, View } from "react-native";
+import { View } from "react-native";
+import { BodyText, Heading } from "../ui";
 
 export default function ProductSpecifications({
   specifications,
@@ -9,27 +12,36 @@ export default function ProductSpecifications({
   modelNumber: string;
   specifications: any;
 }) {
+  const { isDark } = useTheme();
+  const theme = useThemedStyles();
   return (
     <View className="px-4 mt-8">
-      <Text className="mb-3 text-lg font-jost-bold">Specifications</Text>
+      <Heading level="h4" weight="bold" className="mb-3">
+        Specifications
+      </Heading>
 
       <View className="border">
         {[{ "Model Number": modelNumber }, ...specifications]?.map(
           (attr, i) => (
             <View
               key={i}
-              className="flex-row bg-white border-b border-b-black last:border-b-0"
+              className={classNames(
+                "flex-row border-b border-b-black last:border-b-0",
+                isDark ? theme.mutedSurface : "bg-background"
+              )}
             >
-              <View className="w-40 p-3 border-r bg-[#F0F0F0]">
-                <Text className="text-sm font-jost-medium text-primary">
+              <View
+                className={`w-40 p-3 ${isDark ? theme.mutedSurface : "bg-[#F0F0F0]"}`}
+              >
+                <BodyText size="sm" weight="medium">
                   {getKeyValue(attr)?.key}
-                </Text>
+                </BodyText>
               </View>
 
               <View className="flex-1 p-3">
-                <Text className="text-xs text-primary">
+                <BodyText size="xs" tone={theme.labelTone}>
                   {getKeyValue(attr)?.value}
-                </Text>
+                </BodyText>
               </View>
             </View>
           )

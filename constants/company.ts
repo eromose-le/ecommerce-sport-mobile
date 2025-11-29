@@ -1,7 +1,7 @@
 export const COMPANY_INFO = {
   phoneNumbers: ["7072215324", "8116370946", "9027338732"],
   countryCode: "+234",
-  email: "support@sportygalaxy.com",
+  email: "contact@sportygalaxy.com",
   website: "https://www.sportygalaxy.com",
   brandName: "SPORTY GALAXY LIMITED",
   businessAddress: "Alaba International Market, No 25 olojo drive ojo town Lagos",

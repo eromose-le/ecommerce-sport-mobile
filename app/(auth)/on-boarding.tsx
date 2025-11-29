@@ -1,9 +1,11 @@
 import GoodIcon from "@/assets/icons/good.svg";
 import { SvgIcon } from "@/components/common/SvgIcon";
-import { LinkButton, PrimaryButton } from "@/components/ui";
+import { BodyText, Heading, LinkButton, PrimaryButton } from "@/components/ui";
+import SafeContainer from "@/components/ui/layout/safe-container";
 import { SIGN_IN, SIGN_UP } from "@/constants/urls";
 import { onboardingSlides } from "@/lib/dummy-data";
 import { useAuth } from "@/providers/auth";
+import { useThemedStyles } from "@/providers/theme";
 import { router } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import {
@@ -19,6 +21,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 const { width, height } = Dimensions.get("window");
 
 export default function OnBoarding() {
+  const theme = useThemedStyles();
   const { skipLogin } = useAuth();
   const [index, setIndex] = useState(0);
   const flatRef = useRef<FlatList>(null);
@@ -40,7 +43,7 @@ export default function OnBoarding() {
   };
 
   return (
-    <View className="flex-1 bg-white">
+    <SafeContainer padding="sm" gap="md" className={`${theme.pageBg} flex-1`}>
       <StatusBar
         barStyle="light-content"
         backgroundColor="transparent"
@@ -79,15 +82,17 @@ export default function OnBoarding() {
       >
         <View className="flex-row justify-end px-4 mt-2">
           <LinkButton
-            textClassName="text-white"
+            size="lg"
             title="Skip"
             onPress={skipLogin}
+            textClassName="text-white font-jost-bold"
+            spinnerColor={theme.linkSpinnerColor}
           />
         </View>
       </SafeAreaView>
 
       {/* Content area BELOW the image, inside safe area */}
-      <SafeAreaView style={{ flex: 1, marginTop: height * 0.46 }}>
+      <SafeAreaView style={{ flex: 1, marginTop: height * 0.4 }}>
         {/* Pagination Dots */}
         <View className="flex-row justify-center mb-12 space-x-1">
           {onboardingSlides.map((_, i) => (
@@ -102,12 +107,12 @@ export default function OnBoarding() {
 
         {/* Slide Text */}
         <View className="items-center px-6">
-          <Text className="text-center text-[24px] font-jost-bold max-w-60">
+          <Heading level="h1" className="max-w-60" align="center">
             {onboardingSlides[index].title}{" "}
             <Text className="font-extrabold">
               {onboardingSlides[index].highlight}
             </Text>
-          </Text>
+          </Heading>
 
           <View className="items-center gap-3 mt-5 space-y-3">
             {onboardingSlides[index].bullets.map((line: any, idx: number) => (
@@ -115,19 +120,24 @@ export default function OnBoarding() {
                 <Text className="text-lg text-green-600">
                   <SvgIcon Icon={GoodIcon} size={16} />
                 </Text>
-                <Text className="text-base font-jost">{line}</Text>
+                <BodyText size="md" tone={theme.headingTone}>
+                  {line}
+                </BodyText>
+                {/* <Text className="text-base text-blue-600 font-jost">{line}</Text> */}
               </View>
             ))}
           </View>
         </View>
 
         {/* Bottom Buttons */}
-        <View className="gap-3 px-6 mt-auto mb-10">
+        <View className="gap-3 px-6 mt-10 mb-10">
           <PrimaryButton
             title="Sign up"
             onPress={() => router.push(SIGN_UP)}
             loadingText="Signing In..."
-            className="w-full"
+            className={`${theme.primaryButtonClass} w-full`}
+            textClassName={theme.primaryTextClassInverse}
+            spinnerColor={theme.primarySpinnerColor}
           />
 
           <LinkButton
@@ -138,9 +148,11 @@ export default function OnBoarding() {
                 params: { fromOnboarding: "true" },
               });
             }}
+            textClassName={theme.linkTextClass}
+            spinnerColor={theme.linkSpinnerColor}
           />
         </View>
       </SafeAreaView>
-    </View>
+    </SafeContainer>
   );
 }

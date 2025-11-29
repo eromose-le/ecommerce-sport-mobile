@@ -1,6 +1,8 @@
+import { useThemedStyles } from "@/providers/theme";
 import { Product } from "@/services/product/product.types";
 import React from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import { View } from "react-native";
+import { PrimaryButton, SecondaryButton } from "../ui";
 
 type ProductDetailActionsProps = {
   product: Product;
@@ -13,27 +15,25 @@ export default function ProductDetailActions({
   onAddToCart,
   onStartOrder,
 }: ProductDetailActionsProps) {
+  const theme = useThemedStyles();
+
   return (
     <View className="flex-row items-center gap-3 mt-6">
-      <TouchableOpacity
-        onPress={onStartOrder}
-        className="flex-1 py-3 bg-black rounded"
-        activeOpacity={0.85}
-      >
-        <Text className="text-xs text-center text-white font-jost-semibold">
-          Start order
-        </Text>
-      </TouchableOpacity>
+      <PrimaryButton
+        title="Start order"
+        onPress={() => onStartOrder?.()}
+        className={`${theme.primaryButtonClass} rounded px-6`}
+        textClassName={theme.primaryTextClassInverse}
+        spinnerColor={theme.primarySpinnerColor}
+      />
 
-      <TouchableOpacity
+      <SecondaryButton
+        title="Add to Cart"
         onPress={onAddToCart}
-        className="flex-1 py-3 border rounded border-secondary"
-        activeOpacity={0.85}
-      >
-        <Text className="text-xs text-center font-jost-semibold">
-          Add to Cart
-        </Text>
-      </TouchableOpacity>
+        className={`${theme.secondaryButtonClass} rounded px-6`}
+        textClassName={theme.secondaryTextClass}
+        spinnerColor={theme.secondarySpinnerColor}
+      />
     </View>
   );
 }

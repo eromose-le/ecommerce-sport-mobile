@@ -2,6 +2,7 @@ import CartIcon from "@/assets/icons/cart.svg";
 import { CART_PROTECTED, CART_PUBLIC } from "@/constants/urls";
 import { showCartQtyValue } from "@/helpers/cart";
 import { useAuthUser } from "@/hooks/useAuthUser";
+import { useThemedStyles } from "@/providers/theme";
 import { useCartStore } from "@/store/useCartStore";
 import { useRouter } from "expo-router";
 import React, { FC, useEffect } from "react";
@@ -16,6 +17,7 @@ import Animated, {
 import { SvgIcon } from "../common/SvgIcon";
 
 const CartButton: FC = () => {
+  const theme = useThemedStyles();
   const router = useRouter();
   const { user } = useAuthUser();
   const cart = useCartStore((state) => state.cart);
@@ -44,9 +46,9 @@ const CartButton: FC = () => {
   return (
     <TouchableOpacity
       onPress={() => router.push(!!user ? CART_PROTECTED : CART_PUBLIC)}
-      className="relative p-3 rounded-full bg-transparent border border-[#0000001A]"
+      className={`relative p-3 rounded-full bg-transparent border ${theme.surface}`}
     >
-      <SvgIcon Icon={CartIcon} size={22} color={"#000"} />
+      <SvgIcon Icon={CartIcon} size={22} color={theme.iconMuted} />
       {badge.status ? (
         <Animated.View
           style={animatedStyle}

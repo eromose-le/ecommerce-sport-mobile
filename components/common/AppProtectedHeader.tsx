@@ -1,11 +1,15 @@
 import { PROFILE } from "@/constants/urls";
 import { useAuthUser } from "@/hooks/useAuthUser";
+import { useThemedStyles } from "@/providers/theme";
+import classNames from "classnames";
 import { router } from "expo-router";
 import React from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import { TouchableOpacity, View } from "react-native";
+import { BodyText } from "../ui";
 import Logo from "./Logo";
 
 const AppProtectedHeader = () => {
+  const theme = useThemedStyles();
   const { user } = useAuthUser();
 
   const userName =
@@ -18,9 +22,16 @@ const AppProtectedHeader = () => {
       <View className="flex-row gap-2">
         <TouchableOpacity
           onPress={() => router.push(PROFILE)}
-          className="items-center justify-center bg-black rounded-full w-9 h-9"
+          className={classNames(
+            "items-center justify-center rounded-full w-9 h-9",
+            theme.pageBg,
+            theme.primaryBorderColor,
+            "border"
+          )}
         >
-          <Text className="font-semibold text-white">{userName[0] ?? "U"}</Text>
+          <BodyText size="xs" tone={theme.headingTone} weight="light">
+            {userName[0] ?? "Avatar"}
+          </BodyText>
         </TouchableOpacity>
       </View>
     </View>

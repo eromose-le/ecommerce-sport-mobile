@@ -32,7 +32,7 @@ export const LoadingContent = <T,>({
 
   loadingClassName,
 }: LoadingContentProps<T>) => {
-  const defaultContainer = "items-center justify-center flex-1";
+  const defaultContainer = "items-center justify-center flex-1 mt-4";
 
   /** ---------- LOADING ---------- **/
   if (loading) {
@@ -48,7 +48,9 @@ export const LoadingContent = <T,>({
     return ErrorComponent ? (
       ErrorComponent(error, onRetry)
     ) : (
-      <ErrorState error={error} onRetry={onRetry} />
+      <View className="mt-4">
+        <ErrorState error={error} onRetry={onRetry} />
+      </View>
     );
   }
 
@@ -62,7 +64,9 @@ export const LoadingContent = <T,>({
     return EmptyComponent ? (
       EmptyComponent(error, onRetry)
     ) : (
-      <EmptyState error={error} onRetry={onRetry} />
+      <View className="mt-4">
+        <EmptyState error={error} onRetry={onRetry} />
+      </View>
     );
   }
 

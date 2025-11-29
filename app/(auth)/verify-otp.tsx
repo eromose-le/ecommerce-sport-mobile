@@ -1,8 +1,16 @@
 import AppLoader from "@/components/common/AppLoader";
 import OtpInput from "@/components/common/OtpInput";
-import { LinkButton, PrimaryButton, SecondaryButton } from "@/components/ui";
+import {
+  BodyText,
+  Heading,
+  LinkButton,
+  PrimaryButton,
+  SecondaryButton,
+} from "@/components/ui";
+import SafeContainer from "@/components/ui/layout/safe-container";
 import { SIGN_IN, TABS_PROTECTED } from "@/constants/urls";
 import { useAuth } from "@/providers/auth";
+import { useThemedStyles } from "@/providers/theme";
 import { AuthService } from "@/services/api";
 import {
   IResendSignupOtpPayload,
@@ -21,7 +29,6 @@ import {
   TextInput,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { InferType, object, string } from "yup";
 
 const OTP_LENGTH = 4;
@@ -42,6 +49,7 @@ const verifyOtpSchema = object({
 type VerifyOtpFormValues = InferType<typeof verifyOtpSchema>;
 
 export default function VerifyOtp() {
+  const theme = useThemedStyles();
   const params = useLocalSearchParams<{ email?: string }>();
   const { login } = useAuth();
   const [loadingOverlay, setLoadingOverlay] = useState(false);
@@ -130,7 +138,7 @@ export default function VerifyOtp() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
+    <SafeContainer padding="sm" gap="md" className={`${theme.pageBg} flex-1`}>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         className="flex-1"
@@ -140,23 +148,35 @@ export default function VerifyOtp() {
           contentContainerStyle={{ paddingBottom: 60 }}
           showsVerticalScrollIndicator={false}
         >
-          <Text className="mt-10 text-2xl text-center text-primary font-jost-bold">
-            Verify account
-          </Text>
-          <Text className="mt-3 text-xs text-center text-secondary font-jost">
-            Paste or type the {OTP_LENGTH}-digit code sent to your email. You
-            can request another code after the timer ends.
-          </Text>
-          <Text className="mt-3 text-sm text-center text-primary font-jost">
-            ({formik.values.email})
-          </Text>
+          <View className="mt-10">
+            <Heading level="h1" align="center" weight="bold" tone={theme.headingTone}>
+              Verify account
+            </Heading>
+            <BodyText size="sm" align="center" tone={theme.labelTone}>
+              Paste or type the {OTP_LENGTH}-digit code sent to your email. You
+              can request another code after the timer ends.
+            </BodyText>
+            <BodyText
+              align="center"
+              size="md"
+              weight="medium"
+              tone={theme.headingTone}
+            >
+              ({formik.values.email})
+            </BodyText>
+          </View>
 
           <View className="gap-4 mt-14">
             <View className="flex-row flex-wrap items-start gap-1">
-              <Text className="w-32 text-sm text-gray-600 font-jost-medium">
+              <BodyText
+                size="sm"
+                tone={theme.headingTone}
+                className="flex-1 w-32"
+                weight="medium"
+              >
                 * OTP
-              </Text>
-              <View className="flex-1 min-w-[220px]">
+              </BodyText>
+              <View className="flex-2 min-w-[225px] gap-2">
                 <OtpInput
                   length={OTP_LENGTH}
                   value={formik.values.otp}
@@ -169,11 +189,11 @@ export default function VerifyOtp() {
                     {formik.errors.otp}
                   </Text>
                 ) : (
-                  <Text className="mt-2 text-xs text-secondary font-jost">
+                  <BodyText size="sm" align="right" tone={theme.labelTone}>
                     {resendTimer > 0
                       ? `Request new OTP in ${resendTimer}s`
                       : "You can request a new OTP now."}
-                  </Text>
+                  </BodyText>
                 )}
               </View>
             </View>
@@ -184,7 +204,9 @@ export default function VerifyOtp() {
               loading={verifyMutation.isPending}
               loadingText="Verifying..."
               disabled={!formik.isValid}
-              className="mt-4"
+              className={`${theme.primaryButtonClass} mt-4`}
+              textClassName={theme.primaryTextClassInverse}
+              spinnerColor={theme.primarySpinnerColor}
             />
 
             <SecondaryButton
@@ -197,6 +219,9 @@ export default function VerifyOtp() {
               disabled={resendTimer > 0 || resendMutation.isPending}
               loading={resendMutation.isPending}
               loadingText="Sending..."
+              className={theme.secondaryButtonClass}
+              textClassName={theme.secondaryTextClass}
+              spinnerColor={theme.secondarySpinnerColor}
             />
           </View>
 
@@ -204,6 +229,8 @@ export default function VerifyOtp() {
             <LinkButton
               title="Back to Login"
               onPress={() => router.replace(SIGN_IN)}
+              textClassName={theme.linkTextClass}
+              spinnerColor={theme.linkSpinnerColor}
             />
           </View>
         </ScrollView>
@@ -214,6 +241,6 @@ export default function VerifyOtp() {
           <AppLoader />
         </View>
       )}
-    </SafeAreaView>
+    </SafeContainer>
   );
 }

@@ -1,5 +1,7 @@
+import { useThemedStyles } from "@/providers/theme";
 import React, { ReactNode } from "react";
-import { Text, View } from "react-native";
+import { View } from "react-native";
+import { Heading } from "../ui";
 import { BackButton } from "./BackButton";
 
 type AppHeaderProps = {
@@ -21,21 +23,19 @@ const AppHeader: React.FC<AppHeaderProps> = ({
   titleClassName = "",
   left,
 }) => {
+  const theme = useThemedStyles();
   return (
     <View
-      className={`flex-row items-center justify-between px-4 py-2 bg-background ${className}`}
+      className={`flex-row items-center justify-between px-4 py-2 ${theme.pageBg} ${className}`}
     >
       {/* Left: default BackButton, but can be overridden */}
       {left ?? <BackButton />}
 
       {/* Center title */}
       {title && (
-        <Text
-          className={`text-xl font-jost-medium text-primary ${titleClassName}`}
-          numberOfLines={1}
-        >
+        <Heading level="h3" weight="medium" numberOfLines={1}>
           {title}
-        </Text>
+        </Heading>
       )}
 
       {/* Right: custom element or fixed-width spacer */}

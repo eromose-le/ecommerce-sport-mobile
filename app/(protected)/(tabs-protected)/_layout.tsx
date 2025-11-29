@@ -7,12 +7,14 @@ import { ErrorBoundary } from "@/components/common/ErrorBoundary";
 import { TabBarIcon } from "@/components/common/TabBarIcon";
 import { showCartQtyValue } from "@/helpers/cart";
 import { tabScreenOptions } from "@/helpers/tab-screen-options";
+import { useTheme } from "@/providers/theme";
 import { useCartStore } from "@/store/useCartStore";
 import { Tabs } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import { View } from "react-native";
 
 export default function ProtectedTabs() {
+  const { theme: themeKey, isDark } = useTheme();
   const [hydrated, setHydrated] = useState(false);
   const cart = useCartStore((s) => s.cart);
   const badge = useMemo(() => showCartQtyValue(cart), [cart]);
@@ -49,7 +51,7 @@ export default function ProtectedTabs() {
           headerShown: false,
           tabBarShowLabel: false,
           tabBarStyle: {
-            backgroundColor: "#fff",
+            backgroundColor: isDark ? "#0B0B0F" : "#FFFFFF",
             borderTopColor: "transparent",
             height: 74,
             paddingTop: 10,
@@ -75,6 +77,7 @@ export default function ProtectedTabs() {
             rightAction: () => <View className="w-10" />,
             badgeCount: badge.value,
             showBack: false,
+            isDark,
           })}
         />
 
@@ -86,6 +89,7 @@ export default function ProtectedTabs() {
             title: "Orders",
             rightAction: () => <View className="w-10" />,
             showBack: false,
+            isDark,
           })}
         />
 

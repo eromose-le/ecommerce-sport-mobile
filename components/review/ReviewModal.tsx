@@ -1,7 +1,9 @@
 import React from "react";
-import { Text, View } from "react-native";
+import { View } from "react-native";
 
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useThemedStyles } from "@/providers/theme";
+import { BodyText, Heading } from "../ui";
 import Modal from "../common/Modal";
 import ReviewForm from "./ReviewForm";
 
@@ -18,6 +20,8 @@ const ReviewModal = ({
   productId,
   productName,
 }: ReviewModalProps) => {
+  const theme = useThemedStyles();
+
   return (
     <Modal
       visible={visible}
@@ -28,18 +32,23 @@ const ReviewModal = ({
       contentHeight="42%"
     >
       <SafeAreaView
-        className="relative bg-background"
+        className={`relative ${theme.mutedSurface}`}
         edges={["top", "left", "right", "bottom"]}
       >
         <View className="flex-row items-baseline justify-between gap-2 mb-4">
           <View className="flex-1">
-            <Text className="text-lg font-jost-semibold text-primary">
+            <Heading
+              level="h3"
+              weight="semibold"
+              tone={theme.headingTone}
+              className="text-lg"
+            >
               Write a review
-            </Text>
+            </Heading>
             {productName ? (
-              <Text className="mt-0.5 text-xs text-secondary">
+              <BodyText size="xs" tone={theme.labelTone} className="mt-0.5">
                 {productName}
-              </Text>
+              </BodyText>
             ) : null}
           </View>
         </View>

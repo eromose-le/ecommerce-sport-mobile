@@ -4,7 +4,7 @@ import { toastConfig } from "@/components/common/ToastConfig";
 import { AuthProvider } from "@/providers/auth";
 import { PaystackProvider } from "@/providers/paystack";
 import { QueryProvider } from "@/providers/query";
-import { ThemeProvider } from "@/providers/theme";
+import { ThemeProvider, useTheme, useThemedStyles } from "@/providers/theme";
 import { Logger } from "@/utils/logger";
 import {
   Jost_400Regular,
@@ -26,6 +26,8 @@ if (Platform.OS !== "web") {
 }
 
 function RootContent() {
+  const { isDark } = useTheme();
+  const theme = useThemedStyles();
   const [ready, setReady] = useState(false);
   const [fontsLoaded] = useFonts({
     Jost_400Regular,
@@ -58,18 +60,20 @@ function RootContent() {
     };
   }, [fontsLoaded]);
 
+  const statusBarStyle = isDark ? "light" : "dark";
+
   if (!ready) {
     return (
-      <View className="items-center justify-center flex-1 bg-white">
+      <View className={`items-center justify-center flex-1 ${theme.pageBg}`}>
         <AppLoader />
-        <StatusBar style="dark" />
+        <StatusBar style={statusBarStyle} />
       </View>
     );
   }
 
   return (
     <>
-      <StatusBar style="dark" />
+      <StatusBar style={statusBarStyle} />
       <Slot />
     </>
   );

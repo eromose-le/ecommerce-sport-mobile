@@ -1,13 +1,16 @@
 import AppLoader from "@/components/common/AppLoader";
 import PasswordField from "@/components/common/PasswordField";
 import TextField from "@/components/common/TextField";
-import { LinkButton, PrimaryButton } from "@/components/ui";
+import { BodyText, Heading, LinkButton, PrimaryButton } from "@/components/ui";
+import SafeContainer from "@/components/ui/layout/safe-container";
 import { SIGN_IN, VERIFY_OTP } from "@/constants/urls";
+import { useTheme, useThemedStyles } from "@/providers/theme";
 import { AuthService } from "@/services/api";
 import { ICreateUserPayload } from "@/services/auth/auth.types";
 import { Logger } from "@/utils/logger";
 import { AppToast } from "@/utils/toast";
 import { useMutation } from "@tanstack/react-query";
+import classNames from "classnames";
 import { router } from "expo-router";
 import { useFormik } from "formik";
 import { ReactNode, useState } from "react";
@@ -17,11 +20,9 @@ import {
   Modal,
   Platform,
   ScrollView,
-  Text,
   TouchableOpacity,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { boolean, InferType, object, ref, string } from "yup";
 
 type CountryOption = {
@@ -91,6 +92,8 @@ const signUpSchema = object({
 type SignUpFormValues = InferType<typeof signUpSchema>;
 
 export default function SignUp() {
+  const theme = useThemedStyles();
+  const { isDark } = useTheme();
   const [countryModalVisible, setCountryModalVisible] = useState(false);
   const [loadingOverlay, setLoadingOverlay] = useState(false);
 
@@ -164,18 +167,23 @@ export default function SignUp() {
     children: ReactNode;
   }) => (
     <View className="flex-row flex-wrap items-start gap-4">
-      <Text className="w-32 text-sm text-gray-600 font-jost-medium">
+      <BodyText
+        size="sm"
+        tone={theme.headingTone}
+        className="flex-1 w-32"
+        weight="medium"
+      >
         {required ? "* " : ""}
         {label}
-      </Text>
-      <View className="flex-1 min-w-[220px]">{children}</View>
+      </BodyText>
+      <View className="flex-2 min-w-[225px]">{children}</View>
     </View>
   );
 
   Logger.warn("formik", formik.values);
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
+    <SafeContainer padding="sm" gap="md" className={`${theme.pageBg} flex-1`}>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         className="flex-1"
@@ -185,14 +193,26 @@ export default function SignUp() {
           contentContainerStyle={{ paddingBottom: 60 }}
           showsVerticalScrollIndicator={false}
         >
-          <Text className="mt-10 text-2xl text-center text-primary font-jost-bold">
-            Sign up
-          </Text>
+          <View className="w-full mx-auto mt-10 max-w-60">
+            <Heading
+              level="h1"
+              className=""
+              align="center"
+              weight="bold"
+              tone={theme.headingTone}
+            >
+              Sign up
+            </Heading>
+          </View>
 
-          <View className="gap-4 mt-16">
+          <View className="flex-col gap-4 mt-16">
             <FieldRow label="Country / Region">
               <TouchableOpacity
-                className="flex-row items-center justify-between px-4 py-3 bg-white border-[0.34px] border-[#DEE2E6] rounded"
+                className={classNames(
+                  "flex-row items-center justify-between px-4 py-4 rounded-xl border",
+                  theme.surface,
+                  theme.primaryBorderColor
+                )}
                 onPress={() => setCountryModalVisible(true)}
                 activeOpacity={0.8}
               >
@@ -202,11 +222,13 @@ export default function SignUp() {
                     className="w-8 h-5 rounded-sm"
                     resizeMode="cover"
                   />
-                  <Text className="text-xs text-primary font-jost-medium">
+                  <BodyText size="xs" tone={theme.headingTone} weight="medium">
                     {selectedCountry.label}
-                  </Text>
+                  </BodyText>
                 </View>
-                <Text className="text-xs text-primary">Change</Text>
+                <BodyText size="xs" tone={theme.headingTone} weight="medium">
+                  Change
+                </BodyText>
               </TouchableOpacity>
             </FieldRow>
 
@@ -341,49 +363,70 @@ export default function SignUp() {
               </View>
             </FieldRow>
 
-            <View className="flex-row items-center justify-center gap-3 align-middle">
+            <View className="flex-row items-center justify-center gap-3 mt-2 align-middle">
               <TouchableOpacity
                 onPress={handleToggleTerms}
-                className="items-center justify-center w-5 h-5 mt-1 border border-gray-300 rounded-full"
+                className={classNames(
+                  "items-center justify-center w-5 h-5 mt-1 border rounded-full",
+                  formik.values.agreeToTerms ? theme.pageBgInverse : "",
+                  formik.values.agreeToTerms
+                    ? ""
+                    : isDark
+                      ? "border-gray-600"
+                      : "border-gray-300"
+                )}
               >
                 {formik.values.agreeToTerms && (
-                  <View className="h-2.5 w-2.5 rounded-full bg-black" />
+                  <View
+                    className={`h-2.5 w-2.5 rounded-full ${theme.pageBgInverse}`}
+                  />
                 )}
               </TouchableOpacity>
-              <Text className="items-center justify-center flex-1 text-sm leading-6 align-middle text-secondary">
-                I agree to (a)
-                <Text className="text-primary font-jost-semibold">
-                  {" "}
-                  Free Membership Agreement
-                </Text>
-                , (b)
-                <Text className="text-primary font-jost-semibold">
-                  {" "}
-                  Terms of Use
-                </Text>
-                , and (c)
-                <Text className="text-primary font-jost-semibold">
-                  {" "}
-                  Privacy Policy
-                </Text>
-                . I agree to receive more information from sportygalaxy.com
-                about its products and services.
-              </Text>
+
+              <TouchableOpacity className="w-full" onPress={handleToggleTerms}>
+                <BodyText
+                  size="md"
+                  tone={theme.labelTone}
+                  className="flex-1 w-full"
+                  weight="light"
+                >
+                  I agree to (a)
+                  <BodyText tone={theme.headingTone} weight="bold">
+                    {" "}
+                    Free Membership Agreement
+                  </BodyText>
+                  , (b)
+                  <BodyText tone={theme.headingTone} weight="bold">
+                    {" "}
+                    Terms of Use
+                  </BodyText>
+                  , and (c)
+                  <BodyText tone={theme.headingTone} weight="bold">
+                    {" "}
+                    Privacy Policy
+                  </BodyText>
+                  . I agree to receive more information from sportygalaxy.com
+                  about its products and services.
+                </BodyText>
+              </TouchableOpacity>
             </View>
             {formik.touched.agreeToTerms && formik.errors.agreeToTerms ? (
-              <Text className="text-xs text-red-500 font-jost">
+              <BodyText size="xs" tone="danger">
                 {formik.errors.agreeToTerms}
-              </Text>
+              </BodyText>
             ) : null}
 
-            <PrimaryButton
-              title="Agree and Register"
-              onPress={handleRegister}
-              loading={registerMutation.isPending}
-              loadingText="Registering..."
-              disabled={!formik.isValid}
-              className="mt-4"
-            />
+            <View className="mt-4">
+              <PrimaryButton
+                title="Agree and Register"
+                onPress={handleRegister}
+                loading={registerMutation.isPending}
+                loadingText="Registering..."
+                disabled={!formik.isValid}
+                textClassName={theme.primaryTextClassInverse}
+                spinnerColor={theme.primarySpinnerColor}
+              />
+            </View>
           </View>
 
           <View className="mt-4">
@@ -395,6 +438,8 @@ export default function SignUp() {
                   params: { fromOnboarding: "true" },
                 })
               }
+              textClassName={theme.linkTextClass}
+              spinnerColor={theme.linkSpinnerColor}
             />
           </View>
         </ScrollView>
@@ -407,16 +452,25 @@ export default function SignUp() {
         onRequestClose={() => setCountryModalVisible(false)}
       >
         <View className="items-center justify-center flex-1 px-6 bg-black/40">
-          <View className="w-full max-h-[70%] rounded-3xl bg-white p-4">
-            <View className="flex-row items-center justify-between mb-4">
-              <Text className="text-lg text-gray-900 font-jost-bold">
+          <View
+            className={`w-full max-h-[70%] rounded-3xl p-4 ${theme.mutedSurface}`}
+          >
+            <View className="flex-row items-center justify-between pb-4">
+              <Heading level="h3" weight="bold" tone={theme.headingTone}>
                 Select Country
-              </Text>
+              </Heading>
               <TouchableOpacity onPress={() => setCountryModalVisible(false)}>
-                <Text className="text-sm text-gray-500 font-jost">Close</Text>
+                <BodyText size="sm" tone={theme.labelTone}>
+                  Close
+                </BodyText>
               </TouchableOpacity>
             </View>
-            <ScrollView className="divide-y divide-gray-100">
+            <ScrollView
+              className={classNames(
+                "divide-y",
+                isDark ? "divide-gray-800" : "divide-gray-100"
+              )}
+            >
               {COUNTRY_OPTIONS.map((country) => {
                 const isActive = country.value === selectedCountry.value;
                 return (
@@ -434,18 +488,26 @@ export default function SignUp() {
                         className="w-8 h-5 rounded-sm"
                       />
                       <View>
-                        <Text className="text-base text-gray-900 font-jost">
+                        <BodyText
+                          size="md"
+                          weight="medium"
+                          tone={theme.headingTone}
+                        >
                           {country.label}
-                        </Text>
-                        <Text className="text-xs text-gray-500">
+                        </BodyText>
+                        <BodyText size="xs" tone={theme.labelTone}>
                           {country.dialCode}
-                        </Text>
+                        </BodyText>
                       </View>
                     </View>
                     {isActive && (
-                      <Text className="text-sm font-jost-medium text-primary">
+                      <BodyText
+                        size="sm"
+                        weight="medium"
+                        tone={theme.headingTone}
+                      >
                         Selected
-                      </Text>
+                      </BodyText>
                     )}
                   </TouchableOpacity>
                 );
@@ -460,6 +522,6 @@ export default function SignUp() {
           <AppLoader />
         </View>
       )}
-    </SafeAreaView>
+    </SafeContainer>
   );
 }

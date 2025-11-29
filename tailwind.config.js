@@ -19,6 +19,8 @@ module.exports = {
         bold: "700",
       },
       colors: {
+        white: "#FFFFFF",
+        black: "#0B0B0F",
         primary: "#000000",
         secondary: "#808080",
         background: "#FCFBFC",

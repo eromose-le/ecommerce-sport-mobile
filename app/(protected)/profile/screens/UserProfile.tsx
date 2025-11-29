@@ -1,13 +1,14 @@
 import ScrollableForm from "@/components/common/ScrollableForm";
 import TextField from "@/components/common/TextField";
-import { PrimaryButton } from "@/components/ui";
+import { BodyText, PrimaryButton } from "@/components/ui";
 import { useUpdateProfileMutation } from "@/hooks/useUpdateProfileMutation";
 import { useAuth } from "@/providers/auth";
+import { useThemedStyles } from "@/providers/theme";
 import { IUpdateUserPayload } from "@/services/user/user.types";
 import { getFormikTextFieldProps } from "@/utils/formik";
 import { Logger } from "@/utils/logger";
 import { useFormik } from "formik";
-import { Text, View } from "react-native";
+import { View } from "react-native";
 import { InferType, object, string } from "yup";
 
 const userProfileSchema = object({
@@ -27,6 +28,7 @@ type UserProfileFormValues = InferType<typeof userProfileSchema>;
 
 const UserProfile = () => {
   const { user } = useAuth();
+  const theme = useThemedStyles();
   const updateProfile = useUpdateProfileMutation();
   const formik = useFormik<UserProfileFormValues>({
     enableReinitialize: true,
@@ -54,10 +56,10 @@ const UserProfile = () => {
 
   return (
     <ScrollableForm>
-      <Text className="mb-4 text-sm text-secondary">
+      <BodyText size="md" tone={theme.bodyTone} className="mb-4">
         Update your basic profile information. These details are used to
         personalize your experience.
-      </Text>
+      </BodyText>
 
       <View className="gap-4 mt-2">
         <TextField
@@ -112,6 +114,9 @@ const UserProfile = () => {
           loading={updateProfile.isPending}
           disabled={!formik.isValid}
           title="Save changes"
+          className={`${theme.primaryButtonClass}`}
+          textClassName={theme.primaryTextClassInverse}
+          spinnerColor={theme.primarySpinnerColor}
         />
       </View>
     </ScrollableForm>

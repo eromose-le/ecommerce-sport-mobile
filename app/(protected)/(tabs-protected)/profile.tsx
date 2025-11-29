@@ -6,16 +6,17 @@ import {
 } from "@/components/profile/profile-constants";
 import ProfileRow from "@/components/profile/ProfileRow";
 import ProfileSection from "@/components/profile/ProfileSection";
-import { LinkButton } from "@/components/ui";
+import { BodyText, Heading, LinkButton } from "@/components/ui";
 import { AppEnv } from "@/constants/env";
 import { NOTIFICATION_PROTECTED, PROFILE_DETAIL } from "@/constants/urls";
 import { useAuth } from "@/providers/auth";
+import { useTheme, useThemedStyles } from "@/providers/theme";
 import { ProfileLink, ScreenKey } from "@/types/profile";
 import { exImageLink } from "@/utils/images";
 import { AppToast } from "@/utils/toast";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { Image, ScrollView, Switch, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const versionNumber = AppEnv.config.appVersion;
@@ -29,6 +30,8 @@ const navigateToProfileDetail = (key: ScreenKey) => {
 
 export default function ProtectedProfile() {
   const { user, logout } = useAuth();
+  const theme = useThemedStyles();
+  const { isDark, setTheme } = useTheme();
   const displayName =
     [user?.firstName, user?.lastName].filter(Boolean).join(" ") || "Guest";
   const avatarUri = user?.avatar || exImageLink(displayName);
@@ -67,7 +70,7 @@ export default function ProtectedProfile() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView className={`flex-1 ${theme.pageBg}`}>
       <ScrollView
         className="flex-1 px-6"
         contentContainerStyle={{ paddingBottom: 48 }}
@@ -77,28 +80,60 @@ export default function ProtectedProfile() {
             source={{ uri: avatarUri }}
             className="mb-4 rounded-full w-28 h-28"
           />
-          <Text className="text-2xl text-primary font-jost-bold">
+          <Heading level="h2" weight="bold" tone={theme.headingTone}>
             {displayName}
-          </Text>
+          </Heading>
         </View>
 
         <TouchableOpacity
-          className="flex-row items-center justify-between mt-12 p-4 bg-white border border-[#F1F1F1] rounded-2xl shadow-sm"
+          className={`flex-row items-center justify-between mt-12 p-4 rounded-2xl border shadow-sm ${theme.surface} ${theme.primaryBorderColor}`}
           onPress={handleOrders}
           activeOpacity={0.8}
         >
           <View className="flex-row items-center gap-4">
-            <Ionicons name="cart-outline" size={26} color="#000" />
-            <Text className="text-lg font-jost-medium text-primary">
+            <Ionicons
+              name="cart-outline"
+              size={26}
+              color={theme.headingTone === "inverse" ? "#f5f5f5" : "#111"}
+            />
+            <BodyText size="lg" weight="medium" tone={theme.headingTone}>
               My Orders
-            </Text>
+            </BodyText>
           </View>
-          <Ionicons name="chevron-forward" size={20} color="#000" />
+          <Ionicons
+            name="chevron-forward"
+            size={20}
+            color={theme.headingTone === "inverse" ? "#f5f5f5" : "#111"}
+          />
         </TouchableOpacity>
 
-        <View className="h-px bg-[#E5E7EB] my-8" />
+        <View
+          className="h-px my-8"
+          style={{ backgroundColor: isDark ? "#1f2937" : "#E5E7EB" }}
+        />
 
         <ProfileSection title="Settings">
+          <View className="flex-row items-center justify-between px-1 py-2">
+            <View className="flex-row items-center gap-3">
+              <View className="w-9 h-9 rounded-full bg-[#F5F5F5] items-center justify-center">
+                <Ionicons
+                  name={isDark ? "moon" : "moon-outline"}
+                  size={18}
+                  color="#4B5563"
+                />
+              </View>
+              <BodyText size="md" weight="medium" tone={theme.headingTone}>
+                Dark mode
+              </BodyText>
+            </View>
+            <Switch
+              value={isDark}
+              onValueChange={(val) => setTheme(val ? "dark" : "light")}
+              trackColor={{ false: "#E5E7EB", true: "#111827" }}
+              thumbColor={isDark ? "#F9FAFB" : "#111827"}
+              ios_backgroundColor="#E5E7EB"
+            />
+          </View>
           {settingsLinks.map((link) => (
             <ProfileRow
               key={link.key}
@@ -111,7 +146,10 @@ export default function ProtectedProfile() {
           ))}
         </ProfileSection>
 
-        <View className="h-px bg-[#E5E7EB] my-8" />
+        <View
+          className="h-px my-8"
+          style={{ backgroundColor: isDark ? "#1f2937" : "#E5E7EB" }}
+        />
 
         <ProfileSection title="Help">
           {helpLinks.map((link) => (
@@ -137,14 +175,14 @@ export default function ProtectedProfile() {
                   onPress={() => handleLinkPress(link)}
                 />
                 {index < legalLinks.length - 1 && (
-                  <Text className="text-secondary">|</Text>
+                  <BodyText tone={theme.labelTone}>|</BodyText>
                 )}
               </View>
             ))}
           </View>
-          <Text className="mt-6 text-xs text-secondary font-jost">
+          <BodyText size="xs" tone={theme.labelTone} className="mt-6">
             Version {versionNumber}
-          </Text>
+          </BodyText>
         </View>
       </ScrollView>
     </SafeAreaView>

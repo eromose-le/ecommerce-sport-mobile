@@ -1,7 +1,15 @@
 import AppLoader from "@/components/common/AppLoader";
 import PasswordField from "@/components/common/PasswordField";
-import { LinkButton, PrimaryButton, SecondaryButton } from "@/components/ui";
+import {
+  BodyText,
+  Heading,
+  LinkButton,
+  PrimaryButton,
+  SecondaryButton,
+} from "@/components/ui";
+import SafeContainer from "@/components/ui/layout/safe-container";
 import { FORGOT_PASSWORD, SIGN_IN } from "@/constants/urls";
+import { useThemedStyles } from "@/providers/theme";
 import { AuthService } from "@/services/api";
 import {
   IRequestPasswordResetPayload,
@@ -21,7 +29,6 @@ import {
   TextInput,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { InferType, object, ref, string } from "yup";
 
 const OTP_LENGTH = 4;
@@ -48,6 +55,7 @@ const resetPasswordSchema = object({
 type ResetPasswordFormValues = InferType<typeof resetPasswordSchema>;
 
 export default function ResetPassword() {
+  const theme = useThemedStyles();
   const params = useLocalSearchParams<{ email?: string }>();
   const [loadingOverlay, setLoadingOverlay] = useState(false);
   const [resendTimer, setResendTimer] = useState(RESEND_INTERVAL);
@@ -166,7 +174,7 @@ export default function ResetPassword() {
   Logger.warn("formik", formik.values);
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
+    <SafeContainer padding="sm" gap="md" className={`${theme.pageBg} flex-1`}>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         className="flex-1"
@@ -176,21 +184,33 @@ export default function ResetPassword() {
           contentContainerStyle={{ paddingBottom: 60 }}
           showsVerticalScrollIndicator={false}
         >
-          <Text className="mt-10 text-2xl text-center text-primary font-jost-bold">
-            Reset password
-          </Text>
-          <Text className="mt-3 text-xs text-center text-secondary font-jost">
-            Enter the code we emailed you along with your new password.
-          </Text>
-          <Text className="mt-3 text-sm text-center text-primary font-jost">
-            ({formik.values.email})
-          </Text>
+          <View className="mt-10">
+            <Heading level="h1" align="center" weight="bold">
+              Reset password
+            </Heading>
+            <BodyText size="sm" align="center" tone={theme.labelTone}>
+              Enter the code we emailed you along with your new password.
+            </BodyText>
+            <BodyText
+              align="center"
+              size="md"
+              weight="medium"
+              tone={theme.headingTone}
+            >
+              ({formik.values.email})
+            </BodyText>
+          </View>
 
           <View className="gap-6 mt-14">
             <View className="gap-2">
-              <Text className="text-sm text-gray-700 font-jost-medium">
+              <BodyText
+                size="sm"
+                tone={theme.headingTone}
+                className="flex-1 w-32"
+                weight="medium"
+              >
                 OTP Code
-              </Text>
+              </BodyText>
               {renderOtpBoxes()}
               {formik.touched.code && formik.errors.code ? (
                 <Text className="text-xs text-red-500 font-jost">
@@ -208,6 +228,8 @@ export default function ResetPassword() {
                   }
                   onPress={handleResend}
                   disabled={resendDisabled || resendMutation.isPending}
+                  textClassName={theme.linkTextClass}
+                  spinnerColor={theme.linkSpinnerColor}
                 />
               </View>
             </View>
@@ -248,16 +270,23 @@ export default function ResetPassword() {
               loading={verifyMutation.isPending}
               loadingText="Updating..."
               disabled={!formik.isValid}
+              className={theme.primaryButtonClass}
+              textClassName={theme.primaryTextClassInverse}
+              spinnerColor={theme.primarySpinnerColor}
             />
 
             <LinkButton
               title="Back to Forgot Password"
               onPress={() => router.replace(FORGOT_PASSWORD)}
+              textClassName={theme.linkTextClass}
+              spinnerColor={theme.linkSpinnerColor}
             />
 
             <LinkButton
               title="Return to Login"
               onPress={() => router.replace(SIGN_IN)}
+              textClassName={theme.linkTextClass}
+              spinnerColor={theme.linkSpinnerColor}
             />
           </View>
         </ScrollView>
@@ -268,6 +297,6 @@ export default function ResetPassword() {
           <AppLoader />
         </View>
       )}
-    </SafeAreaView>
+    </SafeContainer>
   );
 }

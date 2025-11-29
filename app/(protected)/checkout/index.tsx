@@ -3,7 +3,7 @@ import CartEmpty from "@/components/cart/CartEmpty";
 import AppHeader from "@/components/common/AppHeader";
 import Modal from "@/components/common/Modal";
 import TextField from "@/components/common/TextField";
-import { PrimaryButton } from "@/components/ui";
+import { BodyText, Heading, PrimaryButton } from "@/components/ui";
 import { TABS_PROTECTED } from "@/constants/urls";
 import {
   MINIMUM_CHECKOUT_AMOUNT,
@@ -15,6 +15,7 @@ import {
   showTotalPriceInCart,
 } from "@/helpers/cart";
 import { useAuth } from "@/providers/auth";
+import { useTheme, useThemedStyles } from "@/providers/theme";
 import { OrderService, PaymentService } from "@/services/api";
 import {
   InitializePayment,
@@ -24,6 +25,7 @@ import { useCartStore } from "@/store/useCartStore";
 import { formatCurrency } from "@/utils/currency";
 import { Logger } from "@/utils/logger";
 import { AppToast } from "@/utils/toast";
+import classNames from "classnames";
 import { router } from "expo-router";
 import { useFormik } from "formik";
 import { useMemo, useState } from "react";
@@ -32,7 +34,6 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  Text,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -76,6 +77,8 @@ export default function ProtectedCheckout() {
   const { cart, incrementQty, decrementQty, removeFromCart, clearCart } =
     useCartStore();
   const { user } = useAuth();
+  const theme = useThemedStyles();
+  const { isDark } = useTheme();
   const { popup } = usePaystack();
 
   const [paymentOption, setPaymentOption] = useState<"FULL" | "PARTIAL">(
@@ -390,9 +393,12 @@ export default function ProtectedCheckout() {
         setFieldValue("state", item.value);
         setSelectStateOpen(false);
       }}
-      className="px-4 py-3 border-b border-gray-100"
+      className={classNames("px-4 py-3 border-b", theme.mutedSurface)}
+      style={{ borderColor: isDark ? "#1f2937" : "#e5e7eb" }}
     >
-      <Text className="text-base font-jost">{item.label}</Text>
+      <BodyText size="md" weight="medium" tone={theme.headingTone}>
+        {item.label}
+      </BodyText>
     </TouchableOpacity>
   );
 
@@ -406,30 +412,36 @@ export default function ProtectedCheckout() {
       <TouchableOpacity
         onPress={() => setPaymentOption(option)}
         className={`flex-1 rounded-2xl border px-4 py-3 ${
-          isActive ? "bg-black border-black" : "bg-white border-gray-200"
+          isActive
+            ? isDark
+              ? "bg-white border-white"
+              : "bg-black border-black"
+            : isDark
+              ? "bg-transparent border-gray-700"
+              : "bg-white border-gray-200"
         }`}
         activeOpacity={0.8}
       >
-        <Text
-          className={`text-sm font-jost-semibold ${
-            isActive ? "text-white" : "text-primary"
-          }`}
+        <BodyText
+          size="sm"
+          weight="semibold"
+          tone={isActive ? (isDark ? "primary" : "inverse") : theme.headingTone}
         >
           {label}
-        </Text>
-        <Text
-          className={`mt-1 text-xs font-jost ${
-            isActive ? "text-gray-200" : "text-secondary"
-          }`}
+        </BodyText>
+        <BodyText
+          size="xs"
+          tone={isActive ? (isDark ? "primary" : "inverse") : theme.labelTone}
+          className="mt-1"
         >
           {description}
-        </Text>
+        </BodyText>
       </TouchableOpacity>
     );
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
+    <SafeAreaView className={`flex-1 ${theme.pageBg}`}>
       <AppHeader title="Checkout" />
 
       <KeyboardAvoidingView
@@ -443,7 +455,9 @@ export default function ProtectedCheckout() {
           showsVerticalScrollIndicator={false}
         >
           <View className="px-4 pb-6">
-            <Text className="text-xl font-jost-semibold">Delivery details</Text>
+            <Heading level="h3" weight="semibold" tone={theme.headingTone}>
+              Delivery details
+            </Heading>
 
             <View className="gap-3 mt-4">
               <TextField
@@ -481,35 +495,48 @@ export default function ProtectedCheckout() {
               />
 
               <View>
-                <Text className="mb-2 text-sm font-jost-medium text-primary">
+                <BodyText
+                  size="sm"
+                  weight="medium"
+                  tone={theme.headingTone}
+                  className="mb-2"
+                >
                   State
-                </Text>
+                </BodyText>
                 <TouchableOpacity
-                  className="flex-row items-center justify-between px-4 py-4 bg-white border border-gray-200 rounded-2xl"
+                  className="flex-row items-center justify-between px-4 py-4 border rounded-2xl"
+                  style={{
+                    borderColor: isDark ? "#1f2937" : "#e5e7eb",
+                    backgroundColor: isDark ? "#0f172a" : "#ffffff",
+                  }}
                   onPress={() => setSelectStateOpen(true)}
                   activeOpacity={0.8}
                 >
-                  <Text
-                    className={`text-sm font-jost ${
-                      selectedStateLabel ? "text-primary" : "text-secondary"
-                    }`}
+                  <BodyText
+                    size="sm"
+                    weight="medium"
+                    tone={
+                      selectedStateLabel ? theme.headingTone : theme.labelTone
+                    }
                   >
                     {selectedStateLabel || "Select state"}
-                  </Text>
-                  <Text className="text-xs text-secondary">Change</Text>
+                  </BodyText>
+                  <BodyText size="xs" tone={theme.labelTone}>
+                    Change
+                  </BodyText>
                 </TouchableOpacity>
                 {touched.state && errors.state ? (
-                  <Text className="mt-1 text-xs text-red-500">
+                  <BodyText size="xs" tone="danger" className="mt-1">
                     {errors.state}
-                  </Text>
+                  </BodyText>
                 ) : null}
               </View>
             </View>
 
             <View className="mt-8">
-              <Text className="text-xl font-jost-semibold">
+              <Heading level="h3" weight="semibold" tone={theme.headingTone}>
                 Payment options
-              </Text>
+              </Heading>
               <View className="flex-row gap-3 mt-3">
                 {paymentOptionButton(
                   "FULL",
@@ -525,50 +552,64 @@ export default function ProtectedCheckout() {
             </View>
 
             <View className="mt-8">
-              <Text className="text-xl font-jost-semibold">Order summary</Text>
+              <Heading level="h3" weight="semibold" tone={theme.headingTone}>
+                Order summary
+              </Heading>
               <View className="gap-2 mt-3">
                 <View className="flex-row justify-between">
-                  <Text className="text-sm text-secondary font-jost">
+                  <BodyText size="sm" tone={theme.labelTone}>
                     Subtotal
-                  </Text>
-                  <Text className="text-sm font-jost-medium">
+                  </BodyText>
+                  <BodyText size="sm" weight="medium" tone={theme.headingTone}>
                     {formatCurrency(subtotal)}
-                  </Text>
+                  </BodyText>
                 </View>
                 <View className="flex-row justify-between">
-                  <Text className="text-sm text-secondary font-jost">
+                  <BodyText size="sm" tone={theme.labelTone}>
                     Shipping ({shippingLabel})
-                  </Text>
-                  <Text className="text-sm font-jost-medium">
+                  </BodyText>
+                  <BodyText size="sm" weight="medium" tone={theme.headingTone}>
                     {formatCurrency(shippingFee)}
-                  </Text>
+                  </BodyText>
                 </View>
                 <View className="flex-row justify-between">
-                  <Text className="text-base font-jost-medium">Total</Text>
-                  <Text className="text-base font-jost-semibold">
+                  <BodyText size="md" weight="medium" tone={theme.headingTone}>
+                    Total
+                  </BodyText>
+                  <BodyText
+                    size="md"
+                    weight="semibold"
+                    tone={theme.headingTone}
+                  >
                     {formatCurrency(checkoutAmount)}
-                  </Text>
+                  </BodyText>
                 </View>
                 <View className="flex-row justify-between">
-                  <Text className="text-base font-jost-medium">
+                  <BodyText size="md" weight="medium" tone={theme.headingTone}>
                     Amount to pay (
                     {paymentOption === "PARTIAL" ? "30%" : "100%"})
-                  </Text>
-                  <Text className="text-base font-jost-semibold">
+                  </BodyText>
+                  <BodyText
+                    size="md"
+                    weight="semibold"
+                    tone={theme.headingTone}
+                  >
                     {formatCurrency(payableAmount)}
-                  </Text>
+                  </BodyText>
                 </View>
               </View>
               {belowMinimum && (
-                <Text className="mt-2 text-xs text-red-500 font-jost">
+                <BodyText size="xs" tone="danger" className="mt-2">
                   Minimum checkout amount is{" "}
                   {formatCurrency(MINIMUM_CHECKOUT_AMOUNT)}.
-                </Text>
+                </BodyText>
               )}
             </View>
 
             <View className="mt-8">
-              <Text className="text-xl font-jost-semibold">Items</Text>
+              <Heading level="h3" weight="semibold" tone={theme.headingTone}>
+                Items
+              </Heading>
               <View className="mt-3">
                 {cart.map((item) => (
                   <CartCard
@@ -593,10 +634,13 @@ export default function ProtectedCheckout() {
                 loading={loadingPayment || isSubmitting}
                 disabled={belowMinimum || loadingPayment || isSubmitting}
                 loadingText="Starting payment..."
+                className={`${theme.primaryButtonClass}`}
+                textClassName={theme.primaryTextClassInverse}
+                spinnerColor={theme.primarySpinnerColor}
               />
-              <Text className="mt-2 text-xs text-secondary font-jost">
+              <BodyText size="xs" tone={theme.labelTone} className="mt-2">
                 Secured by Paystack
-              </Text>
+              </BodyText>
             </View>
           </View>
         </ScrollView>
@@ -608,13 +652,18 @@ export default function ProtectedCheckout() {
         contentHeight="90%"
       >
         <SafeAreaView
-          className="relative flex-1 bg-background"
+          className={`relative flex-1 ${theme.pageBg}`}
           edges={["top", "left", "right", "bottom"]}
         >
-          <View className="flex-row items-baseline justify-between gap-2 mb-4">
-            <Text className="text-lg font-jost-semibold text-primary">
+          <View
+            className={classNames(
+              "flex-row items-baseline justify-between gap-2 pb-4",
+              theme.mutedSurface
+            )}
+          >
+            <Heading level="h4" weight="semibold" tone={theme.headingTone}>
               Select state
-            </Text>
+            </Heading>
           </View>
 
           <FlatList

@@ -1,5 +1,6 @@
 import { PRODUCT_DETAIL } from "@/constants/urls";
 import { showSinglePriceInCart } from "@/helpers/cart";
+import { useTheme, useThemedStyles } from "@/providers/theme";
 import { CartItem } from "@/services/cart/cart.types";
 import { formatCurrency } from "@/utils/currency";
 import { resolveImageSource } from "@/utils/images";
@@ -12,10 +13,10 @@ import {
   Animated,
   Image,
   PanResponder,
-  Text,
   TouchableOpacity,
   View,
 } from "react-native";
+import { BodyText, Heading } from "../ui";
 
 type CartCardProps = {
   item: CartItem;
@@ -30,6 +31,8 @@ const CartCard: React.FC<CartCardProps> = ({
   onDecrement,
   onRemove,
 }) => {
+  const theme = useThemedStyles();
+  const { isDark } = useTheme();
   const qty = Math.max(1, item?.variant?.qty || 1);
   const lineTotal = showSinglePriceInCart(item);
   const imageSource = resolveImageSource(
@@ -124,19 +127,32 @@ const CartCard: React.FC<CartCardProps> = ({
   return (
     <View className="flex-1 mb-1 overflow-hidden">
       {/* Right side background */}
-      <View className="absolute inset-y-0 right-0 items-center justify-center px-4 bg-red-50 rounded-2xl">
+      <View
+        className={classNames(
+          "absolute inset-y-0 right-0 items-center justify-center px-4 rounded-2xl",
+          isDark ? "bg-[#3f1a1a]" : "bg-red-50"
+        )}
+      >
         <Ionicons name="trash-outline" size={20} color="#ef4444" />
       </View>
 
       {/* Left side background */}
-      <View className="absolute inset-y-0 left-0 items-center justify-center px-4 bg-red-50 rounded-2xl">
+      <View
+        className={classNames(
+          "absolute inset-y-0 left-0 items-center justify-center px-4 rounded-2xl",
+          isDark ? "bg-[#3f1a1a]" : "bg-red-50"
+        )}
+      >
         <Ionicons name="trash-outline" size={20} color="#ef4444" />
       </View>
 
       <Animated.View
         style={{ transform: [{ translateX }] }}
         {...panResponder.panHandlers}
-        className="flex-row items-center gap-4 p-4 bg-white rounded"
+        className={classNames(
+          "flex-row items-center gap-4 p-4 rounded",
+          theme.pageBg
+        )}
         onLayout={(e) => {
           setCardWidth(e.nativeEvent.layout.width);
         }}
@@ -156,29 +172,40 @@ const CartCard: React.FC<CartCardProps> = ({
           activeOpacity={0.8}
           className="flex-1 ml-4"
         >
-          <Text className="text-lg font-jost-medium" numberOfLines={1}>
-            {item.name}
-          </Text>
-          <Text
-            numberOfLines={2}
-            className="mt-1 text-sm text-secondary font-jost"
+          <Heading
+            level="h4"
+            weight="medium"
+            tone={theme.headingTone}
+            numberOfLines={1}
           >
+            {item.name}
+          </Heading>
+          <BodyText numberOfLines={2} tone={theme.labelTone} className="mt-1">
             {item.description || "No description added"}
-          </Text>
+          </BodyText>
 
-          <Text className="mt-2 text-base font-bold">
+          <BodyText
+            size="md"
+            weight="bold"
+            tone={theme.headingTone}
+            className="mt-2"
+          >
             {formatCurrency(lineTotal)}
-          </Text>
+          </BodyText>
 
           <View className="flex-row items-center justify-between mt-2">
             {/* Quantity Controls */}
             <View className="flex-row items-center ">
               <TouchableOpacity
                 className={classNames(
+                  "px-3 py-2 border rounded",
                   isDisableIncreament
-                    ? "border-gray-300 bg-[#eee]"
-                    : "bg-black",
-                  "px-3 py-2 border border-black rounded"
+                    ? isDark
+                      ? "border-gray-600 bg-transparent"
+                      : "border-gray-300 bg-[#eee]"
+                    : isDark
+                      ? "border-white bg-white"
+                      : "border-black bg-black"
                 )}
                 onPress={onDecrement}
                 disabled={isDisableIncreament}
@@ -186,17 +213,36 @@ const CartCard: React.FC<CartCardProps> = ({
                 <Ionicons
                   name="remove"
                   size={14}
-                  color={isDisableIncreament ? "#aaa" : "white"}
+                  color={
+                    isDisableIncreament
+                      ? theme.iconMuted
+                      : isDark
+                        ? "#0b0b0f"
+                        : "white"
+                  }
                 />
               </TouchableOpacity>
 
-              <Text className="mx-3 font-jost">{qty}</Text>
+              <BodyText
+                weight="medium"
+                tone={theme.headingTone}
+                className="mx-3"
+              >
+                {qty}
+              </BodyText>
 
               <TouchableOpacity
-                className="px-3 py-2 bg-black border border-black rounded"
+                className={classNames(
+                  "px-3 py-2 border rounded",
+                  isDark ? "border-white bg-white" : "border-black bg-black"
+                )}
                 onPress={onIncrement}
               >
-                <Ionicons name="add" size={14} color="white" />
+                <Ionicons
+                  name="add"
+                  size={14}
+                  color={isDark ? "#0b0b0f" : "white"}
+                />
               </TouchableOpacity>
             </View>
 
@@ -207,9 +253,9 @@ const CartCard: React.FC<CartCardProps> = ({
                 hitSlop={8}
                 className="items-center"
               >
-                <Text className="text-base text-red-600 font-jost-semibold">
+                <BodyText size="md" weight="semibold" tone="danger">
                   Remove
-                </Text>
+                </BodyText>
               </TouchableOpacity>
             </View>
           </View>
@@ -222,9 +268,9 @@ const CartCard: React.FC<CartCardProps> = ({
           disabled
           className="px-4 py-2 border border-gray-300 rounded-xl w-fit"
         >
-          <Text className="text-sm font-jost text-secondary">
+          <BodyText size="sm" tone={theme.labelTone}>
             Save for later
-          </Text>
+          </BodyText>
         </TouchableOpacity>
 
         {/* Trash Icon */}

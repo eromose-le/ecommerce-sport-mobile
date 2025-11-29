@@ -1,5 +1,8 @@
+import { useTheme, useThemedStyles } from "@/providers/theme";
 import React from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import { TouchableOpacity, View } from "react-native";
+import classNames from "classnames";
+import { BodyText } from "../ui";
 
 interface EmptyStateProps {
   error?: any;
@@ -16,8 +19,17 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   EmptyComponent,
   icon,
 }) => {
-  const defaultContainer =
-    "items-center px-5 py-8 w-full border border-background bg-white rounded-2xl";
+  const theme = useThemedStyles();
+  const { isDark } = useTheme();
+  const defaultContainer = classNames(
+    "items-center px-5 py-8 w-full border rounded-2xl",
+    theme.mutedSurface || theme.surface
+  );
+  const retryButtonClass = classNames(
+    "self-center px-3 py-1 mt-2 rounded-full",
+    isDark ? "bg-white" : "bg-black"
+  );
+  const retryTextTone = isDark ? "primary" : "inverse";
 
   if (EmptyComponent) {
     return (
@@ -32,18 +44,23 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
       <>
         {icon}
 
-        <Text className="mb-0 text-center font-jost-medium">
+        <BodyText
+          weight="medium"
+          tone={theme.bodyTone}
+          align="center"
+          className="mb-0"
+        >
           {error ? error : "No data available"}
-        </Text>
+        </BodyText>
 
         {onRetry && (
           <TouchableOpacity
             onPress={onRetry}
-            className="self-center px-3 py-1 mt-2 bg-green-500 rounded-full"
+            className={retryButtonClass}
           >
-            <Text className="text-xs font-medium text-white font-jost-medium">
+            <BodyText size="xs" weight="medium" tone={retryTextTone}>
               Retry
-            </Text>
+            </BodyText>
           </TouchableOpacity>
         )}
       </>

@@ -1,5 +1,6 @@
 import { PRODUCT_DETAIL } from "@/constants/urls";
 import { calculatePercentageDecrease } from "@/helpers/product-discount";
+import { useThemedStyles } from "@/providers/theme";
 import { Product } from "@/services/product/product.types";
 import { useCartStore } from "@/store/useCartStore";
 import { formatCurrency } from "@/utils/currency";
@@ -9,6 +10,7 @@ import classNames from "classnames";
 import { Link } from "expo-router";
 import React from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
+import { BodyText } from "../ui";
 
 interface ProductCardProps {
   product: Product;
@@ -24,6 +26,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   width,
   onAddToCart,
 }) => {
+  const theme = useThemedStyles();
   const { addToCart } = useCartStore();
   const discountCap = calculatePercentageDecrease({
     price: Number(product?.price),
@@ -41,7 +44,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     >
       <TouchableOpacity
         style={{ width }}
-        className="relative p-3 bg-white"
+        className={`relative p-3 ${theme.pageBg}`}
         activeOpacity={0.8}
       >
         {/* NOTE: sales */}
@@ -66,49 +69,78 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           className={`w-full ${horizontal ? "h-32" : "h-40"} bg-[#F5F5F7]`}
           resizeMode="cover"
         />
-
-        <Text
-          className="mt-3 mb-1 text-base font-jost-medium"
+        <BodyText
+          size="md"
+          align="left"
+          weight="medium"
+          tone={theme.bodyTone}
           numberOfLines={1}
+          className="mt-3 mb-1"
         >
           {product?.name}
-        </Text>
+        </BodyText>
 
-        <Text
-          className="mb-2 text-sm text-secondary font-jost"
+        <BodyText
+          size="sm"
+          align="left"
+          weight="light"
+          tone={theme.labelTone}
           numberOfLines={1}
+          className="mb-2"
         >
           {product?.description}
-        </Text>
+        </BodyText>
 
         <View className="flex-row items-center justify-between">
           <>
             {discountCap ? (
               <View className="space-y-0.5">
-                <Text className="text-base line-through text-secondary font-jost-medium">
+                <BodyText
+                  size="md"
+                  align="left"
+                  weight="medium"
+                  tone={theme.labelTone}
+                  numberOfLines={1}
+                  className="line-through "
+                >
                   {formatCurrency(product?.price || 0)}
-                </Text>
-                <Text className="text-base text-primary font-jost-semibold">
+                </BodyText>
+
+                <BodyText
+                  size="md"
+                  align="left"
+                  weight="semibold"
+                  tone={theme.bodyTone}
+                  numberOfLines={1}
+                  className=""
+                >
                   {formatCurrency(product?.salesPrice || 0)}
-                </Text>
+                </BodyText>
               </View>
             ) : (
-              <Text className="text-base text-primary font-jost-semibold">
+              <BodyText
+                size="md"
+                align="left"
+                weight="semibold"
+                tone={theme.bodyTone}
+                numberOfLines={1}
+                className=""
+              >
                 {formatCurrency(product?.price || 0)}
-              </Text>
+              </BodyText>
             )}
           </>
 
           {/* Separate button for add-to-cart to avoid blocking Link */}
           <TouchableOpacity
-            className="hidden p-2 bg-black rounded-full "
+            className={`hidden p-2 rounded-full ${theme.pageBgInverse}`}
             onPress={(e) => {
               e.stopPropagation(); // prevent triggering the Link
               onAddToCart?.();
               addToCart(product, true);
             }}
           >
-            <Ionicons name="add" size={16} color="white" />
+            <Ionicons name="add" size={16} color={theme.pageBgInverse} />
           </TouchableOpacity>
         </View>
       </TouchableOpacity>

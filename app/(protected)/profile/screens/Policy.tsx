@@ -1,28 +1,38 @@
 import ScrollableForm from "@/components/common/ScrollableForm";
 import { COMPANY_INFO } from "@/constants/company";
 import React from "react";
-import { Text, View } from "react-native";
+import { View } from "react-native";
+import { BodyText, Heading } from "@/components/ui";
+import { useThemedStyles, useTheme } from "@/providers/theme";
 
 const Policy = ({ type }: { type: "privacy" | "terms" }) => {
+  const theme = useThemedStyles();
+  const { isDark } = useTheme();
   return (
     <ScrollableForm>
-      <Text className="mb-4 text-lg font-jost-bold text-primary">
+      <Heading level="h3" weight="bold" tone={theme.headingTone} className="mb-4">
         {type === "privacy" ? "Privacy policy" : "Terms & conditions"}
-      </Text>
+      </Heading>
       {policySections[type].map((section) => (
         <View
           key={section.title}
-          className="p-4 mb-4 bg-white border border-gray-100 shadow-sm rounded-2xl"
+          className="p-4 mb-4 border shadow-sm rounded-2xl"
+          style={{
+            borderColor: isDark ? "#1f2937" : "#e5e7eb",
+            backgroundColor: isDark ? "#0f172a" : "#ffffff",
+          }}
         >
-          <Text className="mb-2 text-base font-jost-semibold text-primary">
+          <BodyText size="md" weight="semibold" tone={theme.headingTone} className="mb-2">
             {section.title}
-          </Text>
-          <Text className="text-sm text-secondary">{section.description}</Text>
+          </BodyText>
+          <BodyText size="sm" tone={theme.labelTone}>
+            {section.description}
+          </BodyText>
         </View>
       ))}
-      <Text className="mt-6 text-xs text-secondary">
+      <BodyText size="xs" tone={theme.labelTone} className="mt-6">
         For full legal documentation, contact us via {COMPANY_INFO.email}.
-      </Text>
+      </BodyText>
     </ScrollableForm>
   );
 };
@@ -44,7 +54,7 @@ const policySections = {
     {
       title: "Your controls",
       description:
-        "You can request updates or deletion of your data at any time by contacting support@sportygalaxy.com.",
+        `You can request updates or deletion of your data at any time by contacting ${COMPANY_INFO.email}`,
     },
   ],
   terms: [

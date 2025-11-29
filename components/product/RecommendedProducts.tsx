@@ -7,8 +7,9 @@ import {
 } from "@/services/product/product.types";
 import { useQuery } from "@tanstack/react-query";
 import React, { useMemo } from "react";
-import { Text, View } from "react-native";
+import { View } from "react-native";
 
+import { Heading } from "../ui";
 import { ProductGrid } from "./ProductGrid";
 
 type RecommendedProductsProps = {
@@ -57,9 +58,9 @@ export const RecommendedProducts: React.FC<RecommendedProductsProps> = ({
 
   return (
     <View className="px-4 mt-8 mb-0">
-      <Text className="mb-3 text-lg font-jost-bold">
+      <Heading level="h4" weight="bold" className="mb-3">
         Other recommended products
-      </Text>
+      </Heading>
 
       <ProductGrid
         data={recommendedProducts}

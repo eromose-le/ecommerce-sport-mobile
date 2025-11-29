@@ -1,6 +1,7 @@
 import { BackButton } from "@/components/common/BackButton";
 import { PRODUCT_DETAIL } from "@/constants/urls";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
+import { useTheme, useThemedStyles } from "@/providers/theme";
 import { ProductService } from "@/services/api";
 import { TProduct } from "@/services/product/product.types";
 import { AppToast } from "@/utils/toast";
@@ -13,7 +14,6 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  Text,
   TextInput,
   TouchableOpacity,
   View,
@@ -21,11 +21,14 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { EmptyState } from "../common/EmptyState";
 import { LoadingContent } from "../common/LoadingContent";
+import { BodyText } from "../ui";
 
 export default function Search() {
   const inputRef = useRef<TextInput>(null);
   const [query, setQuery] = useState("");
   const debouncedQuery = useDebouncedValue(query.trim(), 300);
+  const theme = useThemedStyles();
+  const { isDark } = useTheme();
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -62,16 +65,19 @@ export default function Search() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
+    <SafeAreaView className={`flex-1 ${theme.pageBg}`}>
       <View className="flex-row gap-2 px-4 pb-3">
         <BackButton />
-        <View className="flex-row flex-1 items-center px-4 py-3 bg-white border border-[#E5E7EB] rounded-2xl">
-          <Ionicons name="search-outline" size={18} color="#9CA3AF" />
+        <View
+          className="flex-row items-center flex-1 px-4 py-3 border rounded-2xl"
+          style={{ borderColor: isDark ? "#1f2937" : "#E5E7EB" }}
+        >
+          <Ionicons name="search-outline" size={18} color={theme.iconMuted} />
           <TextInput
             ref={inputRef}
             placeholder="Type your search here"
-            placeholderTextColor="#9CA3AF"
-            className="flex-1 ml-3 text-base text-primary font-jost"
+            placeholderTextColor={theme.placeholderColor}
+            className="flex-1 ml-3 text-base font-jost"
             value={query}
             onChangeText={setQuery}
             autoCapitalize="none"
@@ -80,7 +86,7 @@ export default function Search() {
           />
           {query.length > 0 && (
             <TouchableOpacity onPress={() => setQuery("")} hitSlop={8}>
-              <Ionicons name="close-circle" size={18} color="#9CA3AF" />
+              <Ionicons name="close-circle" size={18} color={theme.iconMuted} />
             </TouchableOpacity>
           )}
         </View>
@@ -134,11 +140,15 @@ export default function Search() {
               {productsResponse?.map((product) => (
                 <TouchableOpacity
                   key={product.id}
-                  className="flex-row items-center py-3 border-b border-[#F1F5F9]"
+                  className="flex-row items-center py-3 border-b"
+                  style={{ borderColor: isDark ? "#1f2937" : "#F1F5F9" }}
                   onPress={() => handleSelect(product)}
                   activeOpacity={0.8}
                 >
-                  <View className="items-center justify-center w-12 h-12 mr-3 bg-[#F1F5F9] rounded-full overflow-hidden">
+                  <View
+                    className="items-center justify-center w-12 h-12 mr-3 overflow-hidden rounded-full"
+                    style={{ backgroundColor: isDark ? "#111827" : "#F1F5F9" }}
+                  >
                     {product.displayImage ? (
                       <Image
                         source={{ uri: product.displayImage }}
@@ -146,16 +156,24 @@ export default function Search() {
                         resizeMode="cover"
                       />
                     ) : (
-                      <Ionicons name="cube-outline" size={20} color="#9CA3AF" />
+                      <Ionicons
+                        name="cube-outline"
+                        size={20}
+                        color={theme.iconMuted}
+                      />
                     )}
                   </View>
                   <View className="flex-1">
-                    <Text className="text-base font-jost-medium text-primary">
+                    <BodyText
+                      size="md"
+                      weight="medium"
+                      tone={theme.headingTone}
+                    >
                       {product.name}
-                    </Text>
-                    <Text className="text-xs text-secondary font-jost">
+                    </BodyText>
+                    <BodyText size="xs" tone={theme.labelTone}>
                       ₦{Number(product.price || 0).toLocaleString()}
-                    </Text>
+                    </BodyText>
                   </View>
                 </TouchableOpacity>
               ))}

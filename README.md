@@ -24,8 +24,8 @@ npm run reset-project
 
 <!--
 TASK LIST
-1.  web mobile product detail page spacing on key attribute and specification
-2.  night mood
+1.  web mobile product detail page spacing on key attribute and specification ✅
+2.  night mood ✅
 3. propagate the public index ✅
 4. introduct the default pagination constant and limit ✅
 5. setup custom forms (login / register / forgot password / reset password) ✅
@@ -39,10 +39,10 @@ TASK LIST
 13. categories ✅
 14. image slider ✅
 15. wire product detail screen ✅
-16. add similar product section to product-detail page
-17. checkout page
-18. delivery / shiping fee
-19. paystack integration
+16. add similar product section to product-detail page ✅
+17. checkout page ✅
+18. delivery / shiping fee ✅
+19. paystack integration ✅
 
  -->
 <!--

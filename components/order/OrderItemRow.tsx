@@ -4,8 +4,10 @@ import { Order, OrderItem } from "@/services/order/order.types";
 import { resolveImageSource } from "@/utils/images";
 import { router } from "expo-router";
 import React, { useMemo, useState } from "react";
-import { Image, Text, TouchableOpacity, View } from "react-native";
+import { Image, TouchableOpacity, View } from "react-native";
 import { SecondaryButton } from "../ui";
+import { BodyText } from "../ui";
+import { useThemedStyles, useTheme } from "@/providers/theme";
 
 const OrderItemRow = ({
   order,
@@ -16,6 +18,8 @@ const OrderItemRow = ({
   item: OrderItem;
   isFirst?: boolean;
 }) => {
+  const theme = useThemedStyles();
+  const { isDark } = useTheme();
   const product = item?.product;
   const [showReview, setShowReview] = useState(false);
   const productId = useMemo(
@@ -49,7 +53,7 @@ const OrderItemRow = ({
   return (
     <View
       className={`flex-row items-center gap-3 py-3 ${
-        isFirst ? "pt-0" : "border-t border-gray-100"
+        isFirst ? "pt-0" : isDark ? "border-t border-gray-800" : "border-t border-gray-100"
       }`}
     >
       <Image
@@ -57,31 +61,32 @@ const OrderItemRow = ({
         className="w-16 h-16 rounded-lg"
       />
       <View className="flex-1">
-        <Text
-          className="text-sm font-jost-medium text-primary"
-          numberOfLines={2}
-        >
+        <BodyText size="sm" weight="medium" tone={theme.headingTone} numberOfLines={2}>
           {product?.name || "Unnamed product"}
-        </Text>
-        <Text className="text-xs text-secondary">
+        </BodyText>
+        <BodyText size="xs" tone={theme.labelTone}>
           Qty: {item?.quantity ?? 1}
-        </Text>
-        <Text className="text-xs text-secondary">Item #{item?.orderId}</Text>
+        </BodyText>
+        <BodyText size="xs" tone={theme.labelTone}>
+          Item #{item?.orderId}
+        </BodyText>
       </View>
       <View className="items-end gap-2">
         {canReview ? (
           <TouchableOpacity
             onPress={() => setShowReview(true)}
-            className="px-4 py-2 bg-black rounded-full"
+            className={`px-4 py-2 rounded-full ${isDark ? "bg-white" : "bg-black"}`}
             activeOpacity={0.8}
           >
-            <Text className="text-xs text-white font-jost-medium">Review</Text>
+            <BodyText size="xs" weight="medium" tone={isDark ? "primary" : "inverse"}>
+              Review
+            </BodyText>
           </TouchableOpacity>
         ) : item?.reviewed ? (
-          <View className="px-4 py-2 rounded-full bg-green-50">
-            <Text className="text-xs text-green-700 font-jost-medium">
+          <View className={isDark ? "px-4 py-2 rounded-full bg-green-900/40" : "px-4 py-2 rounded-full bg-green-50"}>
+            <BodyText size="xs" weight="medium" tone={isDark ? "inverse" : "success"}>
               Reviewed
-            </Text>
+            </BodyText>
           </View>
         ) : null}
 

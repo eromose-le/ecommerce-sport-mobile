@@ -1,6 +1,7 @@
 import { LoadingContent } from "@/components/common/LoadingContent";
 import StarRating from "@/components/review/StarRating";
 import { getRatingComment } from "@/helpers/rating-review-map";
+import { useThemedStyles } from "@/providers/theme";
 import { ReviewService } from "@/services/api";
 import { Review } from "@/services/review/review.types";
 import { safeFormatDate } from "@/utils/date";
@@ -11,7 +12,7 @@ import React, { useEffect, useState } from "react";
 import { ActivityIndicator, Image, Text, View } from "react-native";
 import { EmptyState } from "../common/EmptyState";
 import ReviewPaginationButton from "../review/ReviewPaginationButton";
-import { SecondaryButton } from "../ui";
+import { BodyText, Heading, SecondaryButton } from "../ui";
 
 type ProductReviewsProps = {
   productId?: string | number;
@@ -24,6 +25,7 @@ export default function ProductReviews({
   pageSize = 3,
   onAddReview,
 }: ProductReviewsProps) {
+  const theme = useThemedStyles();
   const [page, setPage] = useState(1);
   const stringProductId = productId ? String(productId) : undefined;
 
@@ -89,12 +91,12 @@ export default function ProductReviews({
   if (!stringProductId) {
     return (
       <View className="px-4 mt-8">
-        <Text className="text-lg font-jost-bold text-primary">
+        <Heading level="h4" weight="bold">
           Ratings & Reviews
-        </Text>
-        <Text className="mt-2 text-sm text-secondary">
+        </Heading>
+        <BodyText size="sm" tone={theme.labelTone} className="mt-2">
           Reviews are unavailable for this product.
-        </Text>
+        </BodyText>
       </View>
     );
   }
@@ -102,29 +104,32 @@ export default function ProductReviews({
   return (
     <View className="px-4 mt-8">
       <View className="flex-row items-center justify-between mb-1">
-        <Text className="text-lg font-jost-bold text-primary">
+        <Heading level="h4" weight="bold">
           Ratings & Reviews
-        </Text>
+        </Heading>
 
         {onAddReview && (
           <SecondaryButton
             size="sm"
             title="Write review"
             onPress={onAddReview}
+            className={theme.secondaryButtonClass}
+            textClassName={theme.secondaryTextClass}
+            spinnerColor={theme.secondarySpinnerColor}
           />
         )}
       </View>
 
       <View className="flex-row items-center gap-2">
-        <Text className="text-2xl font-jost-bold text-primary">
+        <Heading level="h2" weight="bold">
           {averageRating?.toFixed(1) ?? "0.0"}
-          <Text className="text-sm text-primary font-jost">
+          <BodyText size="sm" weight="medium">
             /{totalReviews}
-          </Text>
-        </Text>
-        <Text className="text-base text-primary font-jost">
+          </BodyText>
+        </Heading>
+        <BodyText size="md" weight="medium">
           {summaryComment}
-        </Text>
+        </BodyText>
       </View>
 
       <LoadingContent

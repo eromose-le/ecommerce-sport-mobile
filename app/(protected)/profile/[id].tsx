@@ -5,8 +5,10 @@ import {
 } from "@/components/profile/profile-constants";
 import { ScreenComponentProps, ScreenKey } from "@/types/profile";
 import { useLocalSearchParams } from "expo-router";
-import { Text, View } from "react-native";
+import { View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useThemedStyles } from "@/providers/theme";
+import { BodyText } from "@/components/ui";
 import ComingSoon from "./screens/ComingSoon";
 import DeliveryAddress from "./screens/DeliveryAddress";
 import Faq from "./screens/Faq";
@@ -31,18 +33,28 @@ const SCREEN_COMPONENTS: Partial<
 
 export default function ProfileDetailScreen() {
   const params = useLocalSearchParams<{ id?: string }>();
+  const theme = useThemedStyles();
   const screenKey = (params.id as ScreenKey) || profileKeys.userProfile;
   const ScreenComponent = SCREEN_COMPONENTS[screenKey] ?? ComingSoon;
   const title = SCREEN_LABELS[screenKey] || "Profile";
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
-      <View className="flex-row items-center px-6 py-4 border-b border-gray-100">
+    <SafeAreaView className={`flex-1 ${theme.pageBg}`}>
+      <View
+        className="flex-row items-center px-6 py-4 border-b"
+        style={{ borderColor: theme.isDark ? "#1f2937" : "#e5e7eb" }}
+      >
         <BackButton />
 
-        <Text className="flex-1 pr-8 text-lg text-center font-jost-bold text-primary">
+        <BodyText
+          size="lg"
+          weight="bold"
+          tone={theme.headingTone}
+          align="center"
+          className="flex-1 pr-8"
+        >
           {title}
-        </Text>
+        </BodyText>
       </View>
 
       <View className="flex-1">

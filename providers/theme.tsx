@@ -18,61 +18,73 @@ type ThemeStyles = {
   bodyTone: "primary" | "secondary" | "muted" | "inverse";
   labelTone: "primary" | "secondary" | "muted" | "inverse";
   inputClassName: string;
+  inputClassNameInverse: string;
   placeholderColor: string;
   iconMuted: string;
   successIcon: string;
   primaryButtonClass: string;
   primaryTextClass: string;
+  primaryTextClassInverse: string;
   primarySpinnerColor: string;
   secondaryButtonClass: string;
   secondaryTextClass: string;
   secondarySpinnerColor: string;
   linkTextClass: string;
   linkSpinnerColor: string;
+  primaryBorderColor: string;
+  pageBgInverse: string;
 };
 
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
-const THEME_STYLES: Record<ThemeMode, ThemeStyles> = {
+export const THEME_STYLES: Record<ThemeMode, ThemeStyles> = {
   light: {
     pageBg: "bg-background",
+    pageBgInverse: "bg-[#0b0b0f]",
     surface: "bg-white border-[#0000001A]",
-    mutedSurface: "bg-light-100 border border-[#0000001A]",
+    mutedSurface: "bg-light-100",
     headingTone: "primary",
     bodyTone: "primary",
     labelTone: "primary",
     inputClassName: "",
-    placeholderColor: "#9CA3AF",
+    inputClassNameInverse: "",
+    placeholderColor: "#aaaaaa",
     iconMuted: "#6B7280",
     successIcon: "#10B981",
     primaryButtonClass: "",
-    primaryTextClass: "",
-    primarySpinnerColor: "#fff",
+    primaryTextClass: "text-black",
+    primaryTextClassInverse: "text-white",
+    primarySpinnerColor: "#000",
     secondaryButtonClass: "",
-    secondaryTextClass: "",
+    secondaryTextClass: "text-black",
     secondarySpinnerColor: "#000",
-    linkTextClass: "",
+    linkTextClass: "text-black",
     linkSpinnerColor: "#000",
+    primaryBorderColor: "border-[#0000001A]",
   },
   dark: {
-    pageBg: "bg-[#0b0b0f]",
+    pageBg: "bg-black",
+    pageBgInverse: "bg-background",
     surface: "bg-[#0f172a] border-[#1f2937]",
-    mutedSurface: "bg-[#111827] border border-[#1f2937]",
+    mutedSurface: "bg-[#111827]",
     headingTone: "inverse",
     bodyTone: "inverse",
-    labelTone: "inverse",
+    labelTone: "secondary",
     inputClassName: "bg-[#0f172a] border-[#1f2937] text-white",
-    placeholderColor: "#9CA3AF",
+    inputClassNameInverse: "bg-[#0f172a] border-[#1f2937] text-white",
+    placeholderColor: "#aaaaaa",
     iconMuted: "#cbd5e1",
     successIcon: "#34d399",
-    primaryButtonClass: "border border-white/10",
-    primaryTextClass: "",
+    primaryButtonClass: "border border-background bg-background",
+    primaryTextClass: "text-white",
+    primaryTextClassInverse: "text-black",
     primarySpinnerColor: "#fff",
-    secondaryButtonClass: "border-white/70",
-    secondaryTextClass: "text-white",
+    secondaryButtonClass: "border-background",
+    secondaryTextClass: "text-secondary",
     secondarySpinnerColor: "#f3f4f6",
     linkTextClass: "text-white",
     linkSpinnerColor: "#f3f4f6",
+    primaryBorderColor: "border-background",
   },
 };
 
@@ -106,7 +118,7 @@ export const useTheme = () => {
   return ctx;
 };
 
-export const useThemedStyles = () => {
+export const useThemedStyles = (mood?: "light" | "dark") => {
   const { theme } = useTheme();
-  return THEME_STYLES[theme];
+  return THEME_STYLES[mood ?? theme];
 };

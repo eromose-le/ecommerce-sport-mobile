@@ -1,7 +1,8 @@
 import { BackButton } from "@/components/common/BackButton";
 import { TabBarIcon } from "@/components/common/TabBarIcon";
+import { Heading } from "@/components/ui";
 import { JSX } from "react";
-import { Text, View } from "react-native";
+import { View } from "react-native";
 
 export function tabScreenOptions({
   Icon,
@@ -10,6 +11,7 @@ export function tabScreenOptions({
   rightAction,
   badgeCount,
   showBack = true,
+  isDark = false,
 }: {
   Icon: any;
   label: string;
@@ -17,6 +19,7 @@ export function tabScreenOptions({
   rightAction?: () => JSX.Element;
   badgeCount?: number;
   showBack?: boolean;
+  isDark?: boolean;
 }) {
   return {
     title,
@@ -25,9 +28,10 @@ export function tabScreenOptions({
     // HEADER STYLING
     headerStyle: {
       height: 110,
-      borderBottomWidth: 0,
+      borderBottomWidth: 0.2,
       elevation: 0,
       shadowOpacity: 0,
+      backgroundColor: isDark ? "#0B0B0F" : "#FFFFFF",
     },
 
     // TAB ICON
@@ -42,7 +46,9 @@ export function tabScreenOptions({
 
     // HEADER TITLE
     headerTitle: () => (
-      <Text className="text-xl text-center font-jost-semibold">{title}</Text>
+      <Heading level="h3" align="center" weight="semibold">
+        {title}
+      </Heading>
     ),
 
     // HEADER LEFT — BACK BUTTON

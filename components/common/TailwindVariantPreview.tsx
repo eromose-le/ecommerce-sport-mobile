@@ -1,4 +1,5 @@
 import { useTheme, useThemedStyles } from "@/providers/theme";
+import { Logger } from "@/utils/logger";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { ScrollView, Switch, Text, View } from "react-native";
@@ -19,6 +20,8 @@ import {
 const TailwindVariantPreview = () => {
   const { theme: themeKey, setTheme } = useTheme();
   const theme = useThemedStyles();
+
+  Logger.warn("theme -tt", themeKey, theme);
 
   return (
     <ScrollView

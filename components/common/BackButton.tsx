@@ -1,4 +1,5 @@
 import DirectLeftIcon from "@/assets/icons/direct-left.svg";
+import { useThemedStyles } from "@/providers/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React from "react";
@@ -51,26 +52,20 @@ export const BackButton: React.FC<BackButtonProps> = ({
   style,
   icon,
 }) => {
+  const theme = useThemedStyles();
   const router = useRouter();
-
-  const background =
-    variant === "light"
-      ? "bg-transparent border border-[#0000001A]"
-      : variant === "dark"
-        ? "bg-black/20"
-        : "bg-transparent";
 
   return (
     <TouchableOpacity
       onPress={onPress ?? (() => router.back())}
-      className={`p-3 rounded-full ${background} ${className}`}
+      className={`p-3 rounded-full bg-transparent border ${theme.surface} ${className}`}
       style={style}
       activeOpacity={0.8}
     >
       {icon ? (
-        <Ionicons name={icon} size={size} color={color} />
+        <Ionicons name={icon} size={size} color={theme.iconMuted} />
       ) : (
-        <SvgIcon Icon={DirectLeftIcon} size={size} color={color} />
+        <SvgIcon Icon={DirectLeftIcon} size={size} color={theme.iconMuted} />
       )}
     </TouchableOpacity>
   );

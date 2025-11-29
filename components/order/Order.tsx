@@ -1,16 +1,19 @@
 import { useAuth } from "@/providers/auth";
+import { useThemedStyles } from "@/providers/theme";
 import { OrderService } from "@/services/api";
 import { Ionicons } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { RefreshControl, ScrollView, Text, View } from "react-native";
+import { RefreshControl, ScrollView, View } from "react-native";
 import { EmptyState } from "../common/EmptyState";
 import { LoadingContent } from "../common/LoadingContent";
+import { BodyText } from "../ui";
 import OrderCard from "./OrderCard";
 import OrderPaginationButton from "./OrderPaginationButton";
 
 const Order = () => {
   const { user } = useAuth();
+  const theme = useThemedStyles();
   const [page, setPage] = useState(1);
   const limit = 3;
   const { data, error, isLoading, refetch, isRefetching } = useQuery({
@@ -32,7 +35,9 @@ const Order = () => {
   if (!user?.id) {
     return (
       <EmptyState
-        icon={<Ionicons name={"cart-outline"} size={38} color="#ddd" />}
+        icon={
+          <Ionicons name={"cart-outline"} size={38} color={theme.iconMuted} />
+        }
         error="Sign in to view your orders."
       />
     );
@@ -40,7 +45,7 @@ const Order = () => {
 
   return (
     <ScrollView
-      className="flex-1 px-2 bg-background"
+      className={`flex-1 px-2 ${theme.pageBg}`}
       contentContainerStyle={{ paddingBottom: 32 }}
       refreshControl={
         <RefreshControl refreshing={isRefetching} onRefresh={() => refetch()} />
@@ -52,10 +57,14 @@ const Order = () => {
         onRetry={refetch}
         data={ordersResponse}
         EmptyComponent={(error, onRetry) => (
-          <View className="items-center">
+          <View className="items-center mt-4">
             <EmptyState
               icon={
-                <Ionicons name={"bag-handle-outline"} size={38} color="#ddd" />
+                <Ionicons
+                  name={"bag-handle-outline"}
+                  size={38}
+                  color={theme.iconMuted}
+                />
               }
               error="No orders yet"
               onRetry={onRetry}
@@ -75,9 +84,9 @@ const Order = () => {
                 disabled={page === 1}
                 onPress={() => setPage((p) => Math.max(1, p - 1))}
               />
-              <Text className="text-sm text-secondary">
+              <BodyText size="sm" tone={theme.labelTone}>
                 Page {page} of {totalPages}
-              </Text>
+              </BodyText>
               <OrderPaginationButton
                 icon="chevron-forward"
                 disabled={page === totalPages}

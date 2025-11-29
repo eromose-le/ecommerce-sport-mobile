@@ -3,7 +3,8 @@ import AppLoader from "@/components/common/AppLoader";
 import PasswordField from "@/components/common/PasswordField";
 import { SvgIcon } from "@/components/common/SvgIcon";
 import TextField from "@/components/common/TextField";
-import { LinkButton, PrimaryButton } from "@/components/ui";
+import { BodyText, LinkButton, PrimaryButton } from "@/components/ui";
+import SafeContainer from "@/components/ui/layout/safe-container";
 import {
   FORGOT_PASSWORD,
   ON_BOARDING,
@@ -13,12 +14,14 @@ import {
 } from "@/constants/urls";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import { useAuth } from "@/providers/auth";
+import { useThemedStyles, useTheme } from "@/providers/theme";
 import { AuthService } from "@/services/api";
 import { ILoginUserPayload } from "@/services/auth/auth.types";
 import { User } from "@/services/user/user.types";
 import { Logger } from "@/utils/logger";
 import { AppToast } from "@/utils/toast";
 import { useMutation } from "@tanstack/react-query";
+import classNames from "classnames";
 import { router, useLocalSearchParams } from "expo-router";
 import { useFormik } from "formik";
 import { useEffect, useRef, useState } from "react";
@@ -36,7 +39,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { InferType, object, string } from "yup";
 
 const { height } = Dimensions.get("window");
@@ -59,6 +61,8 @@ const signInSchema = object({
 type SignInFormValues = InferType<typeof signInSchema>;
 
 export default function SignIn() {
+  const theme = useThemedStyles();
+  const { isDark } = useTheme();
   const params = useLocalSearchParams<{ fromOnboarding?: string }>();
   const cameFromOnboarding = params?.fromOnboarding === "true";
   const { login, user, skipLogin } = useAuth();
@@ -164,7 +168,7 @@ export default function SignIn() {
   }, [imageHeight]);
 
   return (
-    <View className="flex-1 bg-white">
+    <View className={`flex-1 ${theme.pageBg}`}>
       <StatusBar
         barStyle="light-content"
         backgroundColor="transparent"
@@ -179,7 +183,11 @@ export default function SignIn() {
       />
 
       <Animated.View style={{ marginTop: formOffset, flex: 1 }}>
-        <SafeAreaView className="flex-1">
+        <SafeContainer
+          padding="sm"
+          gap="md"
+          className={`${theme.pageBg} flex-1`}
+        >
           <KeyboardAvoidingView
             behavior={Platform.OS === "ios" ? "padding" : undefined}
             className="flex-1"
@@ -190,17 +198,21 @@ export default function SignIn() {
               contentContainerStyle={{ paddingBottom: 40 }}
             >
               <View className="flex-row items-center justify-center gap-3 mb-6">
-                <TouchableOpacity
-                  className="relative p-3 rounded-full bg-transparent border border-[#0000001A]"
-                  onPress={handleSkip}
-                  disabled={loginMutation.isPending}
-                >
-                  <SvgIcon Icon={DirectLeftIcon} size={16} color={"#000"} />
-                </TouchableOpacity>
-                <Text className="text-2xl text-primary font-jost-bold">
-                  Log in
-                </Text>
-              </View>
+              <TouchableOpacity
+                className={`relative p-3 rounded-full bg-transparent border ${theme.primaryBorderColor}`}
+                onPress={handleSkip}
+                disabled={loginMutation.isPending}
+              >
+                <SvgIcon
+                  Icon={DirectLeftIcon}
+                  size={16}
+                  color={theme.primarySpinnerColor}
+                />
+              </TouchableOpacity>
+              <BodyText size="lg" weight="bold" tone={theme.headingTone}>
+                Log in
+              </BodyText>
+            </View>
 
               <View className="gap-3">
                 <TextField
@@ -232,7 +244,9 @@ export default function SignIn() {
                   loading={loginMutation.isPending}
                   loadingText="Signing In..."
                   disabled={!formik.isValid}
-                  className="w-full"
+                  className={`${theme.primaryButtonClass} w-full`}
+                  textClassName={theme.primaryTextClassInverse}
+                  spinnerColor={theme.primarySpinnerColor}
                 />
                 <LinkButton
                   title="Forgot password ?"
@@ -243,13 +257,22 @@ export default function SignIn() {
                       params: { email: formik.values.email.trim() },
                     })
                   }
+                  textClassName={theme.linkTextClass}
+                  spinnerColor={theme.linkSpinnerColor}
                 />
               </View>
 
-              <View className="items-center">
-                <Text className="mb-4 text-[9px] text-center text-primary font-jost-medium">
-                  Sign up with:
-                </Text>
+              <View className="items-center mt-1">
+                <View className="mb-4">
+                  <BodyText
+                    size="xs"
+                    align="center"
+                    weight="medium"
+                    tone={theme.labelTone}
+                  >
+                    Sign up with:
+                  </BodyText>
+                </View>
 
                 <View className="flex-row justify-between w-full gap-6 px-12 mb-10">
                   <View>
@@ -280,16 +303,20 @@ export default function SignIn() {
                   title="Create Account"
                   onPress={handleRegister}
                   disabled={loginMutation.isPending}
+                  textClassName={theme.linkTextClass}
+                  spinnerColor={theme.linkSpinnerColor}
                 />
                 <LinkButton
                   title="Skip for now?"
                   onPress={handleSkip}
                   disabled={loginMutation.isPending}
+                  textClassName={theme.linkTextClass}
+                  spinnerColor={theme.linkSpinnerColor}
                 />
               </View>
             </ScrollView>
           </KeyboardAvoidingView>
-        </SafeAreaView>
+        </SafeContainer>
       </Animated.View>
 
       {loadingOverlay && (

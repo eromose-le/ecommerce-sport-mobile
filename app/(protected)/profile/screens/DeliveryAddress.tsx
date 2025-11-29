@@ -1,13 +1,14 @@
 import ScrollableForm from "@/components/common/ScrollableForm";
 import TextField from "@/components/common/TextField";
-import { PrimaryButton } from "@/components/ui";
+import { BodyText, PrimaryButton } from "@/components/ui";
 import { useUpdateProfileMutation } from "@/hooks/useUpdateProfileMutation";
 import { useAuth } from "@/providers/auth";
+import { useThemedStyles } from "@/providers/theme";
 import { IUpdateUserPayload } from "@/services/user/user.types";
 import { getFormikTextFieldProps } from "@/utils/formik";
 import { Logger } from "@/utils/logger";
 import { useFormik } from "formik";
-import { Text, View } from "react-native";
+import { View } from "react-native";
 import { InferType, object, string } from "yup";
 
 const deliveryAddressSchema = object({
@@ -19,6 +20,7 @@ type DeliveryAddressFormValues = InferType<typeof deliveryAddressSchema>;
 
 const DeliveryAddress = () => {
   const { user } = useAuth();
+  const theme = useThemedStyles();
   const updateProfile = useUpdateProfileMutation();
   const formik = useFormik<DeliveryAddressFormValues>({
     enableReinitialize: true,
@@ -41,9 +43,9 @@ const DeliveryAddress = () => {
 
   return (
     <ScrollableForm>
-      <Text className="mb-4 text-sm text-secondary">
+      <BodyText size="md" tone={theme.bodyTone} className="mb-4">
         Keep your delivery information accurate to avoid shipping delays.
-      </Text>
+      </BodyText>
 
       <View className="gap-4 mt-2">
         <TextField
@@ -75,6 +77,9 @@ const DeliveryAddress = () => {
           loading={updateProfile.isPending}
           disabled={!formik.isValid}
           title="Update address"
+          className={`${theme.primaryButtonClass}`}
+          textClassName={theme.primaryTextClassInverse}
+          spinnerColor={theme.primarySpinnerColor}
         />
       </View>
     </ScrollableForm>

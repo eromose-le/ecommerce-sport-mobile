@@ -1,4 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
+import classNames from "classnames";
 import React from "react";
 import {
   DimensionValue,
@@ -12,6 +13,7 @@ import {
   ViewStyle,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useThemedStyles } from "@/providers/theme";
 
 type ModalVariant = "bottom" | "center";
 
@@ -66,6 +68,7 @@ const Modal = ({
   dismissOnBackdropPress = true,
 }: ModalProps) => {
   const insets = useSafeAreaInsets();
+  const theme = useThemedStyles();
 
   const isBottomVariant = variant === "bottom";
 
@@ -82,6 +85,12 @@ const Modal = ({
   if (contentHeight != null) {
     baseContentStyle.height = contentHeight;
   }
+
+  const contentBaseClass = isBottomVariant
+    ? "relative rounded-t-3xl px-5 pt-5"
+    : "relative rounded-3xl px-5 pt-5";
+
+  const contentClassName = classNames(contentBaseClass, theme.mutedSurface);
 
   return (
     <ReactNativeModal
@@ -116,18 +125,17 @@ const Modal = ({
                 : { width: "90%", maxWidth: 420 }, // centered card width
             contentStyle,
           ]}
-          className={
-            isBottomVariant
-              ? "relative bg-background rounded-t-3xl px-5 pt-5"
-              : "relative bg-background rounded-3xl px-5 pt-5"
-          }
+          className={contentClassName}
         >
           <TouchableOpacity
-            className="absolute top-5 right-5 z-10 p-1 border border-[#fff] rounded-full"
+            className={classNames(
+              "absolute top-5 right-5 z-10 p-1 rounded-full border",
+              theme.primaryBorderColor
+            )}
             onPress={onClose}
             hitSlop={8}
           >
-            <Ionicons name="close" size={20} color="#aaa" />
+            <Ionicons name="close" size={20} color={theme.iconMuted} />
           </TouchableOpacity>
 
           {children}

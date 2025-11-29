@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
-import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { ScrollView, TouchableOpacity, View } from "react-native";
 
 import CartButton from "@/components/cart/CartButton";
 import ProductAttributes from "@/components/product/ProductAttributes";
@@ -9,7 +9,9 @@ import ProductDetailActions from "@/components/product/ProductDetailActions";
 import ProductGallery from "@/components/product/ProductGallery";
 import ProductReviews from "@/components/product/ProductReviews";
 import ReviewModal from "@/components/review/ReviewModal";
+import { CHECKOUT } from "@/constants/urls";
 import { accumulateAmounts } from "@/helpers/accumulate-amounts";
+import { useTheme, useThemedStyles } from "@/providers/theme";
 import { ProductService } from "@/services/api";
 import { Product } from "@/services/product/product.types";
 import { useCartStore } from "@/store/useCartStore";
@@ -19,16 +21,18 @@ import { AppToast } from "@/utils/toast";
 import { useQuery } from "@tanstack/react-query";
 import classNames from "classnames";
 import { Formik } from "formik";
-import { SafeAreaView } from "react-native-safe-area-context";
 import * as Yup from "yup";
 import AppHeader from "../common/AppHeader";
 import { EmptyState } from "../common/EmptyState";
 import { LoadingContent } from "../common/LoadingContent";
-import { RecommendedProducts } from "./RecommendedProducts";
+import { BodyText, Heading } from "../ui";
+import SafeContainer from "../ui/layout/safe-container";
 import ProductSpecifications from "./ProductSpecifications";
-import { CHECKOUT } from "@/constants/urls";
+import { RecommendedProducts } from "./RecommendedProducts";
 
 export default function ProductDetail() {
+  const theme = useThemedStyles();
+  const { isDark } = useTheme();
   const params = useLocalSearchParams<{
     id?: string;
     product?: any[];
@@ -111,9 +115,33 @@ export default function ProductDetail() {
     return accumulateAmounts([basePrice, ...modifiers]) * (values.qty || 1);
   };
 
+  const getOptionPillClass = (isActive: boolean) =>
+    classNames(
+      "px-3 py-2 rounded-full border",
+      isActive
+        ? isDark
+          ? "border-white bg-white"
+          : "border-black bg-black"
+        : isDark
+        ? "border-gray-600 bg-transparent"
+        : "border-gray-200 bg-white"
+    );
+
+  const getOptionTextTone = (isActive: boolean) =>
+    isActive ? (isDark ? "primary" : "inverse") : theme.bodyTone;
+
+  const getSwatchBorder = (isActive: boolean) =>
+    isActive
+      ? isDark
+        ? "border-white"
+        : "border-black"
+      : isDark
+      ? "border-gray-600"
+      : "border-gray-200";
+
   return (
-    <SafeAreaView className="flex-1 bg-background">
-      <View className="flex-1 bg-white">
+    <SafeContainer className={`${theme.pageBg} flex-1`}>
+      <View className="flex-1">
         <LoadingContent
           loading={isLoading || isFetching}
           loadingClassName="flex-1 flex-col items-center justify-center"
@@ -192,13 +220,19 @@ export default function ProductDetail() {
                 const totalPrice = computeTotal(values);
                 return (
                   <View className="px-4 mt-5">
-                    <Text className="text-2xl font-jost-medium">
+                    <Heading level="h2" weight="medium" tone={theme.headingTone}>
                       {item?.name}
-                    </Text>
+                    </Heading>
 
-                    <Text className="mt-1 text-sm leading-4 font-jost text-secondary">
+                    <BodyText
+                      size="sm"
+                      align="left"
+                      weight="medium"
+                      tone={theme.labelTone}
+                      className="mt-1 leading-5"
+                    >
                       {item?.description}
-                    </Text>
+                    </BodyText>
 
                     {/* Variations */}
                     {colorOptions.length +
@@ -207,15 +241,19 @@ export default function ProductDetail() {
                       dimensionOptions.length >
                       0 && (
                       <View className="gap-2 mt-5">
-                        <Text className="text-sm text-primary font-jost-bold">
+                        <BodyText size="sm" weight="bold" tone={theme.bodyTone}>
                           Variations
-                        </Text>
+                        </BodyText>
 
                         {colorOptions.length > 0 && (
                           <View>
-                            <Text className="mb-2 text-xs text-secondary">
+                            <BodyText
+                              size="xs"
+                              tone={theme.labelTone}
+                              className="mb-2"
+                            >
                               Colors ({colorOptions.length})
-                            </Text>
+                            </BodyText>
                             <View className="flex-row flex-wrap gap-3">
                               {colorOptions?.map((opt, idx) => {
                                 const isActive = values.color === opt.label;
@@ -229,11 +267,9 @@ export default function ProductDetail() {
                                         opt.price || 0
                                       );
                                     }}
-                                    className={`w-8 h-8 rounded-full border ${
+                                    className={`w-8 h-8 rounded-full border ${getSwatchBorder(
                                       isActive
-                                        ? "border-black"
-                                        : "border-gray-200"
-                                    }`}
+                                    )}`}
                                     style={{
                                       backgroundColor: opt.label.toLowerCase(),
                                     }}
@@ -246,9 +282,13 @@ export default function ProductDetail() {
 
                         {sizeOptions.length > 0 && (
                           <View>
-                            <Text className="mb-2 text-xs text-secondary">
+                            <BodyText
+                              size="xs"
+                              tone={theme.labelTone}
+                              className="mb-2"
+                            >
                               Sizes ({sizeOptions.length})
-                            </Text>
+                            </BodyText>
                             <View className="flex-row flex-wrap gap-2">
                               {sizeOptions.map((opt, idx) => {
                                 const isActive = values.size === opt.label;
@@ -262,19 +302,15 @@ export default function ProductDetail() {
                                         opt.price || 0
                                       );
                                     }}
-                                    className={`px-3 py-2 rounded-full border ${
-                                      isActive
-                                        ? "border-black bg-black"
-                                        : "border-gray-200 bg-white"
-                                    }`}
+                                    className={getOptionPillClass(isActive)}
                                   >
-                                    <Text
-                                      className={`text-xs font-jost-medium ${
-                                        isActive ? "text-white" : "text-primary"
-                                      }`}
+                                    <BodyText
+                                      size="xs"
+                                      weight="medium"
+                                      tone={getOptionTextTone(isActive)}
                                     >
                                       {opt.label}
-                                    </Text>
+                                    </BodyText>
                                   </TouchableOpacity>
                                 );
                               })}
@@ -284,9 +320,13 @@ export default function ProductDetail() {
 
                         {weightOptions.length > 0 && (
                           <View>
-                            <Text className="mb-2 text-xs text-secondary">
+                            <BodyText
+                              size="xs"
+                              tone={theme.labelTone}
+                              className="mb-2"
+                            >
                               Weights ({weightOptions.length})
-                            </Text>
+                            </BodyText>
                             <View className="flex-row flex-wrap gap-2">
                               {weightOptions.map((opt, idx) => {
                                 const isActive = values.weight === opt.label;
@@ -300,19 +340,15 @@ export default function ProductDetail() {
                                         opt.price || 0
                                       );
                                     }}
-                                    className={`px-3 py-2 rounded-full border ${
-                                      isActive
-                                        ? "border-black bg-black"
-                                        : "border-gray-200 bg-white"
-                                    }`}
+                                    className={getOptionPillClass(isActive)}
                                   >
-                                    <Text
-                                      className={`text-xs font-jost-medium ${
-                                        isActive ? "text-white" : "text-primary"
-                                      }`}
+                                    <BodyText
+                                      size="xs"
+                                      weight="medium"
+                                      tone={getOptionTextTone(isActive)}
                                     >
                                       {opt.label}
-                                    </Text>
+                                    </BodyText>
                                   </TouchableOpacity>
                                 );
                               })}
@@ -322,9 +358,13 @@ export default function ProductDetail() {
 
                         {dimensionOptions.length > 0 && (
                           <View>
-                            <Text className="mb-2 text-xs text-secondary">
+                            <BodyText
+                              size="xs"
+                              tone={theme.labelTone}
+                              className="mb-2"
+                            >
                               Dimensions ({dimensionOptions.length})
-                            </Text>
+                            </BodyText>
                             <View className="flex-row flex-wrap gap-2">
                               {dimensionOptions.map((opt, idx) => {
                                 const isActive = values.dimension === opt.label;
@@ -338,19 +378,15 @@ export default function ProductDetail() {
                                         opt.price || 0
                                       );
                                     }}
-                                    className={`px-3 py-2 rounded-full border ${
-                                      isActive
-                                        ? "border-black bg-black"
-                                        : "border-gray-200 bg-white"
-                                    }`}
+                                    className={getOptionPillClass(isActive)}
                                   >
-                                    <Text
-                                      className={`text-xs font-jost-medium ${
-                                        isActive ? "text-white" : "text-primary"
-                                      }`}
+                                    <BodyText
+                                      size="xs"
+                                      weight="medium"
+                                      tone={getOptionTextTone(isActive)}
                                     >
                                       {opt.label}
-                                    </Text>
+                                    </BodyText>
                                   </TouchableOpacity>
                                 );
                               })}
@@ -362,16 +398,27 @@ export default function ProductDetail() {
 
                     {/* Pricing & Quantity */}
                     <View className="mt-4">
-                      <Text className="text-2xl font-jost-medium">
+                      <BodyText
+                        size="md"
+                        weight="medium"
+                        tone={theme.headingTone}
+                        className="text-2xl"
+                      >
                         {formatCurrency(totalPrice)}
-                      </Text>
+                      </BodyText>
 
                       <View className="flex-row items-center gap-3 mt-4">
                         <TouchableOpacity
                           disabled={values.qty <= 1}
                           className={classNames(
-                            values.qty <= 1 && "border-[#aaa]",
-                            "flex-row items-center p-1.5 border rounded-full"
+                            "flex-row items-center p-1.5 border rounded-full",
+                            values.qty <= 1
+                              ? isDark
+                                ? "border-gray-700"
+                                : "border-gray-300"
+                              : isDark
+                              ? "border-gray-500"
+                              : "border-primary"
                           )}
                           onPress={() =>
                             setFieldValue(
@@ -383,19 +430,36 @@ export default function ProductDetail() {
                           <Ionicons
                             name="remove"
                             size={24}
-                            color={values.qty <= 1 ? "grey" : "black"}
+                            color={
+                              values.qty <= 1
+                                ? theme.iconMuted
+                                : isDark
+                                ? "#f8fafc"
+                                : "#0b0b0f"
+                            }
                           />
                         </TouchableOpacity>
-                        <Text className="text-base font-jost-medium">
+                        <BodyText
+                          size="md"
+                          weight="medium"
+                          tone={theme.headingTone}
+                        >
                           {values.qty}
-                        </Text>
+                        </BodyText>
                         <TouchableOpacity
-                          className="p-2 bg-black rounded-full"
+                          className={classNames(
+                            "p-2 rounded-full",
+                            isDark ? "bg-white" : "bg-black"
+                          )}
                           onPress={() =>
                             setFieldValue("qty", (values.qty || 1) + 1)
                           }
                         >
-                          <Ionicons name="add" size={24} color="white" />
+                          <Ionicons
+                            name="add"
+                            size={24}
+                            color={isDark ? "#0b0b0f" : "#fff"}
+                          />
                         </TouchableOpacity>
                       </View>
                     </View>
@@ -450,6 +514,6 @@ export default function ProductDetail() {
           </ScrollView>
         </LoadingContent>
       </View>
-    </SafeAreaView>
+    </SafeContainer>
   );
 }
