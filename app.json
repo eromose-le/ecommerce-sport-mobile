@@ -2,11 +2,18 @@
   "expo": {
     "name": "Sporty Galaxy Test",
     "slug": "sporty-galaxy-app-test",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
-    "icon": "./assets/images/logo.png",
+    "icon": "./assets/images/icon.png",
     "scheme": "sportygalaxyapptest",
     "userInterfaceStyle": "automatic",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "checkAutomatically": "ON_LOAD",
+      "fallbackToCacheTimeout": 0
+    },
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
@@ -15,9 +22,9 @@
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#ffffff",
-        "foregroundImage": "./assets/images/logo.png",
-        "backgroundImage": "./assets/images/logo.png",
-        "monochromeImage": "./assets/images/logo.png"
+        "foregroundImage": "./assets/images/icon.png",
+        "backgroundImage": "./assets/images/icon.png",
+        "monochromeImage": "./assets/images/icon.png"
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
@@ -30,15 +37,6 @@
     },
     "plugins": [
       "expo-router",
-      // [
-      //   "expo-router",
-      //   {
-      //     "asyncRoutes": {
-      //       "web": true,
-      //       "default": "development"
-      //     }
-      //   }
-      // ],
       [
         "expo-splash-screen",
         {
@@ -54,6 +52,12 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "e60a2dd1-0863-431a-90ef-67dc5273dddb"
+      }
     }
   }
 }

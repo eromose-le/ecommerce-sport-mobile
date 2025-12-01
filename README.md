@@ -55,4 +55,19 @@ OPTIMIZATION TECHNIQUES
 5. avoid unnecessary renders
 6. Use reanimated for smooth animations
 7. measure performance and don't guess
+
+INIT EXPO
+- LINK to expo
+npx eas-cli@latest init --id 9844fefe-b6ee-4645-bdaa-5c91e8e7a7e9
+- CREATE ios and android builds & SUBMIT to app stores
+npx eas-cli@latest build --platform all --auto-submit
+
+- BUILD apk
+eas build -p android --profile preview
+
+- LINK
+npx -y expo-doctor
+
+- APK download link
+https://expo.dev/accounts/bazzcode/projects/sporty-galaxy-app-test/builds/736dd8ab-5f37-4b33-99e4-377596657108
  -->

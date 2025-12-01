@@ -1,0 +1,73 @@
+{
+  "cli": {
+    "version": ">= 10.0.0",
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "ios": {
+        "simulator": true
+      },
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://sporty-galaxy-dev-backend.onrender.com/api/v1",
+        "EXPO_PUBLIC_PAYSTACK_PUBLIC_KEY": "k_test_d9d3077d7d3332c330535e8b5df75ea74dcb28fb",
+        "EXPO_PUBLIC_PAYSTACK_SECRET_KEY": "sk_test_c284d2e10acad883b5ac344cdda42d61fe762334"
+      }
+    },
+    "preview": {
+      "distribution": "internal",
+      "env": {
+        "APP_VARIANT": "preview",
+        "EXPO_PUBLIC_API_URL": "https://sporty-galaxy-dev-backend.onrender.com/api/v1",
+        "EXPO_PUBLIC_PAYSTACK_PUBLIC_KEY": "k_test_d9d3077d7d3332c330535e8b5df75ea74dcb28fb",
+        "EXPO_PUBLIC_PAYSTACK_SECRET_KEY": "sk_test_c284d2e10acad883b5ac344cdda42d61fe762334"
+      }
+    },
+    "production": {
+      "autoIncrement": true,
+      "env": {
+        "APP_VARIANT": "production",
+        "EXPO_PUBLIC_API_URL": "https://sporty-galaxy-dev-backend.onrender.com/api/v1",
+        "EXPO_PUBLIC_PAYSTACK_PUBLIC_KEY": "k_test_d9d3077d7d3332c330535e8b5df75ea74dcb28fb",
+        "EXPO_PUBLIC_PAYSTACK_SECRET_KEY": "sk_test_c284d2e10acad883b5ac344cdda42d61fe762334"
+      },
+      "channel": "production"
+    },
+    "staging": {
+      "autoIncrement": true,
+      "env": {
+        "APP_VARIANT": "staging",
+        "EXPO_PUBLIC_API_URL": "https://sporty-galaxy-dev-backend.onrender.com/api/v1",
+        "EXPO_PUBLIC_PAYSTACK_PUBLIC_KEY": "k_test_d9d3077d7d3332c330535e8b5df75ea74dcb28fb",
+        "EXPO_PUBLIC_PAYSTACK_SECRET_KEY": "sk_test_c284d2e10acad883b5ac344cdda42d61fe762334"
+      },
+      "channel": "staging"
+    }
+  },
+   "submit": {
+    "production": {
+      // "ios": {
+      //   "appleId": "gberaeseerons@gmail.com",
+      //   "ascAppId": "",
+      //   "appleTeamId": ""
+      // },
+      "android": {
+        "serviceAccountKeyPath": "./",
+        "track": "production"
+      }
+    },
+    "staging": {
+      // "ios": {
+      //   "appleId": "gberaeseerons@gmail.com",
+      //   "ascAppId": "",
+      //   "appleTeamId": ""
+      // },
+      "android": {
+        "serviceAccountKeyPath": "./",
+        "track": "internal"
+      }
+    }
+  }
+}
