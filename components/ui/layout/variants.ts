@@ -5,7 +5,7 @@ export const containerVariants = tv({
   variants: {
     padding: {
       none: "",
-      sm: "px-3 py-3",
+      sm: "px-2 py-3",
       md: "px-5 py-4",
       lg: "px-6 py-5",
     },

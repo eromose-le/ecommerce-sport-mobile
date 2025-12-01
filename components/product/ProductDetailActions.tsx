@@ -1,5 +1,6 @@
 import { useThemedStyles } from "@/providers/theme";
 import { Product } from "@/services/product/product.types";
+import { useCartStore } from "@/store/useCartStore";
 import React from "react";
 import { View } from "react-native";
 import { PrimaryButton, SecondaryButton } from "../ui";
@@ -16,6 +17,10 @@ export default function ProductDetailActions({
   onStartOrder,
 }: ProductDetailActionsProps) {
   const theme = useThemedStyles();
+  const { cart } = useCartStore();
+  function isItemInCart(itemId: string): any {
+    return cart.some((item) => item.id === itemId);
+  }
 
   return (
     <View className="flex-row items-center gap-3 mt-6">
@@ -28,7 +33,7 @@ export default function ProductDetailActions({
       />
 
       <SecondaryButton
-        title="Add to Cart"
+        title={isItemInCart(product?.id) ? "Added to Cart!" : "Add to Cart"}
         onPress={onAddToCart}
         className={`${theme.secondaryButtonClass} rounded px-6`}
         textClassName={theme.secondaryTextClass}

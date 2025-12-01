@@ -14,7 +14,7 @@ import { useEffect, useMemo, useState } from "react";
 import { View } from "react-native";
 
 export default function ProtectedTabs() {
-  const { theme: themeKey, isDark } = useTheme();
+  const { isDark } = useTheme();
   const [hydrated, setHydrated] = useState(false);
   const cart = useCartStore((s) => s.cart);
   const badge = useMemo(() => showCartQtyValue(cart), [cart]);

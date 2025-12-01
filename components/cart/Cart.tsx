@@ -21,7 +21,8 @@ import { formatCurrency } from "@/utils/currency";
 import classNames from "classnames";
 import { router } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
-import { ScrollView, View } from "react-native";
+import { Platform, ScrollView, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Cart() {
   const theme = useThemedStyles();
@@ -56,7 +57,13 @@ export default function Cart() {
       dismissOnBackdropPress
       contentHeight="auto"
     >
-      <View className="gap-3 pt-4 pb-10">
+      <SafeAreaView
+        edges={["top", "bottom"]}
+        className={classNames(
+          "gap-3 pt-4",
+          Platform.OS === "ios" ? "pb-10" : "pb-2"
+        )}
+      >
         <Heading
           level="h3"
           weight="semibold"
@@ -97,7 +104,7 @@ export default function Cart() {
             spinnerColor={theme.secondarySpinnerColor}
           />
         </View>
-      </View>
+      </SafeAreaView>
     </Modal>
   );
 
@@ -158,7 +165,7 @@ export default function Cart() {
             </BodyText>
           </View>
           <PrimaryButton
-            title="Check out"
+            title="Checkout"
             onPress={() => router.push(user ? CHECKOUT : SIGN_IN)}
             className={`${theme.primaryButtonClass}`}
             textClassName={theme.primaryTextClassInverse}

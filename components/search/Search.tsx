@@ -67,9 +67,11 @@ export default function Search() {
   return (
     <SafeAreaView className={`flex-1 ${theme.pageBg}`}>
       <View className="flex-row gap-2 px-4 pb-3">
-        <BackButton />
+        <View className="items-center justify-center h-fit">
+          <BackButton />
+        </View>
         <View
-          className="flex-row items-center flex-1 px-4 py-3 border rounded-2xl"
+          className="flex-row items-center flex-1 px-4 py-0 border rounded-2xl"
           style={{ borderColor: isDark ? "#1f2937" : "#E5E7EB" }}
         >
           <Ionicons name="search-outline" size={18} color={theme.iconMuted} />

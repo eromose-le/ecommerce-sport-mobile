@@ -166,17 +166,18 @@ export default function SignUp() {
     required?: boolean;
     children: ReactNode;
   }) => (
-    <View className="flex-row flex-wrap items-start gap-4">
+    <View className="flex-row flex-wrap items-start justify-center gap-4 mx-auto">
       <BodyText
         size="sm"
         tone={theme.headingTone}
-        className="flex-1 w-32"
+        className="flex-1 min-w-[32px]"
         weight="medium"
+        align="right"
       >
         {required ? "* " : ""}
         {label}
       </BodyText>
-      <View className="flex-2 min-w-[225px]">{children}</View>
+      <View className="flex-1 min-w-[225px]">{children}</View>
     </View>
   );
 
@@ -205,7 +206,7 @@ export default function SignUp() {
             </Heading>
           </View>
 
-          <View className="flex-col gap-4 mt-16">
+          <View className="flex flex-col items-center justify-center gap-4 mx-auto mt-16">
             <FieldRow label="Country / Region">
               <TouchableOpacity
                 className={classNames(
@@ -262,9 +263,9 @@ export default function SignUp() {
 
             <FieldRow label="Confirm Password">
               <PasswordField
-                label="Enter the login password again"
+                label="Re-Enter login password"
                 hideLabel
-                placeholder="Enter the login password again"
+                placeholder="Re-enter login password"
                 value={formik.values.confirmPassword}
                 onChangeText={formik.handleChange("confirmPassword")}
                 onBlur={formik.handleBlur("confirmPassword")}

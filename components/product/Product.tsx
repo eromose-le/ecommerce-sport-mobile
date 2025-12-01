@@ -59,7 +59,7 @@ export default function Product() {
       </View> */}
 
       {/* Best Selling Section */}
-      <View className="mt-2 mb-8">
+      <View className="mt-2 mb-4">
         <Title
           title="New arrival"
           actionText="See all"
@@ -80,7 +80,9 @@ export default function Product() {
             scrollEnabled={false}
           />
         </View>
+      </View>
 
+      <View className="mt-2 mb-4">
         <LinkButton title="See all products" onPress={handleSeeAll} />
       </View>
 

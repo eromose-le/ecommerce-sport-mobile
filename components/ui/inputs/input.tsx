@@ -152,7 +152,7 @@ const Input: React.FC<InputProps> = ({
           onFocus={handleFocus}
           onBlur={handleBlur}
           textAlignVertical={textAlignVertical ?? (multiline ? "top" : "auto")}
-          className={inputClass}
+          className={`${inputClass}`}
           {...rest}
         />
 

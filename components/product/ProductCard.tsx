@@ -1,6 +1,6 @@
 import { PRODUCT_DETAIL } from "@/constants/urls";
 import { calculatePercentageDecrease } from "@/helpers/product-discount";
-import { useThemedStyles } from "@/providers/theme";
+import { useTheme, useThemedStyles } from "@/providers/theme";
 import { Product } from "@/services/product/product.types";
 import { useCartStore } from "@/store/useCartStore";
 import { formatCurrency } from "@/utils/currency";
@@ -26,6 +26,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   width,
   onAddToCart,
 }) => {
+  const { isDark } = useTheme();
   const theme = useThemedStyles();
   const { addToCart } = useCartStore();
   const discountCap = calculatePercentageDecrease({
@@ -44,7 +45,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     >
       <TouchableOpacity
         style={{ width }}
-        className={`relative p-3 ${theme.pageBg}`}
+        className={`relative p-3 ${isDark ? theme.mutedSurface : "bg-white"} rounded`}
         activeOpacity={0.8}
       >
         {/* NOTE: sales */}

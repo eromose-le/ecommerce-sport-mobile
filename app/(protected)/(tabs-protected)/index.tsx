@@ -142,7 +142,10 @@ export default function ProtectedHome() {
             <TouchableOpacity
               activeOpacity={0.85}
               onPress={handleSearchPress}
-              className="flex-row items-center px-3 py-3 bg-[#F0F0F0] gap-4 rounded-2xl"
+              className={classNames(
+                "flex-row items-center gap-4 px-3 py-3 rounded-2xl",
+                isSticky ? theme.pageBg : theme.mutedSurface
+              )}
             >
               <View className="flex-row items-center px-6 py-2 mr-2 bg-white rounded-xl">
                 <Text className="mr-2 text-sm font-bold text-primary">
@@ -154,7 +157,11 @@ export default function ProtectedHome() {
               <Text className="flex-1 text-secondary font-jost-medium">
                 I am looking for...
               </Text>
-              <Ionicons name="search-outline" size={20} color="black" />
+              <Ionicons
+                name="search-outline"
+                size={20}
+                color={theme.iconMuted}
+              />
             </TouchableOpacity>
           </Container>
         </Animated.View>

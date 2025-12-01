@@ -98,9 +98,16 @@ export default function PublicHome() {
             <TouchableOpacity
               activeOpacity={0.85}
               onPress={handleSearchPress}
-              className="flex-row items-center px-3 py-3 bg-[#F0F0F0] gap-4 rounded-2xl"
+              className={classNames(
+                "flex-row items-center px-3 py-3 gap-4 rounded-2xl",
+                isSticky ? theme.pageBg : theme.mutedSurface
+              )}
             >
-              <View className="flex-row items-center px-6 py-2 mr-2 bg-white rounded-xl">
+              <View
+                className={classNames(
+                  "flex-row items-center px-6 bg-white py-2 mr-2 rounded-xl"
+                )}
+              >
                 <Text className="mr-2 text-sm font-bold text-primary">
                   Products
                 </Text>
@@ -110,14 +117,16 @@ export default function PublicHome() {
               <Text className="flex-1 text-secondary font-jost-medium">
                 I am looking for...
               </Text>
-              <Ionicons name="search-outline" size={20} color="black" />
+              <Ionicons
+                name="search-outline"
+                size={20}
+                color={theme.iconMuted}
+              />
             </TouchableOpacity>
           </Container>
         </Animated.View>
 
         <Product />
-
-        {/* <TailwindVariantPreview /> */}
       </ScrollView>
     </SafeContainer>
   );
