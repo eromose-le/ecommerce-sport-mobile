@@ -53,14 +53,14 @@ export default function PublicHome() {
   return (
     <SafeContainer
       edges={["top", "left", "right"]}
-      padding="sm"
+      padding="md"
       gap="md"
       className={`${theme.pageBg} flex-1`}
     >
       <ScrollView
         className="flex-1 px-5"
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 50 }}
+        contentContainerStyle={{ paddingBottom: 10 }}
         stickyHeaderIndices={[1]}
         onScroll={handleScroll}
         keyboardShouldPersistTaps="handled"
@@ -83,7 +83,7 @@ export default function PublicHome() {
               "z-50 rounded-3xl",
               isSticky ? theme.mutedSurface : theme.pageBg
             )}
-            padding="md"
+            padding={isSticky ? "md" : "none"}
             background="default"
           >
             <BodyText

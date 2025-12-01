@@ -69,14 +69,14 @@ export default function ProtectedHome() {
   return (
     <SafeContainer
       edges={["top", "left", "right"]}
-      padding="sm"
+      padding="md"
       gap="md"
       className={`${theme.pageBg} flex-1`}
     >
       <ScrollView
         className="flex-1"
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 50 }}
+        contentContainerStyle={{ paddingBottom: 10 }}
         stickyHeaderIndices={[1]}
         keyboardShouldPersistTaps="handled"
         onScroll={handleScroll}
@@ -99,7 +99,7 @@ export default function ProtectedHome() {
               "z-50 rounded-3xl",
               isSticky ? theme.mutedSurface : theme.pageBg
             )}
-            padding="md"
+            padding={isSticky ? "md" : "none"}
             background="default"
           >
             <View className="flex-row items-center gap-1 mb-3">
