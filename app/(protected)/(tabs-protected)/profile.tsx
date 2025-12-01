@@ -10,16 +10,42 @@ import { BodyText, Heading, LinkButton } from "@/components/ui";
 import { AppEnv } from "@/constants/env";
 import { NOTIFICATION_PROTECTED, PROFILE_DETAIL } from "@/constants/urls";
 import { useAuth } from "@/providers/auth";
-import { useTheme, useThemedStyles } from "@/providers/theme";
+import { ThemePreference, useTheme, useThemedStyles } from "@/providers/theme";
 import { ProfileLink, ScreenKey } from "@/types/profile";
 import { exImageLink } from "@/utils/images";
 import { AppToast } from "@/utils/toast";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import { Image, ScrollView, Switch, TouchableOpacity, View } from "react-native";
+import { Image, ScrollView, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const versionNumber = AppEnv.config.appVersion;
+
+const themeOptions: {
+  key: ThemePreference;
+  label: string;
+  description: string;
+  icon: keyof typeof Ionicons.glyphMap;
+}[] = [
+  {
+    key: "light",
+    label: "Light",
+    description: "Always use the light appearance",
+    icon: "sunny-outline",
+  },
+  {
+    key: "dark",
+    label: "Dark",
+    description: "Always use the dark appearance",
+    icon: "moon-outline",
+  },
+  {
+    key: "system",
+    label: "System",
+    description: "Follow your device appearance",
+    icon: "phone-portrait-outline",
+  },
+];
 
 const navigateToProfileDetail = (key: ScreenKey) => {
   router.push({
@@ -31,7 +57,7 @@ const navigateToProfileDetail = (key: ScreenKey) => {
 export default function ProtectedProfile() {
   const { user, logout } = useAuth();
   const theme = useThemedStyles();
-  const { isDark, setTheme } = useTheme();
+  const { isDark, preference, setTheme } = useTheme();
   const displayName =
     [user?.firstName, user?.lastName].filter(Boolean).join(" ") || "Guest";
   const avatarUri = user?.avatar || exImageLink(displayName);
@@ -68,6 +94,9 @@ export default function ProtectedProfile() {
       AppToast.failed("Unable to logout", error as any);
     }
   };
+
+  const selectedThemeLabel =
+    themeOptions.find((option) => option.key === preference)?.label || "Light";
 
   return (
     <SafeAreaView className={`flex-1 ${theme.pageBg}`}>
@@ -113,26 +142,66 @@ export default function ProtectedProfile() {
         />
 
         <ProfileSection title="Settings">
-          <View className="flex-row items-center justify-between px-1 py-2">
-            <View className="flex-row items-center gap-3">
-              <View className="w-9 h-9 rounded-full bg-[#F5F5F5] items-center justify-center">
+          <View
+            className={`p-4 rounded-2xl border shadow-sm ${theme.surface} ${theme.primaryBorderColor}`}
+          >
+            <View className="flex-row items-center justify-between">
+              <View className="flex-row items-center gap-3">
                 <Ionicons
-                  name={isDark ? "moon" : "moon-outline"}
+                  name="color-palette-outline"
                   size={18}
-                  color="#4B5563"
+                  color={theme.iconMuted}
                 />
+                <BodyText size="md" weight="medium" tone={theme.headingTone}>
+                  Appearance
+                </BodyText>
               </View>
-              <BodyText size="md" weight="medium" tone={theme.headingTone}>
-                Dark mode
+              <BodyText size="sm" tone={theme.labelTone}>
+                {selectedThemeLabel}
               </BodyText>
             </View>
-            <Switch
-              value={isDark}
-              onValueChange={(val) => setTheme(val ? "dark" : "light")}
-              trackColor={{ false: "#E5E7EB", true: "#111827" }}
-              thumbColor={isDark ? "#F9FAFB" : "#111827"}
-              ios_backgroundColor="#E5E7EB"
-            />
+
+            <View className="gap-3 mt-4">
+              {themeOptions.map((option) => {
+                const isSelected = option.key === preference;
+                const accentColor = isDark ? "#f3f4f6" : "#111827";
+
+                return (
+                  <TouchableOpacity
+                    key={option.key}
+                    className="flex-row items-center justify-between px-3 py-3 rounded-xl"
+                    style={{
+                      backgroundColor: isDark ? "#111827" : "#F5F5F5",
+                      borderColor: isSelected ? accentColor : "transparent",
+                      borderWidth: isSelected ? 1 : 0,
+                    }}
+                    onPress={() => setTheme(option.key)}
+                    activeOpacity={0.9}
+                  >
+                    <View className="flex-row items-center gap-3">
+                      <Ionicons
+                        name={option.icon}
+                        size={20}
+                        color={isSelected ? accentColor : theme.iconMuted}
+                      />
+                      <View className="gap-1">
+                        <BodyText weight="medium" tone={theme.headingTone}>
+                          {option.label}
+                        </BodyText>
+                        <BodyText size="sm" tone={theme.labelTone}>
+                          {option.description}
+                        </BodyText>
+                      </View>
+                    </View>
+                    <Ionicons
+                      name={isSelected ? "radio-button-on" : "radio-button-off"}
+                      size={18}
+                      color={isSelected ? accentColor : theme.iconMuted}
+                    />
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
           </View>
           {settingsLinks.map((link) => (
             <ProfileRow

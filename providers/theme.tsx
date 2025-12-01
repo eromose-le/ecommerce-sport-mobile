@@ -1,12 +1,24 @@
-import { useColorScheme } from "nativewind";
-import React, { createContext, useContext, useMemo } from "react";
+import { Logger } from "@/utils/logger";
+import * as SecureStore from "expo-secure-store";
+import { useColorScheme as useNativewindColorScheme } from "nativewind";
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+import { Appearance } from "react-native";
 
 type ThemeMode = "light" | "dark";
+export type ThemePreference = ThemeMode | "system";
 
 type ThemeContextValue = {
   theme: ThemeMode;
+  preference: ThemePreference;
   isDark: boolean;
-  setTheme: (mode: ThemeMode) => void;
+  setTheme: (mode: ThemePreference) => void;
   toggleTheme: () => void;
 };
 
@@ -34,6 +46,8 @@ type ThemeStyles = {
   primaryBorderColor: string;
   pageBgInverse: string;
 };
+
+const THEME_PREFERENCE_KEY = "theme-preference";
 
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
@@ -71,7 +85,8 @@ export const THEME_STYLES: Record<ThemeMode, ThemeStyles> = {
     bodyTone: "inverse",
     labelTone: "secondary",
     inputClassName: "bg-[#0f172a] border-[#1f2937] text-white",
-    inputClassNameInverse: "bg-[#0f172a] border-[#1f2937] text-white",
+    inputClassNameInverse:
+      "bg-[#111827] border-[#1f2937] dark:focus:border-[#808080] text-white",
     placeholderColor: "#aaaaaa",
     iconMuted: "#cbd5e1",
     successIcon: "#34d399",
@@ -91,18 +106,90 @@ export const THEME_STYLES: Record<ThemeMode, ThemeStyles> = {
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const { colorScheme, setColorScheme } = useColorScheme();
-  const theme: ThemeMode = colorScheme === "dark" ? "dark" : "light";
+  const { setColorScheme: setNativewindColorScheme } =
+    useNativewindColorScheme();
+  const [preference, setPreference] = useState<ThemePreference>("light");
+  const [systemScheme, setSystemScheme] = useState<ThemeMode>(() =>
+    Appearance.getColorScheme() === "dark" ? "dark" : "light"
+  );
+
+  useEffect(() => {
+    const loadPreference = async () => {
+      try {
+        const storageAvailable = await SecureStore.isAvailableAsync();
+        if (!storageAvailable) return;
+
+        const storedPreference =
+          await SecureStore.getItemAsync(THEME_PREFERENCE_KEY);
+
+        if (
+          storedPreference === "light" ||
+          storedPreference === "dark" ||
+          storedPreference === "system"
+        ) {
+          setPreference(storedPreference);
+        }
+      } catch (error) {
+        Logger.warn("Theme preference load failed", error);
+      }
+    };
+
+    loadPreference();
+  }, []);
+
+  useEffect(() => {
+    const subscription = Appearance.addChangeListener(({ colorScheme }) => {
+      setSystemScheme(colorScheme === "dark" ? "dark" : "light");
+    });
+
+    return () => subscription.remove();
+  }, []);
+
+  const resolvedTheme: ThemeMode =
+    preference === "system" ? systemScheme : preference;
+
+  useEffect(() => {
+    const targetScheme = preference === "system" ? "system" : resolvedTheme;
+
+    try {
+      setNativewindColorScheme(targetScheme);
+    } catch (error) {
+      Logger.warn("Nativewind theme sync failed", error);
+    }
+
+    if (preference === "system") {
+      const deviceScheme =
+        Appearance.getColorScheme() === "dark" ? "dark" : "light";
+      setSystemScheme(deviceScheme);
+    }
+  }, [preference, resolvedTheme, setNativewindColorScheme]);
+
+  const persistPreference = useCallback(async (mode: ThemePreference) => {
+    setPreference(mode);
+    try {
+      const storageAvailable = await SecureStore.isAvailableAsync();
+      if (!storageAvailable) return;
+
+      await SecureStore.setItemAsync(THEME_PREFERENCE_KEY, mode);
+    } catch (error) {
+      Logger.warn("Theme preference save failed", error);
+    }
+  }, []);
 
   const value = useMemo<ThemeContextValue>(
     (): ThemeContextValue => ({
-      theme,
-      isDark: theme === "dark",
-      setTheme: (mode: ThemeMode): void => setColorScheme(mode),
-      toggleTheme: (): void =>
-        setColorScheme(theme === "dark" ? "light" : "dark"),
+      theme: resolvedTheme,
+      preference,
+      isDark: resolvedTheme === "dark",
+      setTheme: (mode: ThemePreference): void => {
+        persistPreference(mode);
+      },
+      toggleTheme: (): void => {
+        const nextTheme = resolvedTheme === "dark" ? "light" : "dark";
+        persistPreference(nextTheme);
+      },
     }),
-    [theme, setColorScheme]
+    [persistPreference, preference, resolvedTheme]
   );
 
   return (
@@ -118,7 +205,7 @@ export const useTheme = () => {
   return ctx;
 };
 
-export const useThemedStyles = (mood?: "light" | "dark") => {
+export const useThemedStyles = (mood?: ThemeMode) => {
   const { theme } = useTheme();
   return THEME_STYLES[mood ?? theme];
 };
