@@ -15,6 +15,7 @@ import Faq from "./screens/Faq";
 import Orders from "./screens/Orders";
 import PaymentMethods from "./screens/PaymentMethods";
 import Policy from "./screens/Policy";
+import AppSecurity from "./screens/AppSecurity";
 import Support from "./screens/Support";
 import UserProfile from "./screens/UserProfile";
 
@@ -25,6 +26,7 @@ const SCREEN_COMPONENTS: Partial<
   [profileKeys.userProfile]: () => <UserProfile />,
   [profileKeys.deliveryAddress]: () => <DeliveryAddress />,
   [profileKeys.paymentMethods]: () => <PaymentMethods />,
+  [profileKeys.appLock]: () => <AppSecurity />,
   [profileKeys.faq]: () => <Faq />,
   [profileKeys.support]: () => <Support />,
   [profileKeys.privacyPolicy]: () => <Policy type="privacy" />,
