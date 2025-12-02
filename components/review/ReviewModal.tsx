@@ -29,7 +29,7 @@ const ReviewModal = ({
       variant="bottom"
       occupyFullBottom
       dismissOnBackdropPress={false}
-      contentHeight="55%"
+      // contentHeight="55%"
     >
       <SafeAreaView
         className={`relative ${theme.mutedSurface}`}

@@ -702,7 +702,7 @@ const AllProducts = () => {
         <SafeAreaView className="">
           <ScrollView
             showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ gap: 8, paddingVertical: 4 }}
+            contentContainerStyle={{ gap: 8, paddingVertical: 10 }}
           >
             {filterModalContent}
           </ScrollView>

@@ -61,7 +61,7 @@ export default function Cart() {
         edges={["top", "bottom"]}
         className={classNames(
           "gap-3 pt-4",
-          Platform.OS === "ios" ? "pb-10" : "pb-2"
+          Platform.OS === "ios" ? "pb-10" : "pb-8"
         )}
       >
         <Heading
