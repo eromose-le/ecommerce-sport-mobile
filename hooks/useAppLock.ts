@@ -4,26 +4,27 @@ import { Logger } from "@/utils/logger";
 import { AppToast } from "@/utils/toast";
 import * as LocalAuthentication from "expo-local-authentication";
 import { useCallback, useEffect, useMemo } from "react";
-import { AppState } from "react-native";
+import { AppState, Platform } from "react-native";
 
 export const getBiometricLabel = (
   types: LocalAuthentication.AuthenticationType[]
 ) => {
-  if (
-    types.includes(LocalAuthentication.AuthenticationType.FACIAL_RECOGNITION)
-  ) {
-    return "Face ID";
+  const has = (type: LocalAuthentication.AuthenticationType) =>
+    types.includes(type);
+
+  if (has(LocalAuthentication.AuthenticationType.FACIAL_RECOGNITION)) {
+    return Platform.OS === "ios" ? "Face ID" : "Face unlock";
   }
 
-  if (types.includes(LocalAuthentication.AuthenticationType.IRIS)) {
+  if (has(LocalAuthentication.AuthenticationType.IRIS)) {
     return "Iris";
   }
 
-  if (types.includes(LocalAuthentication.AuthenticationType.FINGERPRINT)) {
-    return "Fingerprint";
+  if (has(LocalAuthentication.AuthenticationType.FINGERPRINT)) {
+    return Platform.OS === "ios" ? "Touch ID" : "Fingerprint";
   }
 
-  return "Biometrics";
+  return Platform.OS === "ios" ? "Face ID" : "Biometric unlock";
 };
 
 export const useAppLock = (attachLifecycle = false) => {
@@ -116,7 +117,9 @@ export const useAppLock = (attachLifecycle = false) => {
       return false;
     }
 
-    const success = await performBiometricCheck("Unlock Sporty Galaxy");
+    const success = await performBiometricCheck(
+      `Unlock Sporty Galaxy with ${biometricLabel}`
+    );
     if (success) setLocked(false);
 
     return success;
@@ -147,12 +150,12 @@ export const useAppLock = (attachLifecycle = false) => {
     }
 
     if (!info.enrolled) {
-      AppToast.info("Set up Face ID or fingerprint in your device settings");
+      AppToast.info(`Set up ${biometricLabel} in your device settings`);
       return false;
     }
 
     const success = await performBiometricCheck(
-      "Confirm biometrics to enable app lock"
+      `Confirm ${biometricLabel} to enable app lock`
     );
     if (success) {
       enableBiometrics();
