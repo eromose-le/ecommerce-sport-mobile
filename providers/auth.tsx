@@ -4,6 +4,7 @@ import { router } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { Logger } from "@/utils/logger";
+import { useAppLockStore } from "@/store/useAppLockStore";
 
 interface AuthContextProps {
   user: User | null;
@@ -81,6 +82,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const logout = async () => {
     setUser(null);
     await SecureStore.deleteItemAsync("user");
+    useAppLockStore.getState().clear();
     router.push({
       pathname: SIGN_IN,
       params: { fromOnboarding: "true" },

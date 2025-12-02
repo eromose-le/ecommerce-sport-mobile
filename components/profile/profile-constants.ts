@@ -5,6 +5,7 @@ export const profileKeys = {
   userProfile: "user-profile",
   paymentMethods: "payment-methods",
   deliveryAddress: "delivery-address",
+  appLock: "app-lock",
   notifications: "notifications",
   faq: "faq",
   support: "support",
@@ -27,6 +28,11 @@ export const settingsLinks: ProfileLink[] = [
     key: profileKeys.deliveryAddress,
     label: "Delivery address",
     icon: "location-outline",
+  },
+  {
+    key: profileKeys.appLock,
+    label: "App security",
+    icon: "lock-closed-outline",
   },
   // {
   //   key: profileKeys.notifications,
@@ -62,6 +68,7 @@ export const SCREEN_LABELS: Record<string, string> = {
   [profileKeys.userProfile]: "User profile",
   [profileKeys.paymentMethods]: "Payment methods",
   [profileKeys.deliveryAddress]: "Delivery address",
+  [profileKeys.appLock]: "App security",
   [profileKeys.faq]: "FAQ",
   [profileKeys.support]: "Support",
   [profileKeys.privacyPolicy]: "Privacy policy",
