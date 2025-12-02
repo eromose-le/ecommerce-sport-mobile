@@ -9,7 +9,7 @@ const showToast = (type: ToastVariant, message: string, sub?: string) => {
     text2: sub,
     position: "bottom",
     bottomOffset: 10,
-    visibilityTime: 2000,
+    visibilityTime: 5000,
     useModal: false, // Must be off for stack view
   });
 };

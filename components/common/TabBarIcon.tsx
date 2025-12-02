@@ -61,7 +61,12 @@ export const TabBarIcon: React.FC<TabBarIconProps> = ({
 
   return (
     <View className="flex items-center justify-center w-20">
-      <SvgIcon Icon={Icon} size={size} color={color} />
+      <SvgIcon
+        Icon={Icon}
+        size={size}
+        color={color}
+        fill={focused ? color : "transparent"}
+      />
 
       {/* BADGE */}
       {showBadge && (
