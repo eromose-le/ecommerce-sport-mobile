@@ -192,7 +192,7 @@ export default function SignIn() {
             <ScrollView
               showsVerticalScrollIndicator={false}
               className="flex-1 px-11"
-              contentContainerStyle={{ paddingBottom: 40 }}
+              contentContainerStyle={{ paddingBottom: 10 }}
             >
               <View className="flex-row items-center justify-center gap-3 mb-6">
                 <TouchableOpacity

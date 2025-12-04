@@ -22,7 +22,7 @@ const ScrollableForm = ({ children }: { children: React.ReactNode }) => {
         className="flex-1 px-6 pt-6"
         automaticallyAdjustKeyboardInsets
         contentInsetAdjustmentBehavior="automatic"
-        contentContainerStyle={{ paddingBottom: 52 + insets.bottom }}
+        contentContainerStyle={{ paddingBottom: 10 + insets.bottom }}
         keyboardDismissMode="interactive"
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}

@@ -451,7 +451,7 @@ export default function ProtectedCheckout() {
       >
         <ScrollView
           className="flex-1"
-          contentContainerStyle={{ paddingBottom: 32 }}
+          contentContainerStyle={{ paddingBottom: 10 }}
           showsVerticalScrollIndicator={false}
         >
           <View className="px-4 pb-6">

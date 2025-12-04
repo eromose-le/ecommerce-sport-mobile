@@ -191,7 +191,7 @@ export default function SignUp() {
       >
         <ScrollView
           className="flex-1 px-6"
-          contentContainerStyle={{ paddingBottom: 60 }}
+          contentContainerStyle={{ paddingBottom: 10 }}
           showsVerticalScrollIndicator={false}
         >
           <View className="w-full mx-auto mt-10 max-w-60">

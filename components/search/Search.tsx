@@ -97,7 +97,7 @@ export default function Search() {
       >
         <ScrollView
           contentInsetAdjustmentBehavior="automatic"
-          contentContainerStyle={{ paddingBottom: 52 }}
+          contentContainerStyle={{ paddingBottom: 10 }}
           keyboardDismissMode="interactive"
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}

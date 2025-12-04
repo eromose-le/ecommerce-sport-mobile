@@ -26,7 +26,7 @@ const TailwindVariantPreview = () => {
   return (
     <ScrollView
       className={`flex-1 ${theme.pageBg}`}
-      contentContainerStyle={{ paddingBottom: 32 }}
+      contentContainerStyle={{ paddingBottom: 10 }}
     >
       <Container padding="sm" gap="md" className={theme.pageBg}>
         <Row justify="between" align="center">

@@ -102,7 +102,7 @@ export default function ProtectedProfile() {
     <SafeAreaView className={`flex-1 ${theme.pageBg}`}>
       <ScrollView
         className="flex-1 px-6"
-        contentContainerStyle={{ paddingBottom: 48 }}
+        contentContainerStyle={{ paddingBottom: 10 }}
       >
         <View className="items-center mt-10">
           <Image
