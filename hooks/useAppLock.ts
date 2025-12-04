@@ -85,10 +85,18 @@ export const useAppLock = (attachLifecycle = false) => {
   useEffect(() => {
     if (!attachLifecycle) return;
 
+    let previousState = AppState.currentState;
+
     const sub = AppState.addEventListener("change", (state) => {
-      if (state === "active" && user && lockEnabled) {
+      const leavingApp =
+        previousState === "active" &&
+        (state === "inactive" || state === "background");
+
+      if (leavingApp && user && lockEnabled) {
         setLocked(true);
       }
+
+      previousState = state;
     });
 
     return () => sub.remove();

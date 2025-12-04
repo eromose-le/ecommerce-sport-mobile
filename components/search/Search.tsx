@@ -21,6 +21,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { EmptyState } from "../common/EmptyState";
 import { LoadingContent } from "../common/LoadingContent";
+import TextField from "../common/TextField";
 import { BodyText } from "../ui";
 
 export default function Search() {
@@ -70,28 +71,23 @@ export default function Search() {
         <View className="items-center justify-center h-fit">
           <BackButton />
         </View>
-        <View
-          className="flex-row items-center flex-1 px-4 py-0 border rounded-2xl"
-          style={{ borderColor: isDark ? "#1f2937" : "#E5E7EB" }}
-        >
-          <Ionicons name="search-outline" size={18} color={theme.iconMuted} />
-          <TextInput
-            ref={inputRef}
-            placeholder="Type your search here"
-            placeholderTextColor={theme.placeholderColor}
-            className="flex-1 ml-3 text-base font-jost"
-            value={query}
-            onChangeText={setQuery}
-            autoCapitalize="none"
-            autoCorrect={false}
-            returnKeyType="search"
-          />
-          {query.length > 0 && (
-            <TouchableOpacity onPress={() => setQuery("")} hitSlop={8}>
-              <Ionicons name="close-circle" size={18} color={theme.iconMuted} />
-            </TouchableOpacity>
-          )}
-        </View>
+        <TextField
+          ref={inputRef}
+          label="Search products"
+          hideLabel
+          placeholder="Type your search here"
+          keyboardType="email-address"
+          autoCapitalize="none"
+          value={query}
+          onChangeText={setQuery}
+          autoCorrect={false}
+          returnKeyType="search"
+          containerClassName="flex-1"
+          leftIconName="search-outline"
+          rightIconName={query.length ? "close-circle" : undefined}
+          onRightIconPress={query.length ? () => setQuery("") : undefined}
+          rightIconDisabled={!query.length}
+        />
       </View>
 
       <KeyboardAvoidingView

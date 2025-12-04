@@ -34,144 +34,156 @@ export type InputProps = Omit<TextInputProps, "value" | "onChangeText"> &
     labelUppercase?: boolean;
   };
 
-const Input: React.FC<InputProps> = ({
-  label,
-  value,
-  onChangeText,
-  error,
-  helperText,
-  helperTone,
-  hideLabel,
-  containerClassName,
-  labelClassName,
-  inputClassName,
-  helperClassName,
-  leftElement,
-  rightElement,
-  required,
-  disabled,
-  labelTone,
-  labelUppercase,
-  spacing,
-  size,
-  rounded,
-  editable = true,
-  placeholder,
-  placeholderTextColor,
-  multiline,
-  numberOfLines,
-  onFocus,
-  onBlur,
-  textAlignVertical,
-  ...rest
-}) => {
-  const [isFocused, setIsFocused] = useState(false);
-  const themed = useThemedStyles();
+const Input = React.forwardRef<TextInput, InputProps>(
+  (
+    {
+      label,
+      value,
+      onChangeText,
+      error,
+      helperText,
+      helperTone,
+      hideLabel,
+      containerClassName,
+      labelClassName,
+      inputClassName,
+      helperClassName,
+      leftElement,
+      rightElement,
+      required,
+      disabled,
+      labelTone,
+      labelUppercase,
+      spacing,
+      size,
+      rounded,
+      editable = true,
+      placeholder,
+      placeholderTextColor,
+      multiline,
+      numberOfLines,
+      onFocus,
+      onBlur,
+      textAlignVertical,
+      ...rest
+    },
+    ref
+  ) => {
+    const [isFocused, setIsFocused] = useState(false);
+    const themed = useThemedStyles();
 
-  const isEditable = disabled ? false : editable;
-  const hasError = typeof error === "string" ? error.length > 0 : !!error;
-  const helper =
-    helperText ?? (typeof error === "string" ? (error as string) : undefined);
-  const resolvedValue =
-    value === undefined || value === null ? "" : String(value);
-  const resolvedPlaceholder = placeholder ?? label;
-  const resolvedPlaceholderColor =
-    placeholderTextColor ?? themed.placeholderColor;
+    const isEditable = disabled ? false : editable;
+    const hasError = typeof error === "string" ? error.length > 0 : !!error;
+    const helper =
+      helperText ?? (typeof error === "string" ? (error as string) : undefined);
+    const resolvedValue =
+      value === undefined || value === null ? "" : String(value);
+    const resolvedPlaceholder = placeholder ?? label;
+    const resolvedPlaceholderColor =
+      placeholderTextColor ?? themed.placeholderColor;
 
-  const hasLeft = !!leftElement;
-  const hasRight = !!rightElement;
+    const hasLeft = !!leftElement;
+    const hasRight = !!rightElement;
 
-  const state: NonNullable<InputFieldVariants["state"]> = !isEditable
-    ? "disabled"
-    : hasError
-      ? "error"
-      : isFocused
-        ? "focused"
-        : "default";
+    const state: NonNullable<InputFieldVariants["state"]> = !isEditable
+      ? "disabled"
+      : hasError
+        ? "error"
+        : isFocused
+          ? "focused"
+          : "default";
 
-  const wrapperClass = inputWrapperVariants({
-    spacing,
-    className: containerClassName,
-  });
+    const wrapperClass = inputWrapperVariants({
+      spacing,
+      className: containerClassName,
+    });
 
-  const labelClass = inputLabelVariants({
-    tone:
-      labelTone ??
-      (["primary", "inverse", "secondary"].includes(themed.labelTone as string)
-        ? (themed.labelTone as "primary" | "secondary" | "inverse")
-        : undefined),
-    uppercase: labelUppercase,
-    className: labelClassName,
-  });
+    const labelClass = inputLabelVariants({
+      tone:
+        labelTone ??
+        (["primary", "inverse", "secondary"].includes(
+          themed.labelTone as string
+        )
+          ? (themed.labelTone as "primary" | "secondary" | "inverse")
+          : undefined),
+      uppercase: labelUppercase,
+      className: labelClassName,
+    });
 
-  const inputClass = inputFieldVariants({
-    state,
-    size,
-    rounded,
-    multiline,
-    hasLeft,
-    hasRight,
-    className: [themed.inputClassNameInverse, inputClassName]
-      .filter(Boolean)
-      .join(" "),
-  });
+    const inputClass = inputFieldVariants({
+      state,
+      size,
+      rounded,
+      multiline,
+      hasLeft,
+      hasRight,
+      className: [themed.inputClassNameInverse, inputClassName]
+        .filter(Boolean)
+        .join(" "),
+    });
 
-  const helperClass = inputHelperVariants({
-    tone: hasError ? "error" : helperTone,
-    className: helperClassName,
-  });
+    const helperClass = inputHelperVariants({
+      tone: hasError ? "error" : helperTone,
+      className: helperClassName,
+    });
 
-  const handleFocus: TextInputProps["onFocus"] = (e) => {
-    setIsFocused(true);
-    onFocus?.(e);
-  };
+    const handleFocus: TextInputProps["onFocus"] = (e) => {
+      setIsFocused(true);
+      onFocus?.(e);
+    };
 
-  const handleBlur: TextInputProps["onBlur"] = (e) => {
-    setIsFocused(false);
-    onBlur?.(e);
-  };
+    const handleBlur: TextInputProps["onBlur"] = (e) => {
+      setIsFocused(false);
+      onBlur?.(e);
+    };
 
-  return (
-    <View className={wrapperClass}>
-      {!hideLabel && label ? (
-        <Text className={labelClass}>
-          {label}
-          {required ? <Text className="text-red-500"> *</Text> : null}
-        </Text>
-      ) : null}
-
-      <View className="relative">
-        <TextInput
-          value={resolvedValue}
-          editable={isEditable}
-          onChangeText={onChangeText}
-          multiline={multiline}
-          numberOfLines={numberOfLines}
-          placeholder={resolvedPlaceholder}
-          placeholderTextColor={resolvedPlaceholderColor}
-          onFocus={handleFocus}
-          onBlur={handleBlur}
-          textAlignVertical={textAlignVertical ?? (multiline ? "top" : "auto")}
-          className={`${inputClass}`}
-          {...rest}
-        />
-
-        {leftElement ? (
-          <View className="absolute -translate-y-1/2 left-3 top-1/2">
-            {leftElement}
-          </View>
+    return (
+      <View className={wrapperClass}>
+        {!hideLabel && label ? (
+          <Text className={labelClass}>
+            {label}
+            {required ? <Text className="text-red-500"> *</Text> : null}
+          </Text>
         ) : null}
 
-        {rightElement ? (
-          <View className="absolute -translate-y-1/2 right-4 top-1/2">
-            {rightElement}
-          </View>
-        ) : null}
+        <View className="relative">
+          <TextInput
+            ref={ref}
+            value={resolvedValue}
+            editable={isEditable}
+            onChangeText={onChangeText}
+            multiline={multiline}
+            numberOfLines={numberOfLines}
+            placeholder={resolvedPlaceholder}
+            placeholderTextColor={resolvedPlaceholderColor}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
+            textAlignVertical={
+              textAlignVertical ?? (multiline ? "top" : "auto")
+            }
+            className={`${inputClass}`}
+            {...rest}
+          />
+
+          {leftElement ? (
+            <View className="absolute -translate-y-1/2 left-3 top-1/2">
+              {leftElement}
+            </View>
+          ) : null}
+
+          {rightElement ? (
+            <View className="absolute -translate-y-1/2 right-4 top-1/2">
+              {rightElement}
+            </View>
+          ) : null}
+        </View>
+
+        {helper ? <Text className={helperClass}>{helper}</Text> : null}
       </View>
+    );
+  }
+);
 
-      {helper ? <Text className={helperClass}>{helper}</Text> : null}
-    </View>
-  );
-};
+Input.displayName = "Input";
 
 export default Input;

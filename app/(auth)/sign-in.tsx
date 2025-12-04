@@ -14,14 +14,13 @@ import {
 } from "@/constants/urls";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import { useAuth } from "@/providers/auth";
-import { useThemedStyles, useTheme } from "@/providers/theme";
+import { useThemedStyles } from "@/providers/theme";
 import { AuthService } from "@/services/api";
 import { ILoginUserPayload } from "@/services/auth/auth.types";
 import { User } from "@/services/user/user.types";
 import { Logger } from "@/utils/logger";
 import { AppToast } from "@/utils/toast";
 import { useMutation } from "@tanstack/react-query";
-import classNames from "classnames";
 import { router, useLocalSearchParams } from "expo-router";
 import { useFormik } from "formik";
 import { useEffect, useRef, useState } from "react";
@@ -35,7 +34,6 @@ import {
   Platform,
   ScrollView,
   StatusBar,
-  Text,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -62,7 +60,6 @@ type SignInFormValues = InferType<typeof signInSchema>;
 
 export default function SignIn() {
   const theme = useThemedStyles();
-  const { isDark } = useTheme();
   const params = useLocalSearchParams<{ fromOnboarding?: string }>();
   const cameFromOnboarding = params?.fromOnboarding === "true";
   const { login, user, skipLogin } = useAuth();
@@ -198,21 +195,21 @@ export default function SignIn() {
               contentContainerStyle={{ paddingBottom: 40 }}
             >
               <View className="flex-row items-center justify-center gap-3 mb-6">
-              <TouchableOpacity
-                className={`relative p-3 rounded-full bg-transparent border ${theme.primaryBorderColor}`}
-                onPress={handleSkip}
-                disabled={loginMutation.isPending}
-              >
-                <SvgIcon
-                  Icon={DirectLeftIcon}
-                  size={16}
-                  color={theme.primarySpinnerColor}
-                />
-              </TouchableOpacity>
-              <BodyText size="lg" weight="bold" tone={theme.headingTone}>
-                Log in
-              </BodyText>
-            </View>
+                <TouchableOpacity
+                  className={`relative p-3 rounded-full bg-transparent border ${theme.primaryBorderColor}`}
+                  onPress={handleSkip}
+                  disabled={loginMutation.isPending}
+                >
+                  <SvgIcon
+                    Icon={DirectLeftIcon}
+                    size={16}
+                    color={theme.primarySpinnerColor}
+                  />
+                </TouchableOpacity>
+                <BodyText size="lg" weight="bold" tone={theme.headingTone}>
+                  Log in
+                </BodyText>
+              </View>
 
               <View className="gap-3">
                 <TextField
