@@ -8,3 +8,4 @@ export * as OrderService from "../order/order-api";
 export * as ReviewService from "../review/review-api";
 export * as CategoryService from "../category/category-api";
 export * as PaymentService from "../payment/payment-api";
+export * as NotificationService from "../notification/notification-api";

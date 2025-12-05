@@ -1,3 +1,4 @@
+import PrimaryButton from "@/components/common/PrimaryButton";
 import {
   helpLinks,
   legalLinks,
@@ -11,11 +12,13 @@ import { AppEnv } from "@/constants/env";
 import { NOTIFICATION_PROTECTED, PROFILE_DETAIL } from "@/constants/urls";
 import { useAuth } from "@/providers/auth";
 import { ThemePreference, useTheme, useThemedStyles } from "@/providers/theme";
+import { NotificationService } from "@/services/api";
 import { ProfileLink, ScreenKey } from "@/types/profile";
 import { exImageLink } from "@/utils/images";
 import { AppToast } from "@/utils/toast";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
+import { useState } from "react";
 import { Image, ScrollView, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -58,6 +61,7 @@ export default function ProtectedProfile() {
   const { user, logout } = useAuth();
   const theme = useThemedStyles();
   const { isDark, preference, setTheme } = useTheme();
+  const [sendingTestPush, setSendingTestPush] = useState(false);
   const displayName =
     [user?.firstName, user?.lastName].filter(Boolean).join(" ") || "Guest";
   const avatarUri = user?.avatar || exImageLink(displayName);
@@ -92,6 +96,20 @@ export default function ProtectedProfile() {
       AppToast.success("Logged out");
     } catch (error) {
       AppToast.failed("Unable to logout", error as any);
+    }
+  };
+
+  const handleTestPush = async () => {
+    try {
+      setSendingTestPush(true);
+      await NotificationService.sendTestPush();
+      AppToast.success("Test push sent to this device");
+    } catch (error: any) {
+      const message =
+        error?.response?.data?.error || error?.message || "Unable to send push";
+      AppToast.failed(message);
+    } finally {
+      setSendingTestPush(false);
     }
   };
 
@@ -213,6 +231,40 @@ export default function ProtectedProfile() {
               }
             />
           ))}
+        </ProfileSection>
+
+        <View
+          className="h-px my-8"
+          style={{ backgroundColor: isDark ? "#1f2937" : "#E5E7EB" }}
+        />
+
+        <ProfileSection title="Notifications">
+          <View
+            className={`p-4 rounded-2xl border shadow-sm ${theme.surface} ${theme.primaryBorderColor}`}
+          >
+            <View className="flex-row items-center gap-3 mb-3">
+              <Ionicons
+                name="notifications-outline"
+                size={18}
+                color={theme.iconMuted}
+              />
+              <BodyText weight="medium" tone={theme.headingTone}>
+                Send a test push
+              </BodyText>
+            </View>
+            <BodyText size="sm" tone={theme.labelTone} className="mb-4">
+              Make sure push notifications are working on this signed-in device.
+            </BodyText>
+            <PrimaryButton
+              title="Send test push"
+              onPress={handleTestPush}
+              loading={sendingTestPush}
+              loadingText="Sending..."
+              className={`${theme.primaryButtonClass} w-full`}
+              textClassName={theme.primaryTextClassInverse}
+              spinnerColor={theme.primarySpinnerColor}
+            />
+          </View>
         </ProfileSection>
 
         <View

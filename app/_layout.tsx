@@ -7,6 +7,7 @@ import { PaystackProvider } from "@/providers/paystack";
 import { QueryProvider } from "@/providers/query";
 import { ThemeProvider, useTheme, useThemedStyles } from "@/providers/theme";
 import { Logger } from "@/utils/logger";
+import { usePushNotifications } from "@/hooks/usePushNotifications";
 import {
   Jost_400Regular,
   Jost_500Medium,
@@ -29,6 +30,7 @@ if (Platform.OS !== "web") {
 function RootContent() {
   const { isDark } = useTheme();
   const theme = useThemedStyles();
+  usePushNotifications();
   const [ready, setReady] = useState(false);
   const [fontsLoaded] = useFonts({
     Jost_400Regular,
