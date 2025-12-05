@@ -1,4 +1,5 @@
 import AppLoader from "@/components/common/AppLoader";
+import AppOfflineNoticeBanner from "@/components/common/AppOfflineNoticeBanner";
 import { ErrorBoundary } from "@/components/common/ErrorBoundary";
 import { toastConfig } from "@/components/common/ToastConfig";
 import { AuthProvider } from "@/providers/auth";
@@ -15,10 +16,10 @@ import {
 } from "@expo-google-fonts/jost";
 import { Slot } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
+import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
 import { Platform, View } from "react-native";
 import ToastManager from "toastify-react-native";
-import { StatusBar } from "expo-status-bar";
 import "./global.css";
 
 if (Platform.OS !== "web") {
@@ -61,12 +62,14 @@ function RootContent() {
   }, [fontsLoaded]);
 
   const statusBarStyle = isDark ? "light" : "dark";
+  const offlineNotice = <AppOfflineNoticeBanner />;
 
   if (!ready) {
     return (
       <View className={`items-center justify-center flex-1 ${theme.pageBg}`}>
         <AppLoader />
         <StatusBar style={statusBarStyle} />
+        {offlineNotice}
       </View>
     );
   }
@@ -75,6 +78,7 @@ function RootContent() {
     <>
       <StatusBar style={statusBarStyle} />
       <Slot />
+      {offlineNotice}
     </>
   );
 }
