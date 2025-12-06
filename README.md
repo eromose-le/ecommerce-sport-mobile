@@ -69,5 +69,5 @@ eas build -p android --profile preview
 npx -y expo-doctor
 
 - APK download link
-https://expo.dev/accounts/bazzcode/projects/sporty-galaxy-app-test/builds/736dd8ab-5f37-4b33-99e4-377596657108
+https://expo.dev/accounts/bazzcode/projects/sporty-galaxy-app-test/builds/756622e1-7b06-4402-8140-02c5adbf9fd4
  -->

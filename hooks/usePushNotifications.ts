@@ -22,8 +22,8 @@ const ANDROID_CHANNEL_ID = "default";
 const RESOLVED_PROJECT_ID =
   Constants?.expoConfig?.extra?.eas?.projectId ||
   Constants?.easConfig?.projectId ||
-  // Constants?.expoConfig?.projectId
-  null; // Replace with a fallback or valid property if needed
+  // Constants?.expoConfig?.projectId ||
+  null;
 
 const getPermissionsAsync = async () => {
   const { status: existingStatus } = await Notifications.getPermissionsAsync();
@@ -51,11 +51,6 @@ const registerExpoPushToken = async (authToken: string) => {
     return null;
   }
 
-  if (!Constants.isDevice) {
-    Logger.warn("Push", "Push notifications require a physical device");
-    return null;
-  }
-
   const permissionStatus = await getPermissionsAsync();
   if (permissionStatus !== "granted") {
     Logger.warn("Push", "Notification permission not granted");
@@ -67,11 +62,21 @@ const registerExpoPushToken = async (authToken: string) => {
     return null;
   }
 
-  const expoToken = (
-    await Notifications.getExpoPushTokenAsync({
-      projectId: RESOLVED_PROJECT_ID,
-    })
-  ).data;
+  let expoToken: string | null = null;
+  try {
+    expoToken = (
+      await Notifications.getExpoPushTokenAsync({
+        projectId: RESOLVED_PROJECT_ID,
+      })
+    ).data;
+  } catch (error: any) {
+    Logger.warn(
+      "Push",
+      "Failed to get Expo push token (simulator/emulator likely)",
+      error?.message || error
+    );
+    return null;
+  }
 
   await NotificationService.registerPushToken({
     token: expoToken,
