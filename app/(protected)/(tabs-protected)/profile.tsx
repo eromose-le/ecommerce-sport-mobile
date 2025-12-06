@@ -107,7 +107,7 @@ export default function ProtectedProfile() {
         body: "Push notifications are working.",
         data: { tapAction: "open-notifications" },
       });
-      AppToast.success("Test push triggered");
+      AppToast.success("Test push triggered.");
     } catch (error: any) {
       const message =
         error?.response?.data?.error || error?.message || "Unable to send push";
