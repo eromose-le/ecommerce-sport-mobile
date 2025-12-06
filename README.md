@@ -70,4 +70,12 @@ npx -y expo-doctor
 
 - APK download link
 https://expo.dev/accounts/bazzcode/projects/sporty-galaxy-app-test/builds/756622e1-7b06-4402-8140-02c5adbf9fd4
+
+
+DEPLOY 
+npm install --global eas-cli
+eas init --id e60a2dd1-0863-431a-90ef-67dc5273dddb
+npx expo export --platform web
+eas deploy
+eas deploy --prod
  -->

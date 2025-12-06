@@ -32,9 +32,19 @@ export const registerPushToken = async ({
   }
 };
 
-export const sendTestPush = async () => {
+export type SendTestPushPayload = Partial<{
+  title: string;
+  body: string;
+  data: Record<string, any>;
+}>;
+
+export const sendTestPush = async (payload?: SendTestPushPayload) => {
   try {
-    return await api.post("/push/test");
+    return await api.post("/push/test", {
+      title: payload?.title ?? "Test notification",
+      body: payload?.body ?? "Push notifications are working.",
+      data: payload?.data ?? { tapAction: "open-notifications" },
+    });
   } catch (error) {
     Logger.error("sendTestPush Error", error);
     throw error;
