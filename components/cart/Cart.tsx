@@ -1,11 +1,10 @@
 import CartCard from "@/components/cart/CartCard";
 import CartEmpty from "@/components/cart/CartEmpty";
-import Modal from "@/components/common/Modal";
+import ActionPrompt from "@/components/common/ActionPrompt";
 import {
   BodyText,
   Heading,
   PrimaryButton,
-  SecondaryButton,
 } from "@/components/ui";
 import { CHECKOUT, SIGN_IN, SIGN_UP } from "@/constants/urls";
 import {
@@ -21,8 +20,7 @@ import { formatCurrency } from "@/utils/currency";
 import classNames from "classnames";
 import { router } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
-import { Platform, ScrollView, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { ScrollView, View } from "react-native";
 
 export default function Cart() {
   const theme = useThemedStyles();
@@ -50,62 +48,33 @@ export default function Cart() {
   }, [user?.id]);
 
   const authPrompt = (
-    <Modal
+    <ActionPrompt
       visible={showAuthPrompt}
       onClose={() => setShowAuthPrompt(false)}
-      variant="center"
       dismissOnBackdropPress
-      contentHeight="auto"
-    >
-      <SafeAreaView
-        edges={["top", "bottom"]}
-        className={classNames(
-          "gap-3 pt-4",
-          Platform.OS === "ios" ? "pb-10" : "pb-8"
-        )}
-      >
-        <Heading
-          level="h3"
-          weight="semibold"
-          tone={theme.headingTone}
-          align="center"
-        >
-          Sign in to continue
-        </Heading>
-        <BodyText size="sm" tone={theme.labelTone} align="center">
-          Sign in or create an account to manage your cart and checkout.
-        </BodyText>
-        <View className="flex-row gap-3 mt-2">
-          <PrimaryButton
-            title="Sign in"
-            onPress={() => {
-              unSkipLogin();
-              router.replace({
-                pathname: SIGN_IN,
-                params: { fromOnboarding: "true" },
-              });
-            }}
-            className={`flex-1 ${theme.primaryButtonClass}`}
-            textClassName={theme.primaryTextClassInverse}
-            spinnerColor={theme.primarySpinnerColor}
-          />
-          <SecondaryButton
-            title="Create account"
-            onPress={() => {
-              unSkipLogin();
-              router.replace({
-                pathname: SIGN_UP,
-                params: { fromOnboarding: "true" },
-              });
-            }}
-            // onPress={() => navigateToAuth(SIGN_UP)}
-            className={`flex-1 ${theme.secondaryButtonClass}`}
-            textClassName={theme.secondaryTextClass}
-            spinnerColor={theme.secondarySpinnerColor}
-          />
-        </View>
-      </SafeAreaView>
-    </Modal>
+      title="Sign in to continue"
+      description="Sign in or create an account to manage your cart and checkout."
+      primaryAction={{
+        title: "Sign in",
+        onPress: () => {
+          unSkipLogin();
+          router.replace({
+            pathname: SIGN_IN,
+            params: { fromOnboarding: "true" },
+          });
+        },
+      }}
+      secondaryAction={{
+        title: "Create account",
+        onPress: () => {
+          unSkipLogin();
+          router.replace({
+            pathname: SIGN_UP,
+            params: { fromOnboarding: "true" },
+          });
+        },
+      }}
+    />
   );
 
   if (isEmpty) {

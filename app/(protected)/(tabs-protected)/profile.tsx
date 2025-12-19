@@ -9,6 +9,7 @@ import ProfileSection from "@/components/profile/ProfileSection";
 import { BodyText, Heading, LinkButton } from "@/components/ui";
 import { AppEnv } from "@/constants/env";
 import { NOTIFICATION_PROTECTED, PROFILE_DETAIL } from "@/constants/urls";
+import ActionPrompt from "@/components/common/ActionPrompt";
 import { useAuth } from "@/providers/auth";
 import { useTheme, useThemedStyles } from "@/providers/theme";
 import { ProfileLink, ScreenKey } from "@/types/profile";
@@ -16,6 +17,7 @@ import { exImageLink } from "@/utils/images";
 import { AppToast } from "@/utils/toast";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
+import { useState } from "react";
 import { Image, ScrollView, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -32,6 +34,7 @@ export default function ProtectedProfile() {
   const { user, logout } = useAuth();
   const theme = useThemedStyles();
   const { isDark } = useTheme();
+  const [showLogoutPrompt, setShowLogoutPrompt] = useState(false);
   const displayName =
     [user?.firstName, user?.lastName].filter(Boolean).join(" ") || "Guest";
   const avatarUri = user?.avatar || exImageLink(displayName);
@@ -67,6 +70,15 @@ export default function ProtectedProfile() {
     } catch (error) {
       AppToast.failed("Unable to logout", error as any);
     }
+  };
+
+  const handleLogoutPress = () => {
+    setShowLogoutPrompt(true);
+  };
+
+  const handleLogoutConfirm = async () => {
+    setShowLogoutPrompt(false);
+    await handleLogout();
   };
 
   return (
@@ -157,7 +169,7 @@ export default function ProtectedProfile() {
 
           <ProfileRow
             link={{ key: "logout", label: "Logout", icon: "log-out-outline" }}
-            onPress={handleLogout}
+            onPress={handleLogoutPress}
           />
         </ProfileSection>
 
@@ -179,6 +191,20 @@ export default function ProtectedProfile() {
             Version {versionNumber}
           </BodyText>
         </View>
+        <ActionPrompt
+          visible={showLogoutPrompt}
+          onClose={() => setShowLogoutPrompt(false)}
+          title="Log out of your account?"
+          description="You will need to sign in again to access your profile and orders."
+          primaryAction={{
+            title: "Continue",
+            onPress: handleLogoutConfirm,
+          }}
+          secondaryAction={{
+            title: "Cancel",
+            onPress: () => setShowLogoutPrompt(false),
+          }}
+        />
       </ScrollView>
     </SafeAreaView>
   );
