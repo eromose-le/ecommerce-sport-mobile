@@ -11,7 +11,7 @@ import { BodyText, Heading, LinkButton } from "@/components/ui";
 import { AppEnv } from "@/constants/env";
 import { NOTIFICATION_PROTECTED, PROFILE_DETAIL } from "@/constants/urls";
 import { useAuth } from "@/providers/auth";
-import { ThemePreference, useTheme, useThemedStyles } from "@/providers/theme";
+import { useTheme, useThemedStyles } from "@/providers/theme";
 import { NotificationService } from "@/services/api";
 import { ProfileLink, ScreenKey } from "@/types/profile";
 import { exImageLink } from "@/utils/images";
@@ -24,32 +24,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 const versionNumber = AppEnv.config.appVersion;
 
-const themeOptions: {
-  key: ThemePreference;
-  label: string;
-  description: string;
-  icon: keyof typeof Ionicons.glyphMap;
-}[] = [
-  {
-    key: "light",
-    label: "Light",
-    description: "Always use the light appearance",
-    icon: "sunny-outline",
-  },
-  {
-    key: "dark",
-    label: "Dark",
-    description: "Always use the dark appearance",
-    icon: "moon-outline",
-  },
-  {
-    key: "system",
-    label: "System",
-    description: "Follow your device appearance",
-    icon: "phone-portrait-outline",
-  },
-];
-
 const navigateToProfileDetail = (key: ScreenKey) => {
   router.push({
     pathname: PROFILE_DETAIL,
@@ -60,7 +34,7 @@ const navigateToProfileDetail = (key: ScreenKey) => {
 export default function ProtectedProfile() {
   const { user, logout } = useAuth();
   const theme = useThemedStyles();
-  const { isDark, preference, setTheme } = useTheme();
+  const { isDark } = useTheme();
   const [sendingTestPush, setSendingTestPush] = useState(false);
   const displayName =
     [user?.firstName, user?.lastName].filter(Boolean).join(" ") || "Guest";
@@ -117,9 +91,6 @@ export default function ProtectedProfile() {
     }
   };
 
-  const selectedThemeLabel =
-    themeOptions.find((option) => option.key === preference)?.label || "Light";
-
   return (
     <SafeAreaView className={`flex-1 ${theme.pageBg}`}>
       <ScrollView
@@ -164,67 +135,6 @@ export default function ProtectedProfile() {
         />
 
         <ProfileSection title="Settings">
-          <View
-            className={`p-4 rounded-2xl border shadow-sm ${theme.surface} ${theme.primaryBorderColor}`}
-          >
-            <View className="flex-row items-center justify-between">
-              <View className="flex-row items-center gap-3">
-                <Ionicons
-                  name="color-palette-outline"
-                  size={18}
-                  color={theme.iconMuted}
-                />
-                <BodyText size="md" weight="medium" tone={theme.headingTone}>
-                  Appearance
-                </BodyText>
-              </View>
-              <BodyText size="sm" tone={theme.labelTone}>
-                {selectedThemeLabel}
-              </BodyText>
-            </View>
-
-            <View className="gap-3 mt-4">
-              {themeOptions.map((option) => {
-                const isSelected = option.key === preference;
-                const accentColor = isDark ? "#f3f4f6" : "#111827";
-
-                return (
-                  <TouchableOpacity
-                    key={option.key}
-                    className="flex-row items-center justify-between px-3 py-3 rounded-xl"
-                    style={{
-                      backgroundColor: isDark ? "#111827" : "#F5F5F5",
-                      borderColor: isSelected ? accentColor : "transparent",
-                      borderWidth: isSelected ? 1 : 0,
-                    }}
-                    onPress={() => setTheme(option.key)}
-                    activeOpacity={0.9}
-                  >
-                    <View className="flex-row items-center gap-3">
-                      <Ionicons
-                        name={option.icon}
-                        size={20}
-                        color={isSelected ? accentColor : theme.iconMuted}
-                      />
-                      <View className="gap-1">
-                        <BodyText weight="medium" tone={theme.headingTone}>
-                          {option.label}
-                        </BodyText>
-                        <BodyText size="sm" tone={theme.labelTone}>
-                          {option.description}
-                        </BodyText>
-                      </View>
-                    </View>
-                    <Ionicons
-                      name={isSelected ? "radio-button-on" : "radio-button-off"}
-                      size={18}
-                      color={isSelected ? accentColor : theme.iconMuted}
-                    />
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
-          </View>
           {settingsLinks.map((link) => (
             <ProfileRow
               key={link.key}

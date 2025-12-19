@@ -3,6 +3,7 @@ import { ProfileLink } from "@/types/profile";
 export const profileKeys = {
   myOrders: "my-orders",
   userProfile: "user-profile",
+  appearance: "appearance",
   paymentMethods: "payment-methods",
   deliveryAddress: "delivery-address",
   appLock: "app-lock",
@@ -18,6 +19,11 @@ export const settingsLinks: ProfileLink[] = [
     key: profileKeys.userProfile,
     label: "User profile",
     icon: "person-outline",
+  },
+  {
+    key: profileKeys.appearance,
+    label: "Appearance",
+    icon: "color-palette-outline",
   },
   {
     key: profileKeys.paymentMethods,
@@ -66,6 +72,7 @@ export const legalLinks: ProfileLink[] = [
 export const SCREEN_LABELS: Record<string, string> = {
   [profileKeys.myOrders]: "My Orders",
   [profileKeys.userProfile]: "User profile",
+  [profileKeys.appearance]: "Appearance",
   [profileKeys.paymentMethods]: "Payment methods",
   [profileKeys.deliveryAddress]: "Delivery address",
   [profileKeys.appLock]: "App security",

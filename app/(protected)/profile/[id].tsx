@@ -3,19 +3,20 @@ import {
   profileKeys,
   SCREEN_LABELS,
 } from "@/components/profile/profile-constants";
+import { BodyText } from "@/components/ui";
+import { useTheme, useThemedStyles } from "@/providers/theme";
 import { ScreenComponentProps, ScreenKey } from "@/types/profile";
 import { useLocalSearchParams } from "expo-router";
 import { View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useThemedStyles } from "@/providers/theme";
-import { BodyText } from "@/components/ui";
+import AppSecurity from "./screens/AppSecurity";
+import Appearance from "./screens/Appearance";
 import ComingSoon from "./screens/ComingSoon";
 import DeliveryAddress from "./screens/DeliveryAddress";
 import Faq from "./screens/Faq";
 import Orders from "./screens/Orders";
 import PaymentMethods from "./screens/PaymentMethods";
 import Policy from "./screens/Policy";
-import AppSecurity from "./screens/AppSecurity";
 import Support from "./screens/Support";
 import UserProfile from "./screens/UserProfile";
 
@@ -24,9 +25,12 @@ const SCREEN_COMPONENTS: Partial<
 > = {
   [profileKeys.myOrders]: () => <Orders />,
   [profileKeys.userProfile]: () => <UserProfile />,
+  [profileKeys.appearance]: () => <Appearance />,
   [profileKeys.deliveryAddress]: () => <DeliveryAddress />,
   [profileKeys.paymentMethods]: () => <PaymentMethods />,
-  [profileKeys.appLock]: () => <AppSecurity />,
+  [profileKeys.appLock]: ({ screenKey }) => (
+    <AppSecurity screenKey={screenKey} />
+  ),
   [profileKeys.faq]: () => <Faq />,
   [profileKeys.support]: () => <Support />,
   [profileKeys.privacyPolicy]: () => <Policy type="privacy" />,
@@ -36,6 +40,7 @@ const SCREEN_COMPONENTS: Partial<
 export default function ProfileDetailScreen() {
   const params = useLocalSearchParams<{ id?: string }>();
   const theme = useThemedStyles();
+  const { isDark } = useTheme();
   const screenKey = (params.id as ScreenKey) || profileKeys.userProfile;
   const ScreenComponent = SCREEN_COMPONENTS[screenKey] ?? ComingSoon;
   const title = SCREEN_LABELS[screenKey] || "Profile";
@@ -44,7 +49,7 @@ export default function ProfileDetailScreen() {
     <SafeAreaView className={`flex-1 ${theme.pageBg}`}>
       <View
         className="flex-row items-center px-6 py-4 border-b"
-        style={{ borderColor: theme.isDark ? "#1f2937" : "#e5e7eb" }}
+        style={{ borderColor: isDark ? "#1f2937" : "#e5e7eb" }}
       >
         <BackButton />
 
