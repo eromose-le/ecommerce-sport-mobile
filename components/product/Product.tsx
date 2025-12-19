@@ -6,14 +6,17 @@ import { ProductService } from "@/services/api";
 import { IProductResponse } from "@/services/product/product.types";
 
 import { useAuth } from "@/providers/auth";
+import { useTheme, useThemedStyles } from "@/providers/theme";
 import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { View } from "react-native";
 import CategorySlider from "../home/CategorySlider";
-import { LinkButton } from "../ui";
+import { SecondaryButton } from "../ui";
 
 export default function Product() {
   const { user } = useAuth();
+  const { isDark } = useTheme();
+  const theme = useThemedStyles();
 
   const christmasQuery = {
     random: true,
@@ -85,8 +88,16 @@ export default function Product() {
         </View>
       </View>
 
-      <View className="mt-2 mb-4">
+      {/* <View className="mt-2 mb-4">
         <LinkButton title="See all products" onPress={handleSeeAll} />
+      </View> */}
+      <View className="mx-auto mt-2 mb-4 w-fit">
+        <SecondaryButton
+          size="sm"
+          title="See all products"
+          onPress={handleSeeAll}
+          className={`w-fit items-center justify-center rounded-full border-2 ${isDark ? "border-[#0f172a]" : theme.surface}`}
+        />
       </View>
 
       {/* RECENT ARRIVAL. Section */}
