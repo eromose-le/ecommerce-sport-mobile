@@ -17,6 +17,7 @@ import Faq from "./screens/Faq";
 import Orders from "./screens/Orders";
 import PaymentMethods from "./screens/PaymentMethods";
 import Policy from "./screens/Policy";
+import PushNotifications from "./screens/PushNotifications";
 import Support from "./screens/Support";
 import UserProfile from "./screens/UserProfile";
 
@@ -26,6 +27,7 @@ const SCREEN_COMPONENTS: Partial<
   [profileKeys.myOrders]: () => <Orders />,
   [profileKeys.userProfile]: () => <UserProfile />,
   [profileKeys.appearance]: () => <Appearance />,
+  [profileKeys.pushNotifications]: () => <PushNotifications />,
   [profileKeys.deliveryAddress]: () => <DeliveryAddress />,
   [profileKeys.paymentMethods]: () => <PaymentMethods />,
   [profileKeys.appLock]: ({ screenKey }) => (

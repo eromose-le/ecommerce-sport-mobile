@@ -30,7 +30,7 @@ const resolveProjectId = () =>
 const isExpoPushToken = (token: string) =>
   /^Expo(Push)?Token\[[A-Za-z0-9-]+\]$/.test(token);
 
-const configureAndroidChannel = async () => {
+export const configureAndroidChannel = async () => {
   if (Platform.OS !== "android") return;
 
   await Notifications.setNotificationChannelAsync(ANDROID_CHANNEL_ID, {
@@ -42,7 +42,7 @@ const configureAndroidChannel = async () => {
   });
 };
 
-const registerForPushNotificationsAsync = async (
+export const registerForPushNotificationsAsync = async (
   authToken: string
 ): Promise<string | null> => {
   if (Platform.OS === "web") {
