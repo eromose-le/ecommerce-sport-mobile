@@ -1,5 +1,6 @@
 import AppProtectedHeader from "@/components/common/AppProtectedHeader";
 import { LoadingContent } from "@/components/common/LoadingContent";
+import HeroSlider from "@/components/home/HeroSlider";
 import Product from "@/components/product/Product";
 import { BodyText, Container } from "@/components/ui";
 import SafeContainer from "@/components/ui/layout/safe-container";
@@ -165,6 +166,11 @@ export default function ProtectedHome() {
             </TouchableOpacity>
           </Container>
         </Animated.View>
+
+        {/* Hero Slider */}
+        <View className="my-4">
+          <HeroSlider />
+        </View>
 
         <Product />
       </ScrollView>

@@ -15,7 +15,7 @@ import { Product } from "@/services/product/product.types";
 import { Ionicons } from "@expo/vector-icons";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import classNames from "classnames";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { ScrollView, TextInput, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { BackButton } from "../common/BackButton";
@@ -36,6 +36,12 @@ type FilterState = {
   createdAt?: string | null;
   page: number;
   limit: number;
+};
+
+type AllProductsProps = {
+  initialCategoryId?: string;
+  initialSubcategoryId?: string;
+  initialQuery?: string;
 };
 
 const COLOR_FILTERS = [
@@ -76,11 +82,43 @@ const defaultFilter: FilterState = {
   limit: PAGINATION_DEFAULT.limit,
 };
 
-const AllProducts = () => {
+const buildInitialFilter = ({
+  initialCategoryId,
+  initialSubcategoryId,
+  initialQuery,
+}: AllProductsProps): FilterState => ({
+  ...defaultFilter,
+  ...(initialQuery ? { q: initialQuery } : {}),
+  ...(initialCategoryId ? { category: initialCategoryId } : {}),
+  ...(initialSubcategoryId ? { subcategory: initialSubcategoryId } : {}),
+});
+
+const AllProducts = ({
+  initialCategoryId,
+  initialSubcategoryId,
+  initialQuery,
+}: AllProductsProps) => {
   const theme = useThemedStyles();
   const { isDark } = useTheme();
-  const [filter, setFilter] = useState<FilterState>(defaultFilter);
+  const [filter, setFilter] = useState<FilterState>(() =>
+    buildInitialFilter({ initialCategoryId, initialSubcategoryId, initialQuery })
+  );
   const [showFilters, setShowFilters] = useState(false);
+
+  useEffect(() => {
+    const next = buildInitialFilter({
+      initialCategoryId,
+      initialSubcategoryId,
+      initialQuery,
+    });
+    setFilter((prev) => {
+      const hasChanged =
+        prev.category !== next.category ||
+        prev.subcategory !== next.subcategory ||
+        prev.q !== next.q;
+      return hasChanged ? next : prev;
+    });
+  }, [initialCategoryId, initialQuery, initialSubcategoryId]);
 
   const getPillClass = (isActive: boolean) =>
     classNames(
@@ -121,6 +159,15 @@ const AllProducts = () => {
     Array.isArray(categoryDetail.data.subcategories)
       ? categoryDetail.data.subcategories
       : [];
+
+  const activeCategoryLabel = filter.category
+    ? categories.find((item) => item.id === filter.category)?.name ||
+      filter.category
+    : undefined;
+  const activeSubcategoryLabel = filter.subcategory
+    ? subcategories.find((item) => item.id === filter.subcategory)?.name ||
+      filter.subcategory
+    : undefined;
 
   const debouncedSearch = useDebouncedValue(filter.q.trim(), 400);
 
@@ -236,13 +283,13 @@ const AllProducts = () => {
   const activeBadges = [
     filter.category
       ? {
-          label: filter.category,
+          label: activeCategoryLabel ?? filter.category,
           onClear: () => updateFilter({ category: undefined }),
         }
       : null,
     filter.subcategory
       ? {
-          label: `Sub: ${filter.subcategory}`,
+          label: `Sub: ${activeSubcategoryLabel ?? filter.subcategory}`,
           onClear: () => updateFilter({ subcategory: undefined }),
         }
       : null,

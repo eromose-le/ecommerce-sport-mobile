@@ -1,4 +1,5 @@
 import AppPublicHeader from "@/components/common/AppPublicHeader";
+import HeroSlider from "@/components/home/HeroSlider";
 import Product from "@/components/product/Product";
 import { BodyText, Container } from "@/components/ui";
 import SafeContainer from "@/components/ui/layout/safe-container";
@@ -58,7 +59,7 @@ export default function PublicHome() {
       className={`${theme.pageBg} flex-1`}
     >
       <ScrollView
-        className="flex-1 px-5"
+        className="flex-1"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 10 }}
         stickyHeaderIndices={[1]}
@@ -125,6 +126,11 @@ export default function PublicHome() {
             </TouchableOpacity>
           </Container>
         </Animated.View>
+
+        {/* Hero Slider */}
+        <View className="my-4">
+          <HeroSlider />
+        </View>
 
         <Product />
       </ScrollView>

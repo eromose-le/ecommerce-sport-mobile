@@ -12,6 +12,8 @@ import React from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 import { BodyText } from "../ui";
 
+const bubbleImage = require("@/assets/images/bubble.png");
+
 interface ProductCardProps {
   product: Product;
   horizontal?: boolean;
@@ -52,7 +54,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         <Text
           className={classNames(
             !discountCap && "hidden",
-            "bg-orange-400 rounded-md p-1 absolute w-fit z-[1] text-xs text-white font-jost-semibold"
+            "bg-orange-400 rounded-md p-1 absolute w-fit z-[2] text-xs text-white font-jost-semibold"
           )}
         >
           {discountCap}
@@ -65,11 +67,20 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           resizeMode="contain"
         /> */}
 
-        <Image
-          source={resolveImageSource(product?.displayImage)}
-          className={`w-full ${horizontal ? "h-32" : "h-40"} bg-[#F5F5F7]`}
-          resizeMode="cover"
-        />
+        <View className="relative">
+          <Image
+            source={resolveImageSource(product?.displayImage)}
+            className={`w-full ${horizontal ? "h-32" : "h-40"} bg-[#F5F5F7]`}
+            resizeMode="cover"
+          />
+          <Image
+            source={bubbleImage}
+            resizeMode="contain"
+            className="absolute top-2 left-2 z-[1]"
+            style={{ width: 44, height: 64 }}
+            // pointerEvents="none"
+          />
+        </View>
         <BodyText
           size="md"
           align="left"

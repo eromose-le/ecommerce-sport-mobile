@@ -68,6 +68,7 @@ export type TProductQuery = {
   category?: string;
   subcategory?: string;
   stock?: string;
+  random?: boolean;
   color?: string[];
   type?: string[];
   size?: string[];
