@@ -1,6 +1,6 @@
 import { useThemedStyles } from "@/providers/theme";
 import classNames from "classnames";
-import React from "react";
+import React, { memo } from "react";
 import { View } from "react-native";
 
 interface SkeletonCardProps {
@@ -8,7 +8,7 @@ interface SkeletonCardProps {
   horizontal?: boolean;
 }
 
-export const SkeletonCard: React.FC<SkeletonCardProps> = ({
+const SkeletonCardComponent: React.FC<SkeletonCardProps> = ({
   width,
   horizontal,
 }) => {
@@ -45,3 +45,5 @@ export const SkeletonCard: React.FC<SkeletonCardProps> = ({
     </View>
   );
 };
+
+export const SkeletonCard = memo(SkeletonCardComponent);

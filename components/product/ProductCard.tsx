@@ -8,7 +8,7 @@ import { resolveImageSource } from "@/utils/images";
 import { Ionicons } from "@expo/vector-icons";
 import classNames from "classnames";
 import { Link } from "expo-router";
-import React from "react";
+import React, { memo } from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 import { BodyText } from "../ui";
 
@@ -22,7 +22,7 @@ interface ProductCardProps {
   onAddToCart?: () => void;
 }
 
-export const ProductCard: React.FC<ProductCardProps> = ({
+const ProductCardComponent: React.FC<ProductCardProps> = ({
   product,
   horizontal = false,
   width,
@@ -30,7 +30,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 }) => {
   const { isDark } = useTheme();
   const theme = useThemedStyles();
-  const { addToCart } = useCartStore();
+  const addToCart = useCartStore((state) => state.addToCart);
   const discountCap = calculatePercentageDecrease({
     price: Number(product?.price),
     salesPrice: Number(product?.salesPrice),
@@ -159,3 +159,5 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     </Link>
   );
 };
+
+export const ProductCard = memo(ProductCardComponent);

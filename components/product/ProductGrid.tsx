@@ -1,6 +1,6 @@
 import { useThemedStyles } from "@/providers/theme";
 import { Product } from "@/services/product/product.types";
-import React, { useMemo } from "react";
+import React, { useCallback, useMemo } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -70,6 +70,31 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
     [skeletonCount]
   );
 
+  const dataSource = useMemo(
+    () => (loading ? skeletons : data),
+    [data, loading, skeletons]
+  );
+
+  const keyExtractor = useCallback((item: GridItem, index: number) => {
+    const id = (item as any)?.id;
+    return id ? String(id) : `item-${index}`;
+  }, []);
+
+  const renderItem = useCallback(
+    ({ item, index }: { item: GridItem; index: number }) =>
+      (item as SkeletonItem).skeleton ? (
+        <SkeletonCard width={cardWidth} horizontal={horizontal} />
+      ) : (
+        <ProductCard
+          product={item as Product}
+          width={cardWidth}
+          horizontal={horizontal}
+          index={index}
+        />
+      ),
+    [cardWidth, horizontal]
+  );
+
   if (error) {
     return <ErrorState error={error} onRetry={onRetry} />;
   }
@@ -80,7 +105,7 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
 
   return (
     <FlatList
-      data={(loading ? skeletons : data) as GridItem[]}
+      data={dataSource as GridItem[]}
       horizontal={horizontal}
       scrollEnabled={scrollEnabled}
       showsHorizontalScrollIndicator={false}
@@ -100,21 +125,8 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
             }
           : undefined
       }
-      keyExtractor={(item: GridItem, index) =>
-        (item as any)?.id ? String((item as any).id) : `item-${index}`
-      }
-      renderItem={({ item, index }) =>
-        (item as SkeletonItem).skeleton ? (
-          <SkeletonCard width={cardWidth} horizontal={horizontal} />
-        ) : (
-          <ProductCard
-            product={item as Product}
-            width={cardWidth}
-            horizontal={horizontal}
-            index={index}
-          />
-        )
-      }
+      keyExtractor={keyExtractor}
+      renderItem={renderItem}
       ListHeaderComponent={ListHeaderComponent}
       ListFooterComponent={
         loadingMore ? (
