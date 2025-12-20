@@ -1,10 +1,11 @@
 import { SIGN_IN, TABS_PUBLIC } from "@/constants/urls";
 import { User } from "@/services/user/user.types";
+import { useAppLockStore } from "@/store/useAppLockStore";
+import { Logger } from "@/utils/logger";
+import { identifyLogRocketUser } from "@/utils/logrocket.native";
 import { router } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { Logger } from "@/utils/logger";
-import { useAppLockStore } from "@/store/useAppLockStore";
 
 interface AuthContextProps {
   user: User | null;
@@ -52,6 +53,32 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       isMounted = false;
     };
   }, []);
+
+  useEffect(() => {
+    if (!user?.id) return;
+
+    const name = [user.firstName, user.lastName].filter(Boolean).join(" ");
+    const traits: Record<string, string | number | boolean> = {};
+
+    if (name) traits.name = name;
+    if (user.email) traits.email = user.email;
+    if (user.phone) traits.phone = user.phone;
+    if (typeof user.isVerified === "boolean")
+      traits.isVerified = user.isVerified;
+    if (typeof user.unreadNotifications === "number") {
+      traits.unreadNotifications = user.unreadNotifications;
+    }
+
+    identifyLogRocketUser(String(user.id), traits);
+  }, [
+    user?.email,
+    user?.firstName,
+    user?.id,
+    user?.isVerified,
+    user?.lastName,
+    user?.phone,
+    user?.unreadNotifications,
+  ]);
 
   const skipLogin = async () => {
     setSkippedLogin(true);

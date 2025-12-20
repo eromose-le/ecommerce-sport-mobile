@@ -8,6 +8,7 @@ import { QueryProvider } from "@/providers/query";
 import { ThemeProvider, useTheme, useThemedStyles } from "@/providers/theme";
 import { Logger } from "@/utils/logger";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
+import { initLogRocket } from "@/utils/logrocket.native";
 import {
   Jost_400Regular,
   Jost_500Medium,
@@ -31,6 +32,9 @@ function RootContent() {
   const { isDark } = useTheme();
   const theme = useThemedStyles();
   usePushNotifications();
+  useEffect(() => {
+    initLogRocket();
+  }, []);
   const [ready, setReady] = useState(false);
   const [fontsLoaded] = useFonts({
     Jost_400Regular,

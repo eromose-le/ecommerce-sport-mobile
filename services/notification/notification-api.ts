@@ -35,6 +35,7 @@ export const registerPushToken = async ({
 export type SendTestPushPayload = Partial<{
   title: string;
   body: string;
+  token: string;
   data: Record<string, any>;
 }>;
 
@@ -43,6 +44,7 @@ export const sendTestPush = async (payload?: SendTestPushPayload) => {
     return await api.post("/push/test", {
       title: payload?.title ?? "Test notification",
       body: payload?.body ?? "Push notifications are working.",
+      token: payload?.token,
       data: payload?.data ?? { tapAction: "open-notifications" },
     });
   } catch (error) {

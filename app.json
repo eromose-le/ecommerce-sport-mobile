@@ -47,7 +47,16 @@
         }
       ],
       "expo-font",
-      "expo-video"
+      "expo-video",
+      "@logrocket/react-native",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "minSdkVersion": 25
+          }
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

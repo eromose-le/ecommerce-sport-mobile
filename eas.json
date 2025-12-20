@@ -14,7 +14,8 @@
         "EXPO_PUBLIC_API_URL": "https://sporty-galaxy-dev-backend.onrender.com/api/v1",
         "EXPO_PUBLIC_PAYSTACK_PUBLIC_KEY": "k_test_d9d3077d7d3332c330535e8b5df75ea74dcb28fb",
         "EXPO_PUBLIC_PAYSTACK_SECRET_KEY": "sk_test_c284d2e10acad883b5ac344cdda42d61fe762334",
-        "EXPO_PUBLIC_EAS_PROJECT_ID": "e60a2dd1-0863-431a-90ef-67dc5273dddb"
+        "EXPO_PUBLIC_EAS_PROJECT_ID": "e60a2dd1-0863-431a-90ef-67dc5273dddb",
+        "EXPO_PUBLIC_LOGROCKET_APP_ID": "ktmw2b/sportygalaxy-test"
       }
     },
     "preview": {
@@ -24,7 +25,8 @@
         "EXPO_PUBLIC_API_URL": "https://sporty-galaxy-dev-backend.onrender.com/api/v1",
         "EXPO_PUBLIC_PAYSTACK_PUBLIC_KEY": "k_test_d9d3077d7d3332c330535e8b5df75ea74dcb28fb",
         "EXPO_PUBLIC_PAYSTACK_SECRET_KEY": "sk_test_c284d2e10acad883b5ac344cdda42d61fe762334",
-        "EXPO_PUBLIC_EAS_PROJECT_ID": "e60a2dd1-0863-431a-90ef-67dc5273dddb"
+        "EXPO_PUBLIC_EAS_PROJECT_ID": "e60a2dd1-0863-431a-90ef-67dc5273dddb",
+        "EXPO_PUBLIC_LOGROCKET_APP_ID": "ktmw2b/sportygalaxy-test"
       }
     },
     "production": {
@@ -34,7 +36,8 @@
         "EXPO_PUBLIC_API_URL": "https://sporty-galaxy-dev-backend.onrender.com/api/v1",
         "EXPO_PUBLIC_PAYSTACK_PUBLIC_KEY": "k_test_d9d3077d7d3332c330535e8b5df75ea74dcb28fb",
         "EXPO_PUBLIC_PAYSTACK_SECRET_KEY": "sk_test_c284d2e10acad883b5ac344cdda42d61fe762334",
-        "EXPO_PUBLIC_EAS_PROJECT_ID": "e60a2dd1-0863-431a-90ef-67dc5273dddb"
+        "EXPO_PUBLIC_EAS_PROJECT_ID": "e60a2dd1-0863-431a-90ef-67dc5273dddb",
+        "EXPO_PUBLIC_LOGROCKET_APP_ID": "ktmw2b/sportygalaxy-test"
       },
       "channel": "production"
     },
@@ -45,7 +48,8 @@
         "EXPO_PUBLIC_API_URL": "https://sporty-galaxy-dev-backend.onrender.com/api/v1",
         "EXPO_PUBLIC_PAYSTACK_PUBLIC_KEY": "k_test_d9d3077d7d3332c330535e8b5df75ea74dcb28fb",
         "EXPO_PUBLIC_PAYSTACK_SECRET_KEY": "sk_test_c284d2e10acad883b5ac344cdda42d61fe762334",
-        "EXPO_PUBLIC_EAS_PROJECT_ID": "e60a2dd1-0863-431a-90ef-67dc5273dddb"
+        "EXPO_PUBLIC_EAS_PROJECT_ID": "e60a2dd1-0863-431a-90ef-67dc5273dddb",
+        "EXPO_PUBLIC_LOGROCKET_APP_ID": "ktmw2b/sportygalaxy-test"
       },
       "channel": "staging"
     }

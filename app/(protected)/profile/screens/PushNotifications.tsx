@@ -108,11 +108,24 @@ const PushNotifications = () => {
       AppToast.info("Enable push notifications to send a test alert.");
       return;
     }
+    if (!user?.token) {
+      AppToast.info("Sign in to send a test alert.");
+      return;
+    }
     try {
       setSendingTestPush(true);
+      const expoToken = await registerForPushNotificationsAsync(user.token);
+      if (!expoToken) {
+        AppToast.failed("Unable to get a push token for this device.");
+        return;
+      }
+
+      AppToast.success(`EXPO TOKEN ${expoToken}`);
+      Logger.warn("EXPO TOKEN", expoToken);
       await NotificationService.sendTestPush({
         title: "Sporty Galaxy test",
         body: "Push notifications are working.",
+        token: expoToken,
         data: { tapAction: "open-notifications" },
       });
       AppToast.success("Test push triggered.");
@@ -202,3 +215,9 @@ const PushNotifications = () => {
 };
 
 export default PushNotifications;
+
+// {
+//       token: "ExponentPushToken[kM-hFgJyGUE_QzNoYpKp_D]",
+//       platform: "ios",
+//       appVersion: "1.0.1",
+//     }

@@ -2,7 +2,10 @@ import { AppEnv } from "@/constants/env";
 import { useAuth } from "@/providers/auth";
 import { NotificationService } from "@/services/api";
 import { Logger } from "@/utils/logger";
+import { trackLogRocketEvent } from "@/utils/logrocket.native";
+import { AppToast } from "@/utils/toast";
 import Constants from "expo-constants";
+import * as Device from "expo-device";
 import type { Subscription } from "expo-notifications";
 import * as Notifications from "expo-notifications";
 import { useEffect, useRef } from "react";
@@ -27,8 +30,8 @@ const resolveProjectId = () =>
   process.env.EXPO_PUBLIC_EAS_PROJECT_ID ||
   null;
 
-const isExpoPushToken = (token: string) =>
-  /^Expo(Push)?Token\[[A-Za-z0-9-]+\]$/.test(token);
+// const isExpoPushToken = (token: string) =>
+//   /^Expo(Push)?Token\[[A-Za-z0-9-]+\]$/.test(token);
 
 export const configureAndroidChannel = async () => {
   if (Platform.OS !== "android") return;
@@ -50,10 +53,24 @@ export const registerForPushNotificationsAsync = async (
     return null;
   }
 
-  // if (!Device.isDevice) {
-  //   Logger.warn("Push", "Must use a physical device for push notifications");
-  //   return null;
-  // }
+  if (!Device.isDevice) {
+    AppToast.failed(
+      `Must use a physical device for push notifications ${JSON.stringify({
+        deviceIs: Device.isDevice,
+        deviceName: Device.deviceName,
+        deviceType: Device.deviceType,
+        deviceBrand: Device.brand,
+      })}`
+    );
+    trackLogRocketEvent("Device.Info", {
+      deviceIs: Device.isDevice,
+      deviceName: Device.deviceName,
+      deviceType: Device.deviceType,
+      deviceBrand: Device.brand,
+    });
+    Logger.warn("Push", "Must use a physical device for push notifications");
+    return null;
+  }
 
   const { status: existingStatus } = await Notifications.getPermissionsAsync();
   const { status: finalStatus } =
@@ -62,12 +79,17 @@ export const registerForPushNotificationsAsync = async (
       : await Notifications.requestPermissionsAsync();
 
   if (finalStatus !== "granted") {
+    trackLogRocketEvent("Push.PermissionDenied", {
+      platform: Platform.OS,
+      status: finalStatus,
+    });
     Logger.warn("Push", "Notification permission not granted");
     return null;
   }
 
   const projectId = resolveProjectId();
   if (!projectId) {
+    trackLogRocketEvent("Push.MissingProjectId", { platform: Platform.OS });
     Logger.warn(
       "Push",
       "Missing EAS project id; set extra.eas.projectId in app.json/app.config"
@@ -83,6 +105,7 @@ export const registerForPushNotificationsAsync = async (
       })
     ).data;
   } catch (error: any) {
+    trackLogRocketEvent("Push.TokenFetchFailed", { platform: Platform.OS });
     Logger.warn(
       "Push",
       "Failed to get Expo push token (simulator/emulator likely)",
@@ -91,10 +114,15 @@ export const registerForPushNotificationsAsync = async (
     return null;
   }
 
+  const tokenPreview = `${expoToken.slice(0, 8)}...`;
   Logger.info("Push", "Expo token acquired", {
     projectId,
     platform: Platform.OS,
-    tokenPreview: `${expoToken.slice(0, 8)}...`,
+    tokenPreview,
+  });
+  trackLogRocketEvent("Push.TokenAcquired", {
+    platform: Platform.OS,
+    tokenPreview,
   });
 
   // if (!isExpoPushToken(expoToken)) {
@@ -104,12 +132,23 @@ export const registerForPushNotificationsAsync = async (
   //   return null;
   // }
 
-  await NotificationService.registerPushToken({
-    token: expoToken,
-    platform: Platform.OS,
-    appVersion: Constants.expoConfig?.version ?? AppEnv.config.appVersion,
-    authToken,
-  });
+  try {
+    await NotificationService.registerPushToken({
+      token: expoToken,
+      platform: Platform.OS,
+      appVersion: Constants.expoConfig?.version ?? AppEnv.config.appVersion,
+      authToken,
+    });
+    trackLogRocketEvent("Push.TokenRegistered", {
+      platform: Platform.OS,
+      tokenPreview,
+    });
+  } catch (error) {
+    trackLogRocketEvent("Push.TokenRegistrationFailed", {
+      platform: Platform.OS,
+    });
+    throw error;
+  }
 
   return expoToken;
 };
@@ -130,6 +169,18 @@ export const usePushNotifications = () => {
   useEffect(() => {
     receivedSubRef.current = Notifications.addNotificationReceivedListener(
       (notification) => {
+        const content = notification.request.content;
+        const rawData = content.data ?? {};
+        const data =
+          typeof rawData === "object" && rawData !== null ? rawData : {};
+        const dataKeys = Object.keys(data);
+        const bodyPreview = content.body ? content.body.slice(0, 80) : "";
+        trackLogRocketEvent("Push.Received", {
+          title: content.title ?? "",
+          bodyPreview,
+          hasData: dataKeys.length > 0,
+          dataKeys,
+        });
         Logger.info(
           "Push",
           "Notification received",
@@ -140,6 +191,17 @@ export const usePushNotifications = () => {
 
     responseSubRef.current =
       Notifications.addNotificationResponseReceivedListener((response) => {
+        const content = response.notification.request.content;
+        const rawData = content.data ?? {};
+        const data =
+          typeof rawData === "object" && rawData !== null ? rawData : {};
+        const dataKeys = Object.keys(data);
+        trackLogRocketEvent("Push.Tapped", {
+          actionIdentifier: response.actionIdentifier,
+          title: content.title ?? "",
+          hasData: dataKeys.length > 0,
+          dataKeys,
+        });
         Logger.info(
           "Push",
           "Notification tapped",

@@ -92,7 +92,7 @@ export default function ProtectedProfile() {
             source={{ uri: avatarUri }}
             className="mb-4 rounded-full w-28 h-28"
           />
-          <Heading level="h2" weight="bold" tone={theme.headingTone}>
+          <Heading className="capitalize" level="h2" weight="bold" tone={theme.headingTone}>
             {displayName}
           </Heading>
         </View>
