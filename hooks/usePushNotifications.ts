@@ -99,11 +99,12 @@ export const registerForPushNotificationsAsync = async (
 
   let expoToken: string;
   try {
-    expoToken = (
-      await Notifications.getExpoPushTokenAsync({
-        projectId,
-      })
-    ).data;
+    // expoToken = (
+    //   await Notifications.getExpoPushTokenAsync({
+    //     projectId,
+    //   })
+    // ).data;
+    expoToken = (await Notifications.getDevicePushTokenAsync()).data;
   } catch (error: any) {
     trackLogRocketEvent("Push.TokenFetchFailed", { platform: Platform.OS });
     Logger.warn(
