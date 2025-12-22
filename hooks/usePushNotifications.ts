@@ -62,21 +62,21 @@ export const registerForPushNotificationsAsync = async (
   };
 
   Logger.error("2", 2);
-  if (!Device.isDevice) {
-    AppToast.failed(
-      `Must use a physical device for push notifications ${JSON.stringify(deviceInfo)}`
-    );
-    trackLogRocketEvent("Device.Info", deviceInfo);
-    Logger.warn(
-      "Push",
-      "Must use a physical device for push notifications",
-      deviceInfo
-    );
+  // if (!Device.isDevice) {
+  //   AppToast.failed(
+  //     `Must use a physical device for push notifications ${JSON.stringify(deviceInfo)}`
+  //   );
+  //   trackLogRocketEvent("Device.Info", deviceInfo);
+  //   Logger.warn(
+  //     "Push",
+  //     "Must use a physical device for push notifications",
+  //     deviceInfo
+  //   );
 
-    throw new Error(
-      `Push notifications require a physical device - ${deviceInfo.deviceBrand} ${deviceInfo.deviceType} (${deviceInfo.deviceName})`
-    );
-  }
+  //   throw new Error(
+  //     `Push notifications require a physical device - ${deviceInfo.deviceBrand} ${deviceInfo.deviceType} (${deviceInfo.deviceName})`
+  //   );
+  // }
 
   const { status: existingStatus } = await Notifications.getPermissionsAsync();
   const { status: finalStatus } =
@@ -107,7 +107,7 @@ export const registerForPushNotificationsAsync = async (
     return null;
   }
 
-  let apnDeviceToken: string;
+  let apnDeviceToken: string = "";
   let expoDeviceToken: string = "";
 
   Logger.error("4", 4);
@@ -119,17 +119,20 @@ export const registerForPushNotificationsAsync = async (
     ).data;
     trackLogRocketEvent("Push.expoDeviceToken", {
       expoDeviceToken,
+      apnDeviceToken,
       projectId,
     });
   } catch (error: any) {
-    trackLogRocketEvent("Push.TokenFetchFailed", {
+    trackLogRocketEvent("Push.TokenFetchExpoFailed", {
       projectId,
       platform: Platform.OS,
       deviceIsPhysical: Device.isDevice,
       deviceName: Device.deviceName,
       deviceType: Device.deviceType,
       deviceBrand: Device.brand,
-      error,
+      expoDeviceToken,
+      apnDeviceToken,
+      errorLog: JSON.stringify(error),
     });
     Logger.warn(
       "Push",
@@ -138,32 +141,35 @@ export const registerForPushNotificationsAsync = async (
     );
   }
 
-  try {
-    apnDeviceToken = (await Notifications.getDevicePushTokenAsync()).data;
-    trackLogRocketEvent("Push.apnDeviceToken", {
-      apnDeviceToken,
-      projectId,
-    });
-  } catch (error: any) {
-    trackLogRocketEvent("Push.TokenFetchFailed", {
-      projectId,
-      platform: Platform.OS,
-      deviceIsPhysical: Device.isDevice,
-      deviceName: Device.deviceName,
-      deviceType: Device.deviceType,
-      deviceBrand: Device.brand,
-      error,
-    });
-    Logger.warn(
-      "Push",
-      "Failed to get Expo push token (simulator/emulator likely)",
-      error?.message || error
-    );
-    return null;
-  }
+  // try {
+  //   apnDeviceToken = (await Notifications.getDevicePushTokenAsync()).data;
+  //   trackLogRocketEvent("Push.apnDeviceToken", {
+  //     apnDeviceToken,
+  //     expoDeviceToken,
+  //     projectId,
+  //   });
+  // } catch (error: any) {
+  //   trackLogRocketEvent("Push.TokenFetchApnFailed", {
+  //     projectId,
+  //     platform: Platform.OS,
+  //     deviceIsPhysical: Device.isDevice,
+  //     deviceName: Device.deviceName,
+  //     deviceType: Device.deviceType,
+  //     deviceBrand: Device.brand,
+  //     expoDeviceToken,
+  //     apnDeviceToken,
+  //     errorLog: JSON.stringify(error),
+  //   });
+  //   Logger.warn(
+  //     "Push",
+  //     "Failed to get Expo push token (simulator/emulator likely)",
+  //     error?.message || error
+  //   );
+  // }
   Logger.error("5", 5);
 
-  // const expoDeviceTokenPreview = `${expoDeviceToken.slice(0, 8)}...`;
+  // const expoDeviceTokenPreview = `${apnDeviceToken.slice(0, 8)}...`;
+  // const apnDeviceTokenPreview = `${expoDeviceToken.slice(0, 8)}...`;
   const expoDeviceTokenPreview = expoDeviceToken;
   const apnDeviceTokenPreview = apnDeviceToken;
   Logger.info("Push", "Expo token acquired", {
