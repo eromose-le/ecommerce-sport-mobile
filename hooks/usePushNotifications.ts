@@ -48,28 +48,34 @@ export const configureAndroidChannel = async () => {
 export const registerForPushNotificationsAsync = async (
   authToken: string
 ): Promise<string | null> => {
+  Logger.error("1", 1);
   if (Platform.OS === "web") {
     Logger.warn("Push", "Skipping push registration on web");
     return null;
   }
 
+  const deviceInfo = {
+    deviceIsPhysical: Device.isDevice,
+    deviceName: Device.deviceName,
+    deviceType: Device.deviceType,
+    deviceBrand: Device.brand,
+  };
+
+  Logger.error("2", 2);
   if (!Device.isDevice) {
     AppToast.failed(
-      `Must use a physical device for push notifications ${JSON.stringify({
-        deviceIs: Device.isDevice,
-        deviceName: Device.deviceName,
-        deviceType: Device.deviceType,
-        deviceBrand: Device.brand,
-      })}`
+      `Must use a physical device for push notifications ${JSON.stringify(deviceInfo)}`
     );
-    trackLogRocketEvent("Device.Info", {
-      deviceIs: Device.isDevice,
-      deviceName: Device.deviceName,
-      deviceType: Device.deviceType,
-      deviceBrand: Device.brand,
-    });
-    Logger.warn("Push", "Must use a physical device for push notifications");
-    return null;
+    trackLogRocketEvent("Device.Info", deviceInfo);
+    Logger.warn(
+      "Push",
+      "Must use a physical device for push notifications",
+      deviceInfo
+    );
+
+    throw new Error(
+      `Push notifications require a physical device - ${deviceInfo.deviceBrand} ${deviceInfo.deviceType} (${deviceInfo.deviceName})`
+    );
   }
 
   const { status: existingStatus } = await Notifications.getPermissionsAsync();
@@ -83,9 +89,13 @@ export const registerForPushNotificationsAsync = async (
       platform: Platform.OS,
       status: finalStatus,
     });
-    Logger.warn("Push", "Notification permission not granted");
+    Logger.warn("Push", "Notification permission not granted", deviceInfo);
+    AppToast.pending(
+      `Notification permission not granted ${JSON.stringify(deviceInfo)}`
+    );
     return null;
   }
+  Logger.error("3", 3);
 
   const projectId = resolveProjectId();
   if (!projectId) {
@@ -97,16 +107,53 @@ export const registerForPushNotificationsAsync = async (
     return null;
   }
 
-  let expoToken: string;
+  let apnDeviceToken: string;
+  let expoDeviceToken: string = "";
+
+  Logger.error("4", 4);
   try {
-    // expoToken = (
-    //   await Notifications.getExpoPushTokenAsync({
-    //     projectId,
-    //   })
-    // ).data;
-    expoToken = (await Notifications.getDevicePushTokenAsync()).data;
+    expoDeviceToken = (
+      await Notifications.getExpoPushTokenAsync({
+        projectId,
+      })
+    ).data;
+    trackLogRocketEvent("Push.expoDeviceToken", {
+      expoDeviceToken,
+      projectId,
+    });
   } catch (error: any) {
-    trackLogRocketEvent("Push.TokenFetchFailed", { platform: Platform.OS });
+    trackLogRocketEvent("Push.TokenFetchFailed", {
+      projectId,
+      platform: Platform.OS,
+      deviceIsPhysical: Device.isDevice,
+      deviceName: Device.deviceName,
+      deviceType: Device.deviceType,
+      deviceBrand: Device.brand,
+      error,
+    });
+    Logger.warn(
+      "Push",
+      "Failed to get old Expo push token (pre SDK 49)",
+      error
+    );
+  }
+
+  try {
+    apnDeviceToken = (await Notifications.getDevicePushTokenAsync()).data;
+    trackLogRocketEvent("Push.apnDeviceToken", {
+      apnDeviceToken,
+      projectId,
+    });
+  } catch (error: any) {
+    trackLogRocketEvent("Push.TokenFetchFailed", {
+      projectId,
+      platform: Platform.OS,
+      deviceIsPhysical: Device.isDevice,
+      deviceName: Device.deviceName,
+      deviceType: Device.deviceType,
+      deviceBrand: Device.brand,
+      error,
+    });
     Logger.warn(
       "Push",
       "Failed to get Expo push token (simulator/emulator likely)",
@@ -114,44 +161,55 @@ export const registerForPushNotificationsAsync = async (
     );
     return null;
   }
+  Logger.error("5", 5);
 
-  const tokenPreview = `${expoToken.slice(0, 8)}...`;
+  // const expoDeviceTokenPreview = `${expoDeviceToken.slice(0, 8)}...`;
+  const expoDeviceTokenPreview = expoDeviceToken;
+  const apnDeviceTokenPreview = apnDeviceToken;
   Logger.info("Push", "Expo token acquired", {
     projectId,
     platform: Platform.OS,
-    tokenPreview,
+    expoDeviceTokenPreview,
+    apnDeviceTokenPreview,
   });
   trackLogRocketEvent("Push.TokenAcquired", {
     platform: Platform.OS,
-    tokenPreview,
+    expoDeviceTokenPreview,
+    apnDeviceTokenPreview,
   });
 
-  // if (!isExpoPushToken(expoToken)) {
+  // if (!isExpoPushToken(expoDeviceToken)) {
   //   Logger.warn("Push", "Skipping registration; token is not Expo format", {
-  //     expoToken,
+  //     expoDeviceToken,
   //   });
   //   return null;
   // }
 
   try {
-    await NotificationService.registerPushToken({
-      token: expoToken,
-      platform: Platform.OS,
-      appVersion: Constants.expoConfig?.version ?? AppEnv.config.appVersion,
-      authToken,
-    });
+    Logger.error("6", 6, expoDeviceToken);
+    const result: any =
+      (await NotificationService.registerPushToken({
+        // TODO: send both tokens to support legacy Expo tokens
+        token: expoDeviceToken,
+        platform: Platform.OS,
+        appVersion: Constants.expoConfig?.version ?? AppEnv.config.appVersion,
+        authToken,
+      })) ?? null;
     trackLogRocketEvent("Push.TokenRegistered", {
       platform: Platform.OS,
-      tokenPreview,
+      expoDeviceTokenPreview,
     });
+
+    Logger.success("registerPushToken - result", result?.data);
+
+    return result.data.success;
   } catch (error) {
+    Logger.error("7", 7);
     trackLogRocketEvent("Push.TokenRegistrationFailed", {
       platform: Platform.OS,
     });
     throw error;
   }
-
-  return expoToken;
 };
 
 export const usePushNotifications = () => {

@@ -116,12 +116,14 @@ const PushNotifications = () => {
       setSendingTestPush(true);
       const expoToken = await registerForPushNotificationsAsync(user.token);
       if (!expoToken) {
-        AppToast.failed("Unable to get a push token for this device.");
+        AppToast.failed(
+          `Unable to get a push token for this device. ${JSON.stringify(expoToken)}`
+        );
         return;
       }
 
-      AppToast.success(`EXPO TOKEN ${expoToken}`);
-      Logger.warn("EXPO TOKEN", expoToken);
+      // AppToast.success(`EXPO TOKEN ${expoToken.data}`);
+      // Logger.warn("EXPO TOKEN", expoToken.data);
       await NotificationService.sendTestPush({
         title: "Sporty Galaxy test",
         body: "Push notifications are working.",

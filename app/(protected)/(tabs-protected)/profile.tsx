@@ -1,3 +1,4 @@
+import ActionPrompt from "@/components/common/ActionPrompt";
 import {
   helpLinks,
   legalLinks,
@@ -9,7 +10,6 @@ import ProfileSection from "@/components/profile/ProfileSection";
 import { BodyText, Heading, LinkButton } from "@/components/ui";
 import { AppEnv } from "@/constants/env";
 import { NOTIFICATION_PROTECTED, PROFILE_DETAIL } from "@/constants/urls";
-import ActionPrompt from "@/components/common/ActionPrompt";
 import { useAuth } from "@/providers/auth";
 import { useTheme, useThemedStyles } from "@/providers/theme";
 import { ProfileLink, ScreenKey } from "@/types/profile";
@@ -92,7 +92,12 @@ export default function ProtectedProfile() {
             source={{ uri: avatarUri }}
             className="mb-4 rounded-full w-28 h-28"
           />
-          <Heading className="capitalize" level="h2" weight="bold" tone={theme.headingTone}>
+          <Heading
+            className="capitalize"
+            level="h2"
+            weight="bold"
+            tone={theme.headingTone}
+          >
             {displayName}
           </Heading>
         </View>
@@ -149,7 +154,9 @@ export default function ProtectedProfile() {
               label: "Push notifications",
               icon: "notifications-outline",
             }}
-            onPress={() => navigateToProfileDetail(profileKeys.pushNotifications)}
+            onPress={() =>
+              navigateToProfileDetail(profileKeys.pushNotifications)
+            }
           />
         </ProfileSection>
 

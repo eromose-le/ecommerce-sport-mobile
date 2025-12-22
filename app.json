@@ -50,6 +50,12 @@
       "expo-video",
       "@logrocket/react-native",
       [
+        "expo-notifications",
+        {
+          "defaultChannel": "default"
+        }
+      ],
+      [
         "expo-build-properties",
         {
           "android": {

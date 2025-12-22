@@ -13,9 +13,9 @@ export const registerPushToken = async ({
   platform,
   appVersion,
   authToken,
-}: RegisterPushTokenPayload) => {
+}: RegisterPushTokenPayload | any) => {
   try {
-    await api.post(
+    return await api.post(
       "/push/register-token",
       { token, platform, appVersion },
       authToken
