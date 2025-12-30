@@ -54,6 +54,18 @@ export const registerForPushNotificationsAsync = async (
     return null;
   }
 
+  if (Platform.OS === "android" && Constants.appOwnership === "expo") {
+    AppToast.failed(
+      "Expo Go on Android doesn't support remote push notifications. Use a development build."
+    );
+    Logger.warn("Push", "Expo Go does not support Android push tokens");
+    trackLogRocketEvent("Push.ExpoGoUnsupported", {
+      platform: Platform.OS,
+      appOwnership: Constants.appOwnership,
+    });
+    return null;
+  }
+
   const deviceInfo = {
     deviceIsPhysical: Device.isDevice,
     deviceName: Device.deviceName,
@@ -62,21 +74,18 @@ export const registerForPushNotificationsAsync = async (
   };
 
   Logger.error("2", 2);
-  // if (!Device.isDevice) {
-  //   AppToast.failed(
-  //     `Must use a physical device for push notifications ${JSON.stringify(deviceInfo)}`
-  //   );
-  //   trackLogRocketEvent("Device.Info", deviceInfo);
-  //   Logger.warn(
-  //     "Push",
-  //     "Must use a physical device for push notifications",
-  //     deviceInfo
-  //   );
-
-  //   throw new Error(
-  //     `Push notifications require a physical device - ${deviceInfo.deviceBrand} ${deviceInfo.deviceType} (${deviceInfo.deviceName})`
-  //   );
-  // }
+  if (!Device.isDevice) {
+    AppToast.failed(
+      `Must use a physical device for push notifications ${JSON.stringify(deviceInfo)}`
+    );
+    trackLogRocketEvent("Device.Info", deviceInfo);
+    Logger.warn(
+      "Push",
+      "Must use a physical device for push notifications",
+      deviceInfo
+    );
+    return null;
+  }
 
   const { status: existingStatus } = await Notifications.getPermissionsAsync();
   const { status: finalStatus } =
@@ -107,8 +116,8 @@ export const registerForPushNotificationsAsync = async (
     return null;
   }
 
-  let apnDeviceToken: string = "";
-  let expoDeviceToken: string = "";
+  let apnDeviceToken: string | null = null;
+  let expoDeviceToken: string | null = null;
 
   Logger.error("4", 4);
   try {
@@ -136,9 +145,35 @@ export const registerForPushNotificationsAsync = async (
     });
     Logger.warn(
       "Push",
-      "Failed to get old Expo push token (pre SDK 49)",
-      error
+      "Failed to get Expo push token",
+      error?.message || error
     );
+    AppToast.failed(
+      "Unable to get Expo push token. Confirm FCM/APNs credentials and rebuild the app."
+    );
+    return null;
+  }
+
+  if (!expoDeviceToken) {
+    trackLogRocketEvent("Push.TokenFetchExpoFailed", {
+      projectId,
+      platform: Platform.OS,
+      deviceIsPhysical: Device.isDevice,
+      deviceName: Device.deviceName,
+      deviceType: Device.deviceType,
+      deviceBrand: Device.brand,
+      expoDeviceToken,
+      apnDeviceToken,
+      reason: "empty-expo-token",
+    });
+    Logger.warn("Push", "Expo push token was empty", {
+      projectId,
+      platform: Platform.OS,
+    });
+    AppToast.failed(
+      "Expo push token was empty. Rebuild the app after configuring FCM/APNs."
+    );
+    return null;
   }
 
   // try {
@@ -171,7 +206,7 @@ export const registerForPushNotificationsAsync = async (
   // const expoDeviceTokenPreview = `${apnDeviceToken.slice(0, 8)}...`;
   // const apnDeviceTokenPreview = `${expoDeviceToken.slice(0, 8)}...`;
   const expoDeviceTokenPreview = expoDeviceToken;
-  const apnDeviceTokenPreview = apnDeviceToken;
+  const apnDeviceTokenPreview = apnDeviceToken ?? "";
   Logger.info("Push", "Expo token acquired", {
     projectId,
     platform: Platform.OS,

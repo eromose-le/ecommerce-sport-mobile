@@ -122,8 +122,6 @@ const PushNotifications = () => {
         return;
       }
 
-      // AppToast.success(`EXPO TOKEN ${expoToken.data}`);
-      // Logger.warn("EXPO TOKEN", expoToken.data);
       await NotificationService.sendTestPush({
         title: "Sporty Galaxy test",
         body: "Push notifications are working.",

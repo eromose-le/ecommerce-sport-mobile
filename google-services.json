@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1002313721332",
+    "project_id": "sportygalaxy-test",
+    "storage_bucket": "sportygalaxy-test.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1002313721332:android:6233d9579cba683c0605a1",
+        "android_client_info": {
+          "package_name": "com.bazzcode.sportygalaxytest"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA-d6Ws0GUtcyyf_B7ulqI_ixm9nKzGhWo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

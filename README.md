@@ -65,6 +65,15 @@ npx eas-cli@latest build --platform all --auto-submit
 - BUILD apk
 eas build -p android --profile preview
 
+- REBUILD
+eas build --profile development --platform android
+> Swap development with preview or production, and use --platform ios (or --platform all) as needed.
+
+- EAS UI
+eas credentials -p android
+- remove fcm key
+- remove notifiction icon and color customization
+
 - LINK
 npx -y expo-doctor
 
